@@ -1,0 +1,13 @@
+{{- if .Values.engine.modelManager.volumes.aws.efs.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: aws-efs-sc
+  resources:
+    requests:
+      storage: 5Gi
+{{- end }}

@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.engine.namePrefix }}-config
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}} 
+    {{- range $key, $val := .Values.engine.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end}}
+data:
+  engine.toml: |
+    [license]
+      server_url = [
+        {{- if gt (int .Values.scaling.static.licenseProxy.replicas) 0 -}}
+        "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
+        {{- else -}}
+        "https://license.deepgram.com"
+        {{- end -}}
+      ]
+
+    [server]
+      host = "{{ .Values.engine.server.host }}"
+      port = {{ .Values.engine.server.port }}
+
+    [metrics_server]
+      host = "{{ .Values.engine.metricsServer.host }}"
+      port = {{ .Values.engine.metricsServer.port }}
+
+    [model_manager]
+      search_paths = [
+        {{- range $index, $element := .Values.engine.modelManager.searchPaths }}
+          {{- if ne $index 0}},{{ end }}"{{ $element }}"
+        {{- end -}}
+      ]
+
+    [features]
+      multichannel = {{ .Values.engine.features.multichannel }}
+      language_detection = {{ .Values.engine.features.languageDetection }}
+
+    [chunking.batch]
+      min_duration = {{ .Values.engine.chunking.batch.minDuration }}
+      max_duration = {{ .Values.engine.chunking.batch.maxDuration }}
+
+    [chunking.streaming]
+      min_duration = {{ .Values.engine.chunking.streaming.minDuration }}
+      max_duration = {{ .Values.engine.chunking.streaming.maxDuration }}
+      step = {{ .Values.engine.chunking.streaming.step }}
+
+    [half_precision]
+      state = "{{ .Values.engine.halfPrecision.state }}"
+

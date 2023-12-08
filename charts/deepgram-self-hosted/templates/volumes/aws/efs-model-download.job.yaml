@@ -1,0 +1,55 @@
+{{- if .Values.engine.modelManager.volumes.aws.efs.enabled }}
+{{- if .Values.engine.modelManager.models.links }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-models-download
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: model-download
+        image: alpine
+        command:
+          - /bin/sh
+          - -c
+          - |
+            LINKS=$(cat <<EOF
+            {{- range .Values.engine.modelManager.models.links }}
+            {{ . }}
+            {{- end }}
+            EOF
+            )
+            TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
+            
+            echo "$LINKS" | while IFS= read -r link; do
+              FILE_NAME=$(basename "$link")
+              
+              if [ "{{ .Values.engine.modelManager.volumes.aws.efs.forceDownload }}" == "true" ]; then
+                printf "[%s] [INFO] Force downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                wget -O "/mnt/efs/$FILE_NAME" "$link"
+                printf "[%s] [INFO] Downloaded model file (force download): %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+              elif [ ! -f "/mnt/efs/$FILE_NAME" ]; then
+                printf "[%s] [INFO] Downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                wget -O "/mnt/efs/$FILE_NAME" "$link"
+                printf "[%s] [INFO] Downloaded model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+              else
+                printf "[%s] [INFO] Model file already exists in EFS storage: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+              fi
+            done
+        volumeMounts:
+          - name: aws-efs-volume
+            mountPath: /mnt/efs
+      restartPolicy: OnFailure
+      volumes:
+        - name: aws-efs-volume
+          persistentVolumeClaim:
+            claimName: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
+{{- end }}
+{{- end }}
+

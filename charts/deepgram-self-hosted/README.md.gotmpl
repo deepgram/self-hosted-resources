@@ -1,0 +1,43 @@
+{{ template "chart.header" . }}
+{{ template "chart.deprecationWarning" . }}
+
+{{ template "chart.badgesSection" . }}
+
+{{ template "chart.description" . }}
+
+{{ template "chart.homepageLine" . }}
+
+{{ template "chart.sourcesSection" . }}
+
+{{ template "chart.requirementsSection" . }}
+
+## Get Repository Info
+
+```bash
+helm repo add deepgram https://deepgram.github.io/helm-charts
+helm repo update
+```
+
+## Installing the Chart
+
+The Deepgram self-hosted chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
+
+You will need to provide your [self-service Deepgram licensing and credentials](https://developers.deepgram.com/docs/on-prem-self-service-tutorial) information. You may pass this via a custom YAML file. See the [sample file](./sample.values.yaml) for an example. 
+
+You may also override any default configuration values. See [the Values section](#values) for a list of available options.
+
+```
+helm install -f myValues.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted
+```
+
+## Uninstalling the Chart
+
+```bash
+helm uninstall [RELEASE_NAME]
+```
+
+This removes all the Kubernetes components associated with the chart and deletes the release.
+
+{{ template "chart.valuesSection" . }}
+
+{{ template "chart.maintainersSection" . }}

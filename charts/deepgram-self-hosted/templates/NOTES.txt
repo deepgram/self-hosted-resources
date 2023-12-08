@@ -1,0 +1,4 @@
+This is an alpha Helm chart for Deepgram self-hosted deployments.
+
+Please refer to Deepgram's self-hosted documentation for further details:
+* https://developers.deepgram.com/docs/on-prem-introduction
