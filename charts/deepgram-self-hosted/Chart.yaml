@@ -1,7 +1,7 @@
 apiVersion: v2
 name: deepgram-self-hosted
 type: application
-version: 0.1.0
+version: 0.1.1
 appVersion: "release-240426"
 description: A Helm chart for running Deepgram services in a self-hosted environment
 home: "https://developers.deepgram.com/docs/on-prem-introduction"
