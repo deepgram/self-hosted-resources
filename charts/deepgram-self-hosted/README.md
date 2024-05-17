@@ -114,6 +114,12 @@ This removes all the Kubernetes components associated with the chart and deletes
 | engine.modelManager.volumes.aws.efs.forceDownload | bool | `false` | Whether to force a fresh download of all model links provided, even if models are already present in EFS. |
 | engine.modelManager.volumes.aws.efs.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in AWS EFS. |
 | engine.modelManager.volumes.customVolumeClaim | string | `nil` | You may manually create your own volume and volume claim to store and expose model files to the Deepgram Engine. Configure your storage beforehand, and insert the name of your VolumeClaim here. Note: Make sure the PV and PVC accessMode is set to `readWriteMany` or `readOnlyMany` |
+| engine.modelManager.volumes.gcp.gpd.enabled | bool | `false` | Whether to use an [GKE Persistent Disks](https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes) to store Deepgram models for use by Engine containers. This option requires your cluster to be running in [GCP GKE](https://cloud.google.com/kubernetes-engine). See the GKE documentation on [using pre-existing persistent disks](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd). |
+| engine.modelManager.volumes.gcp.gpd.fsType | string | `"ext"` |  |
+| engine.modelManager.volumes.gcp.gpd.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in GCP GPD. |
+| engine.modelManager.volumes.gcp.gpd.storageCapacity | string | `"40G"` | The size of your pre-existing persistent disk. |
+| engine.modelManager.volumes.gcp.gpd.storageClassName | string | `"standard-rwo"` | The storageClassName of the existing persistent disk. |
+| engine.modelManager.volumes.gcp.gpd.volumeHandle | string | `""` | The identifier of your pre-existing persistent disk. The format is projects/{project_id}/zones/{zone_name}/disks/{disk_name} for Zonal persistent disks, or projects/{project_id}/regions/{region_name}/disks/{disk_name} for Regional persistent disks. |
 | engine.namePrefix | string | `"deepgram-engine"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Engine containers. |
 | engine.readinessProbe | object | `` | Readiness probe customization for Engine pods. |
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#engine) for more details. |

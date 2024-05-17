@@ -97,4 +97,6 @@ spec:
           claimName: {{ .Values.engine.modelManager.volumes.customVolumeClaim }}
           {{- else if .Values.engine.modelManager.volumes.aws.efs.enabled }}
           claimName: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
+          {{- else if .Values.engine.modelManager.volumes.gcp.gpd.enabled }}
+          claimName: {{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gpd-pvc
           {{- end }}

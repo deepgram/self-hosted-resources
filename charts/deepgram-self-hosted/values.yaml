@@ -375,6 +375,26 @@ engine:
           # -- Whether to force a fresh download of all model links provided,
           # even if models are already present in EFS.
           forceDownload: false
+      gcp:
+        gpd:
+          # -- Whether to use an [GKE Persistent Disks](https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes)
+          # to store Deepgram models for use by Engine containers.
+          # This option requires your cluster to be running in
+          # [GCP GKE](https://cloud.google.com/kubernetes-engine).
+          # See the GKE documentation on
+          # [using pre-existing persistent disks](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd).
+          enabled: false
+          # -- Name prefix for the resources associated with the model storage in GCP GPD.
+          namePrefix: dg-models
+          # -- The storageClassName of the existing persistent disk.
+          storageClassName: "standard-rwo"
+          # -- The size of your pre-existing persistent disk.
+          storageCapacity: "40G"
+          # -- The identifier of your pre-existing persistent disk.
+          # The format is projects/{project_id}/zones/{zone_name}/disks/{disk_name} for Zonal persistent disks,
+          # or projects/{project_id}/regions/{region_name}/disks/{disk_name} for Regional persistent disks.
+          volumeHandle: ""
+          fsType: "ext"
 
     models:
       # -- Links to your Deepgram models, if automatically downloading
