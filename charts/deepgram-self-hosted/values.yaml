@@ -63,9 +63,6 @@ api:
   # -- Additional labels to add to API resources
   additionalLabels: {}
 
-  # -- Labels to use as a node selection constraint
-  nodeSelector: {}
-
   updateStrategy:
     rollingUpdate:
       # -- The maximum number of API pods, relative to the number of replicas,
@@ -90,6 +87,39 @@ api:
     limits:
       memory: "7800Ki"
       cpu: "3000m"
+
+  # -- Readiness probe customization for API pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for API pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for API pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to API pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram API Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the API component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the API deployment.
+    name:
 
   # -- Configure how the API will listen for your requests
   # @default -- ``
@@ -213,9 +243,6 @@ engine:
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
 
-  # -- Labels to use as a node selection constraint
-  nodeSelector: {}
-
   updateStrategy:
     rollingUpdate:
       # -- The maximum number of Engine pods, relative to the number of replicas,
@@ -261,6 +288,39 @@ engine:
     # -- failureThreshold defines how many unsuccessful startup probe attempts
     # are allowed before the container will be marked as Failed
     failureThreshold: 60
+
+  # -- Readiness probe customization for Engine pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Engine pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for Engine pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to Engine pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the Engine component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the Engine deployment.
+    name:
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``
@@ -383,9 +443,6 @@ licenseProxy:
   # -- Additional labels to add to License Proxy resources
   additionalLabels: {}
 
-  # -- Labels to use as a node selection constraint
-  nodeSelector: {}
-
   updateStrategy:
     # -- For the LicenseProxy, we only expose maxSurge and not maxUnavailable.
     # This is to avoid accidentally having all LicenseProxy nodes go offline during upgrades,
@@ -409,6 +466,39 @@ licenseProxy:
     limits:
       memory: "8Gi"
       cpu: "2000m"
+
+  # -- Readiness probe customization for License Proxy pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Proxy pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for License Proxy pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to License Proxy pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram License Proxy Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the LicenseProxy component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the License Proxy deployment.
+    name:
 
   # -- Configure how the license proxy will listen for licensing requests.
   # @default -- ``

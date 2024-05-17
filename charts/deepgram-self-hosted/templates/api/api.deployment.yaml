@@ -26,12 +26,13 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.global.outstandingRequestGracePeriod }}
       imagePullSecrets:
       - name: {{ required "Missing image repository credentials - see `global.pullSecretRef`" .Values.global.pullSecretRef }}
-      {{- with .Values.api.nodeSelector }}
-      {{- if . }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- end }}
+      affinity:
+        {{- toYaml .Values.api.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.api.tolerations | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+      serviceAccountName: {{ default (printf "%s-sa" .Values.api.namePrefix) .Values.api.serviceAccount.name }}
       containers:
       - name: {{ .Values.api.namePrefix }}
         image: {{ .Values.api.image.path }}:{{ .Values.api.image.tag }}
@@ -57,14 +58,18 @@ spec:
         livenessProbe:
           tcpSocket:
             port: {{ .Values.api.server.port }}
-          initialDelaySeconds: 5
+          initialDelaySeconds: {{ .Values.api.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.api.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.api.livenessProbe.timeoutSeconds }}
         readinessProbe:
           exec:
             command:
             - sh
             - -c
             - curl --silent --insecure http{{ if and (.Values.api.server.https.certFile) (.Values.api.server.https.keyFile) }}s{{ end }}://localhost:{{ .Values.api.server.port }}{{ if not (regexMatch `^\/` .Values.api.server.baseUrl) }}/{{ end }}{{ .Values.api.server.baseUrl}}/status/engine | grep --quiet -e '^{\"engine_connection_status\"\:\"Connected\".*}$'
-          initialDelaySeconds: 5
+          initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
       volumes:
       - name: api-config-volume
         configMap:

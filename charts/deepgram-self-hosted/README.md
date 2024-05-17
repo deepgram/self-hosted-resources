@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240426](https://img.shields.io/badge/AppVersion-release--240426-informational?style=flat-square)
+![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240426](https://img.shields.io/badge/AppVersion-release--240426-informational?style=flat-square)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -50,6 +50,7 @@ This removes all the Kubernetes components associated with the chart and deletes
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
+| api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
 | api.concurrencyLimit.activeRequests | string | `nil` | activeRequests limits the number of active requests handled by a single API container. If additional requests beyond the limit are sent, API will return a 429 HTTP status code. Set to an integer if desired, otherwise the `nil` default means no limit will be set. |
 | api.driverPool | object | `` | driverPool configures the backend pool of speech engines (generically referred to as "drivers" here). The API will load-balance among drivers in the standard pool; if one standard driver fails, the next one will be tried. |
 | api.driverPool.standard | object | `` | standard is the main driver pool to use. |
@@ -64,12 +65,14 @@ This removes all the Kubernetes components associated with the chart and deletes
 | api.image.path | string | `"quay.io/deepgram/onprem-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
 | api.image.tag | string | `"release-240426"` | tag defines which Deepgram release to use for API containers |
+| api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
-| api.nodeSelector | object | `{}` | Labels to use as a node selection constraint |
+| api.readinessProbe | object | `` | Readiness probe customization for API pods. |
 | api.resolver | object | `` | Specify custom DNS resolution options. |
 | api.resolver.maxTTL | int | `nil` | maxTTL sets the DNS TTL value if specifying a custom DNS nameserver. |
 | api.resolver.nameservers | list | `[]` | nameservers allows for specifying custom domain name server(s). A valid list item's format is "{IP} {PORT} {PROTOCOL (tcp or udp)}", e.g. `"127.0.0.1 53 udp"`. |
 | api.resources | object | `` | Configure resource limits per API container. See [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#api) for more details. |
+| api.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
 | api.server | object | `` | Configure how the API will listen for your requests |
 | api.server.callbackConnTimeout | string | `"1s"` | callbackConnTimeout configures how long to wait for a connection to a callback URL. See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback) for more details. The value should be a humantime duration. |
 | api.server.callbackTimeout | string | `"10s"` | callbackTimeout configures how long to wait for a response from a callback URL. See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback) for more details. The value should be a humantime duration. |
@@ -80,9 +83,11 @@ This removes all the Kubernetes components associated with the chart and deletes
 | api.server.https.certFile | string | `nil` | certFile is the host path to the public certificate |
 | api.server.https.keyFile | string | `nil` | keyFile is the host path to the private key for your certificate |
 | api.server.port | int | `8080` | port to listen on. |
+| api.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to API pods. |
 | api.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra API pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | api.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of API pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
+| engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
 | engine.chunking | object | `` | chunking defines the size of STT audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
 | engine.chunking.batch.maxDuration | float | `10` | minDuration is the maximum audio duration for a STT chunk size for a batch request |
 | engine.chunking.batch.minDuration | float | `7` | minDuration is the minimum audio duration for a STT chunk size for a batch request |
@@ -96,6 +101,7 @@ This removes all the Kubernetes components associated with the chart and deletes
 | engine.image.path | string | `"quay.io/deepgram/onprem-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
 | engine.image.tag | string | `"release-240426"` | tag defines which Deepgram release to use for Engine containers |
+| engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
 | engine.metricsServer | object | `` | metricsServer exposes an endpoint on each Engine container for reporting inference-specific system metrics. See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine for more details. |
 | engine.metricsServer.host | string | `"0.0.0.0"` | host is the IP address to listen on for metrics requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.metricsServer.port | int | `9991` | port to listen on for metrics requests |
@@ -107,16 +113,18 @@ This removes all the Kubernetes components associated with the chart and deletes
 | engine.modelManager.volumes.aws.efs.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in AWS EFS. |
 | engine.modelManager.volumes.customVolumeClaim | string | `nil` | You may manually create your own volume and volume claim to store and expose model files to the Deepgram Engine. Configure your storage beforehand, and insert the name of your VolumeClaim here. Note: Make sure the PV and PVC accessMode is set to `readWriteMany` or `readOnlyMany` |
 | engine.namePrefix | string | `"deepgram-engine"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Engine containers. |
-| engine.nodeSelector | object | `{}` | Labels to use as a node selection constraint |
+| engine.readinessProbe | object | `` | Readiness probe customization for Engine pods. |
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
 | engine.resources.requests.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
+| engine.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.server.port | int | `8080` | port to listen on for inference requests |
 | engine.startupProbe | object | `` | The startupProbe combination of `periodSeconds` and `failureThreshold` allows time for the container to load all models and start listening for incoming requests.  Model load time can be affected by hardware I/O speeds, as well as network speeds if you are using a network volume mount for the models.  If you are hitting the failure threshold before models are finished loading, you may want to extend the startup probe. However, this will also extend the time it takes to detect a pod that can't establish a network connection to validate its license. |
 | engine.startupProbe.failureThreshold | int | `60` | failureThreshold defines how many unsuccessful startup probe attempts are allowed before the container will be marked as Failed |
 | engine.startupProbe.periodSeconds | int | `10` | periodSeconds defines how often to execute the probe. |
+| engine.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to Engine pods. |
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
@@ -131,17 +139,21 @@ This removes all the Kubernetes components associated with the chart and deletes
 | gpu-operator.toolkit.version | string | `"v1.15.0-ubi8"` | NVIDIA container toolkit to install. The default `ubuntu` image tag for the toolkit requires a dynamic runtime link to a version of GLIBC that may not be present on nodes running older Linux distribution releases, such as Ubuntu 22.04. Therefore, we specify the `ubi8` image, which statically links the GLIBC library and avoids this issue. |
 | licenseProxy | object | `` | Configuration options for the optional [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy). |
 | licenseProxy.additionalLabels | object | `{}` | Additional labels to add to License Proxy resources |
+| licenseProxy.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for License Proxy pods. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/onprem-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
 | licenseProxy.image.tag | string | `"release-240426"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
-| licenseProxy.nodeSelector | object | `{}` | Labels to use as a node selection constraint |
+| licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
+| licenseProxy.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
 | licenseProxy.server | object | `` | Configure how the license proxy will listen for licensing requests. |
 | licenseProxy.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
 | licenseProxy.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | licenseProxy.server.port | int | `8443` | port to listen on. |
 | licenseProxy.server.statusPort | int | `8080` | statusPort is the port to listen on for the status/health endpoint. |
+| licenseProxy.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to License Proxy pods. |
 | licenseProxy.updateStrategy.rollingUpdate | object | `` | For the LicenseProxy, we only expose maxSurge and not maxUnavailable. This is to avoid accidentally having all LicenseProxy nodes go offline during upgrades, which could impact the entire cluster's connection to the Deepgram License Server. |
 | licenseProxy.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra License Proxy pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | scaling | object | `` | Configuration options for horizontal scaling of Deepgram services. |

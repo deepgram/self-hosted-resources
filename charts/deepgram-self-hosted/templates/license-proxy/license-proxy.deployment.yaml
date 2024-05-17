@@ -26,12 +26,13 @@ spec:
     spec:
       imagePullSecrets:
       - name: {{ required "Missing image repository credentials - see `global.pullSecretRef`" .Values.global.pullSecretRef }}
-      {{- with .Values.licenseProxy.nodeSelector }}
-      {{- if . }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- end }}
+      affinity:
+        {{- toYaml .Values.licenseProxy.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+      serviceAccountName: {{ default (printf "%s-sa" .Values.licenseProxy.namePrefix) .Values.licenseProxy.serviceAccount.name }}
       containers:
       - name: {{ .Values.licenseProxy.namePrefix }}
         image: {{ .Values.licenseProxy.image.path }}:{{ .Values.licenseProxy.image.tag }}
@@ -59,14 +60,18 @@ spec:
         livenessProbe:
           tcpSocket:
             port: {{ .Values.licenseProxy.server.statusPort }}
-          initialDelaySeconds: 5
+          initialDelaySeconds: {{ .Values.licenseProxy.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.licenseProxy.livenessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.licenseProxy.livenessProbe.timeoutSeconds }}
         readinessProbe:
           exec:
             command:
             - sh
             - -c
             - curl --silent http://localhost:{{ .Values.licenseProxy.server.statusPort }}/v1/status | grep --quiet -e '^{.*\"state\"\:\"\(Connected\|TrustBased\)\".*}$'
-          initialDelaySeconds: 5
+          initialDelaySeconds: {{ .Values.licenseProxy.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.licenseProxy.readinessProbe.periodSeconds }}
+          timeoutSeconds: {{ .Values.licenseProxy.readinessProbe.timeoutSeconds }}
       volumes:
       - name: license-proxy-config-volume
         configMap:

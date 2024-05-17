@@ -26,12 +26,13 @@ spec:
       terminationGracePeriodSeconds: {{ .Values.global.outstandingRequestGracePeriod }}
       imagePullSecrets:
       - name: {{ required "Missing image repository credentials - see `global.pullSecretRef`" .Values.global.pullSecretRef }}
-      {{- with .Values.engine.nodeSelector }}
-      {{- if . }}
-      nodeSelector:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
-      {{- end }}
+      affinity:
+        {{- toYaml .Values.engine.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.engine.tolerations | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+      serviceAccountName: {{ default (printf "%s-sa" .Values.engine.namePrefix) .Values.engine.serviceAccount.name }}
       containers:
       - name: {{ .Values.engine.namePrefix }}
         image: {{ .Values.engine.image.path }}:{{ .Values.engine.image.tag }}
@@ -77,9 +78,15 @@ spec:
         livenessProbe:
           tcpSocket:
             port: {{ .Values.engine.server.port }}
+            initialDelaySeconds: {{ .Values.engine.livenessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.engine.livenessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.engine.livenessProbe.failureThreshold }}
         readinessProbe:
           tcpSocket:
             port: {{ .Values.engine.server.port }}
+            initialDelaySeconds: {{ .Values.engine.readinessProbe.initialDelaySeconds }}
+            periodSeconds: {{ .Values.engine.readinessProbe.periodSeconds }}
+            failureThreshold: {{ .Values.engine.readinessProbe.failureThreshold }}
       volumes:
       - name: engine-config-volume
         configMap:
