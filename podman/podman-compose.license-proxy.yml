@@ -1,0 +1,107 @@
+# Make sure to replace placeholder paths to config files and model directories
+
+version: "3.7"
+
+services:
+  # The speech API service.
+  api:
+    image: quay.io/deepgram/onprem-api:release-240426
+
+    # Here we expose the API port to the host machine. The container port
+    # (right-hand side) must match the port that the API service is listening
+    # on (from its configuration file).
+    ports:
+      - "8080:8080"
+
+    # Make sure you `export` your on-prem API key secret in your local environment
+    environment:
+      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path. It must match the path
+    #     specified in the `command` header below.
+    volumes:
+      - "/path/to/api.toml:/api.toml:ro,Z"
+
+    # Invoke the API server
+    command: -v serve /api.toml
+
+    # Default resource limits. Increase as needed.
+    # For more details, see:
+    #     https://developers.deepgram.com/docs/on-prem-deployment-environments#hardware-specifications
+    deploy:
+      resources:
+        limits:
+          cpus: "1.80"
+          memory: 3800M
+
+  # The speech engine service.
+  engine:
+    image: quay.io/deepgram/onprem-engine:release-240426
+
+    # Utilize a GPU, if available.
+    devices:
+      - nvidia.com/gpu=all
+
+    ports:
+      - "9991:9991"
+
+    # Make sure you `export` your on-prem API key secret in your local environment
+    environment:
+      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path.
+    volumes:
+      # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
+      - "/path/to/models:/models:ro,Z"
+      # In-container config path below must match the path specified in the `command` header below.
+      - "/path/to/engine.toml:/engine.toml:ro,Z"
+
+    # Invoke the Engine service
+    command: -v serve /engine.toml
+
+    # Default resource limits. Increase as needed.
+    # For more details, see:
+    #     https://developers.deepgram.com/docs/on-prem-deployment-environments#hardware-specifications
+    deploy:
+      resources:
+        limits:
+          cpus: "3.80"
+          memory: 30G
+        reservations:
+          devices:
+            - capabilities: ["gpu"]
+              count: 1
+
+  # The service to validate your Deepgram license
+  license-proxy:
+    image: quay.io/deepgram/onprem-license-proxy:release-240426
+
+    # Here we expose the License Proxy status port to the host machine. The container port
+    # (right-hand side) must match the port that the License Proxy service is listening
+    # on (from its configuration file).
+    ports:
+      - "8089:8080"
+
+    # Make sure you `export` your on-prem API key secret in your local environment
+    environment:
+      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path. It must match the path
+    #     specified in the `command` header below.
+    volumes:
+      - "/path/to/license-proxy.toml:/license-proxy.toml:ro,Z"
+
+    # Invoke the License Proxy service
+    command: -v serve /license-proxy.toml
+
+    # Default resource limits. Increase as needed.
+    # For more details, see:
+    #     https://developers.deepgram.com/docs/on-prem-deployment-environments#hardware-specifications
+    deploy:
+      resources:
+        limits:
+          cpus: "1.00"
+          memory: 1G
