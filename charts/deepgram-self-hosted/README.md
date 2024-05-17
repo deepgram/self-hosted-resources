@@ -169,10 +169,10 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
 | engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
 | engine.chunking | object | `` | chunking defines the size of STT audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
-| engine.chunking.batch.maxDuration | float | `10` | minDuration is the maximum audio duration for a STT chunk size for a batch request |
-| engine.chunking.batch.minDuration | float | `7` | minDuration is the minimum audio duration for a STT chunk size for a batch request |
-| engine.chunking.streaming.maxDuration | float | `5` | minDuration is the maximum audio duration for a STT chunk size for a streaming request |
-| engine.chunking.streaming.minDuration | float | `3` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
+| engine.chunking.batch.maxDuration | string | `nil` | minDuration is the maximum audio duration for a STT chunk size for a batch request |
+| engine.chunking.batch.minDuration | string | `nil` | minDuration is the minimum audio duration for a STT chunk size for a batch request |
+| engine.chunking.streaming.maxDuration | string | `nil` | minDuration is the maximum audio duration for a STT chunk size for a streaming request |
+| engine.chunking.streaming.minDuration | string | `nil` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
 | engine.chunking.streaming.step | float | `1` | step defines how often to return interim results, in seconds. This value may be lowered to increase the frequency of interim results. However, this also causes a significant decrease in the number of concurrent streams supported by a single GPU. Please contact your Deepgram Account representative for more details. |
 | engine.features | object | `` | Enable ancillary features |
 | engine.features.languageDetection | bool | `true` | languageDetection enables Deepgram language detection *if* a valid language detection model is available |

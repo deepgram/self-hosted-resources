@@ -420,14 +420,14 @@ engine:
   chunking:
     batch:
       # -- minDuration is the minimum audio duration for a STT chunk size for a batch request
-      minDuration: 7.0
+      minDuration:
       # -- minDuration is the maximum audio duration for a STT chunk size for a batch request
-      maxDuration: 10.0
+      maxDuration:
     streaming:
       # -- minDuration is the minimum audio duration for a STT chunk size for a streaming request
-      minDuration: 3.0
+      minDuration:
       # -- minDuration is the maximum audio duration for a STT chunk size for a streaming request
-      maxDuration: 5.0
+      maxDuration:
       # -- step defines how often to return interim results, in seconds.
       # This value may be lowered to increase the frequency of interim results.
       # However, this also causes a significant decrease in the number of concurrent
