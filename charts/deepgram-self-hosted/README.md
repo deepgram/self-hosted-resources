@@ -29,13 +29,33 @@ helm repo update
 
 The Deepgram self-hosted chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
 
-You will need to provide your [self-service Deepgram licensing and credentials](https://developers.deepgram.com/docs/on-prem-self-service-tutorial) information. You may pass this via a custom YAML file. See the [sample file](./sample.values.yaml) for an example.
+You will need to provide your [self-service Deepgram licensing and credentials](https://developers.deepgram.com/docs/on-prem-self-service-tutorial) information. See `global.deepgramSecretRef` and `global.pullSecretRef` in the [Values section](#values) for more details.
 
-You may also override any default configuration values. See [the Values section](#values) for a list of available options.
+You may also override any default configuration values. See [the Values section](#values) for a list of available options, and the [sample values file](./sample.values.yaml) for an example of a standard install.
 
 ```
-helm install -f myValues.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted
+helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 10m
 ```
+
+## Upgrade and Rollback Strategies
+
+To upgrade the Deepgram components to a new version, follow these steps:
+
+1. Update the various `image.tag` values in the `values.yaml` file to the desired version.
+
+2. Run the Helm upgrade command:
+
+    ```bash
+    helm upgrade -f my-values.yaml deepgram deepgram/deepgram-self-hosted --atomic --timeout 20m
+    ```
+
+If you encounter any issues during the upgrade process, you can perform a rollback to the previous version:
+
+```bash
+helm rollback deepgram
+```
+
+Before upgrading, ensure that you have reviewed the release notes and any migration guides provided by Deepgram for the specific version you are upgrading to.
 
 ## Uninstalling the Chart
 
@@ -44,6 +64,64 @@ helm uninstall [RELEASE_NAME]
 ```
 
 This removes all the Kubernetes components associated with the chart and deletes the release.
+
+## Persistent Storage Options
+
+The Deepgram Helm chart supports different persistent storage options for storing Deepgram models and data. The available options include:
+
+- AWS Elastic File System (EFS)
+- Google Cloud Persistent Disk (GPD)
+- Custom PersistentVolumeClaim (PVC)
+
+To configure a specific storage option, see the `engine.modelManager.volumes` [configuration values](#values). Make sure to provide the necessary configuration values for the selected storage option, such as the EFS file system ID or the GPD disk type and size.
+
+For detailed instructions on setting up and configuring each storage option, refer to the respective cloud provider's documentation.
+
+## RBAC Configuration
+
+Role-Based Access Control (RBAC) is used to control access to Kubernetes resources based on the roles and permissions assigned to users or service accounts. The Deepgram Helm chart includes default RBAC roles and bindings for the API, Engine, and License Proxy components.
+
+To use custom RBAC roles and bindings based on your specific security requirements, you can individually specify pre-existing ServiceAccounts to bind to each deployment by specifying the following options:
+
+```
+{api|engine|licenseProxy}.serviceAccount.create=false
+{api|engine|licenseProxy}.serviceAccount.name=<your-pre-existing-sa>
+```
+
+Make sure to review and adjust the RBAC configuration according to the principle of least privilege, granting only the necessary permissions for each component.
+
+## Secret Management
+
+The Deepgram Helm chart takes references to two existing secrets - one containing your distribution credentials to pull container images from Deepgram's image repository, and one containing your Deepgram onprem API key.
+
+Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+
+## Troubleshooting
+
+If you encounter issues while deploying or using Deepgram, consider the following troubleshooting steps:
+
+1. Check the pod status and logs:
+   - Use `kubectl get pods` to check the status of the Deepgram pods.
+   - Use `kubectl logs <pod-name>` to view the logs of a specific pod.
+
+2. Verify resource availability:
+   - Ensure that the cluster has sufficient CPU, memory, and storage resources to accommodate the Deepgram components.
+   - Check for any resource constraints or limits imposed by the namespace or the cluster.
+
+3. Review the Kubernetes events:
+   - Use `kubectl get events` to view any events or errors related to the Deepgram deployment.
+
+4. Check the network connectivity:
+   - Verify that the Deepgram components can communicate with each other and with the Deepgram license server (license.deepgram.com).
+   - Check the network policies and firewall rules to ensure that the necessary ports and protocols are allowed.
+
+5. Collect diagnostic information:
+   - Gather relevant logs and metrics.
+   - Export your existing Helm chart values:
+       ```bash
+       helm get values [RELEASE_NAME] > my-deployed-values.yaml
+       ```
+   - Reach out to the Deepgram support team, providing the collected diagnostic information for assistance.
 
 ## Values
 

@@ -5,7 +5,10 @@
 global:
   # pullSecretRef should refer to a K8s secret that
   # must be created prior to installing this Chart.
-  # You can do so with the following commands:
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
   # ```bash
   # docker login quay.io
   # kubectl create secret generic dg-regcred \
@@ -16,7 +19,10 @@ global:
 
   # deepgramSecretRef should refer to a K8s secret that
   # must be created prior to installing this Chart.
-  # You can do so with the following command:
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram onprem API key
+  # with the following command:
   # ```bash
   # kubectl create secret generic dg-onprem-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
   # ```
