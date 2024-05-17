@@ -82,10 +82,10 @@ api:
   # @default -- ``
   resources:
     requests:
-      memory: "3800Ki"
+      memory: "3800Mi"
       cpu: "1800m"
     limits:
-      memory: "7800Ki"
+      memory: "7800Mi"
       cpu: "3000m"
 
   # -- Readiness probe customization for API pods.
@@ -482,7 +482,7 @@ licenseProxy:
   resources:
     requests:
       memory: "1Gi"
-      cpu: "900m"
+      cpu: "1000m"
     limits:
       memory: "8Gi"
       cpu: "2000m"
