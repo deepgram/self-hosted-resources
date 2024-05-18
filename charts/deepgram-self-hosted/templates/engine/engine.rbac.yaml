@@ -1,4 +1,4 @@
-{{- if .Values.engine.serviceAccount.enabled }}
+{{- if .Values.engine.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -21,7 +21,7 @@ rules:
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["services"]
-    resourceNames: [{{- if gt (.Values.scaling.static.licenseProxy.replicas) 0 -}}"{{ .Values.licenseProxy.namePrefix }}-internal"{{- end -}}]
+    resourceNames: [{{- if gt (int .Values.scaling.static.licenseProxy.replicas) 0 -}}"{{ .Values.licenseProxy.namePrefix }}-internal"{{- end -}}]
     verbs: ["get"]
   - apiGroups: [""]
     resources: ["persistentvolumeclaims"]

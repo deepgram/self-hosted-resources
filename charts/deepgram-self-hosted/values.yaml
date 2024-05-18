@@ -536,8 +536,11 @@ licenseProxy:
     statusPort: 8080
 
 # -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
+# You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.
 gpu-operator:
   # -- Whether to install the NVIDIA GPU Operator to manage driver and/or container toolkit installation.
+  # See the list of [supported Operating Systems](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#supported-operating-systems-and-kubernetes-platforms)
+  # to verify compatibility with your cluster/nodes. Disable this option if your cluster/nodes are not compatible.
   # If disabled, you will need to self-manage NVIDIA software installation on all nodes where you want
   # to schedule Deepgram Engine pods.
   enabled: true

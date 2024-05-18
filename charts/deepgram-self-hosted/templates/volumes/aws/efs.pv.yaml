@@ -17,5 +17,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   csi:
     driver: efs.csi.aws.com
-    volumeHandle: {{ required "Missing AWS EFS fileSystemId see `.engine.modelManager.volumes.aws.efs`" .Values.engine.modelManager.volumes.aws.efs.fileSystemId }}
+    volumeHandle: {{ required "Missing AWS EFS fileSystemId, see `.engine.modelManager.volumes.aws.efs`" .Values.engine.modelManager.volumes.aws.efs.fileSystemId }}
 {{- end }}

@@ -78,15 +78,15 @@ spec:
         livenessProbe:
           tcpSocket:
             port: {{ .Values.engine.server.port }}
-            initialDelaySeconds: {{ .Values.engine.livenessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.engine.livenessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.engine.livenessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.engine.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.engine.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.engine.livenessProbe.failureThreshold }}
         readinessProbe:
           tcpSocket:
             port: {{ .Values.engine.server.port }}
-            initialDelaySeconds: {{ .Values.engine.readinessProbe.initialDelaySeconds }}
-            periodSeconds: {{ .Values.engine.readinessProbe.periodSeconds }}
-            failureThreshold: {{ .Values.engine.readinessProbe.failureThreshold }}
+          initialDelaySeconds: {{ .Values.engine.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.engine.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.engine.readinessProbe.failureThreshold }}
       volumes:
       - name: engine-config-volume
         configMap:
