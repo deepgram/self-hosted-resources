@@ -1,0 +1,39 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: deepgram-self-hosted
+  region: us-west-2
+  version: "1.29"
+
+managedNodeGroups:
+  - name: engine-node-group
+    minSize: 1
+    maxSize: 1
+    desiredCapacity: 1
+    instanceType: g6.2xlarge
+    amiFamily: AmazonLinux2023
+    labels: { deepgram/nodeType: deepgram-engine }
+    securityGroups:
+      attachIDs: ["SG_PLACEHOLDER"]
+    iam:
+      withAddonPolicies:
+        efs: true
+    taints:
+      - key: efs.csi.aws.com/agent-not-ready
+        value: "true"
+        effect: NoExecute
+  - name: api-node-group
+    minSize: 1
+    maxSize: 1
+    desiredCapacity: 1
+    instanceType: c5n.xlarge
+    amiFamily: AmazonLinux2023
+    labels: { deepgram/nodeType: deepgram-api }
+  - name: license-proxy-node-group
+    minSize: 1
+    maxSize: 1
+    desiredCapacity: 1
+    instanceType: t3.large
+    amiFamily: AmazonLinux2023
+    labels: { deepgram/nodeType: deepgram-license-proxy }
