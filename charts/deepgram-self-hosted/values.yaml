@@ -15,7 +15,7 @@ global:
   pullSecretRef:
 
   # -- deepgramSecretRef is the name of the pre-configured K8s
-  # Secret containing your Deepgram onprem API key. See chart
+  # Secret containing your Deepgram self-hosted API key. See chart
   # docs for more details.
   deepgramSecretRef:
 
@@ -54,7 +54,7 @@ api:
     # -- path configures the image path to use for creating API containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-api
+    path: quay.io/deepgram/self-hosted-api
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
@@ -234,7 +234,7 @@ engine:
     # -- path configures the image path to use for creating Engine containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-engine
+    path: quay.io/deepgram/self-hosted-engine
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
@@ -453,7 +453,7 @@ licenseProxy:
     # -- path configures the image path to use for creating License Proxy containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-license-proxy
+    path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
     tag: release-240426
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram

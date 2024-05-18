@@ -92,7 +92,7 @@ Make sure to review and adjust the RBAC configuration according to the principle
 
 ## Secret Management
 
-The Deepgram Helm chart takes references to two existing secrets - one containing your distribution credentials to pull container images from Deepgram's image repository, and one containing your Deepgram onprem API key.
+The Deepgram Helm chart takes references to two existing secrets - one containing your distribution credentials to pull container images from Deepgram's image repository, and one containing your Deepgram self-hosted API key.
 
 Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
 
@@ -140,7 +140,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.diskBufferPath | string | `nil` | If API is receiving requests faster than Engine can process them, a request queue will form. By default, this queue is stored in memory. Under high load, the queue may grow too large and cause Out-Of-Memory errors. To avoid this, set a diskBufferPath to buffer the overflow on the request queue to disk.  WARN: This is only to temporarily buffer requests during high load. If there is not enough Engine capacity to process the queued requests over time, the queue (and response time) will grow indefinitely. |
 | api.features.summarization | bool | `true` | summarization enable summarization *if* a valid summarization model is available. |
 | api.features.topicDetection | bool | `true` | topicDetection enables topic detection *if* a valid topic detection model is available. |
-| api.image.path | string | `"quay.io/deepgram/onprem-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
+| api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
 | api.image.tag | string | `"release-240426"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
@@ -178,7 +178,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.features.languageDetection | bool | `true` | languageDetection enables Deepgram language detection *if* a valid language detection model is available |
 | engine.features.multichannel | bool | `true` | multichannel allows/disallows multichannel requests |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
-| engine.image.path | string | `"quay.io/deepgram/onprem-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
+| engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
 | engine.image.tag | string | `"release-240426"` | tag defines which Deepgram release to use for Engine containers |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -216,7 +216,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
-| global.deepgramSecretRef | string | `nil` | deepgramSecretRef is the name of the pre-configured K8s Secret containing your Deepgram onprem API key. See chart docs for more details. |
+| global.deepgramSecretRef | string | `nil` | deepgramSecretRef is the name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
 | global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. |
 | global.pullSecretRef | string | `nil` | pullSecretRef is the name of the pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `{"driver":{"enabled":true,"version":"550.54.15"},"enabled":true,"toolkit":{"enabled":true,"version":"v1.15.0-ubi8"}}` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) |
@@ -228,7 +228,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy | object | `` | Configuration options for the optional [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy). |
 | licenseProxy.additionalLabels | object | `{}` | Additional labels to add to License Proxy resources |
 | licenseProxy.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for License Proxy pods. |
-| licenseProxy.image.path | string | `"quay.io/deepgram/onprem-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
+| licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
 | licenseProxy.image.tag | string | `"release-240426"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |

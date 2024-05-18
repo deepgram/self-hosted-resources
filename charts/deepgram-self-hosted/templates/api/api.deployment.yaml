@@ -39,7 +39,7 @@ spec:
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         envFrom:
         - secretRef:
-            name: {{ required "Missing Deepgram onprem API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }} 
+            name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }} 
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:

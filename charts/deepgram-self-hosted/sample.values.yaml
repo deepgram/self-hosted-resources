@@ -21,12 +21,12 @@ global:
   # must be created prior to installing this Chart.
   # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
   #
-  # You can create a secret for your Deepgram onprem API key
+  # You can create a secret for your Deepgram self-hosted API key
   # with the following command:
   # ```bash
-  # kubectl create secret generic dg-onprem-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
   # ```
-  deepgramSecretRef: "dg-onprem-api-key"
+  deepgramSecretRef: "dg-self-hosted-api-key"
 
 scaling:
   static:

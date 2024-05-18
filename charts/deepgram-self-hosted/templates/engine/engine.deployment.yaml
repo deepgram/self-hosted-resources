@@ -39,7 +39,7 @@ spec:
         imagePullPolicy: {{ .Values.engine.image.pullPolicy }}
         envFrom:
         - secretRef:
-            name: {{ required "Missing Deepgram onprem API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+            name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
         {{- if le (int .Values.engine.resources.requests.gpu) 0 }}
         env:
         - name: NVIDIA_VISIBLE_DEVICES

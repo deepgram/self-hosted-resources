@@ -17,7 +17,7 @@ There are several [Podman Compose](https://github.com/containers/podman-compose)
     * `/path/to/engine.toml`
     * `/path/to/models`
     * `/path/to/license-proxy.toml`, if applicable
-4. Export your [Deepgram onprem API key](https://developers.deepgram.com/docs/on-prem-self-service-tutorial#create-an-on-prem-api-key) in your deployment environment.
+4. Export your [Deepgram self-hosted API key](https://developers.deepgram.com/docs/on-prem-self-service-tutorial#create-an-on-prem-api-key) in your deployment environment.
     ```bash
     $ export DEEPGRAM_API_KEY=<your api key here>
     ```
