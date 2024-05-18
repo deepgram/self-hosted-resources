@@ -3,8 +3,8 @@ kind: Deployment
 metadata:
   name: {{ .Values.api.namePrefix }}
   labels: &labels
-{{ include "deepgram-self-hosted.labels" . | indent 4}} 
-    app: deepgram-api 
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+    app: deepgram-api
     {{- range $key, $val := .Values.engine.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       app: deepgram-api
-      {{ include "deepgram-self-hosted.selectorLabels" . }} 
+      {{ include "deepgram-self-hosted.selectorLabels" . }}
   replicas: {{ .Values.scaling.static.api.replicas }}
   strategy:
     type: RollingUpdate
@@ -39,7 +39,7 @@ spec:
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         envFrom:
         - secretRef:
-            name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }} 
+            name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:

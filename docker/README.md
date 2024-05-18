@@ -11,7 +11,7 @@ There are several [Docker Compose](https://docs.docker.com/compose/) templates f
     * [Associated Deepgram configuration files](../common/license_proxy_deploy/)
 ## Usage
 1. Read the [Deepgram self-hosted documentation guides](https://developers.deepgram.com/docs/on-prem-introduction), and complete the series of guides until you have a deployment environment configured and are ready to begin the [Deploy Deepgram Services](https://developers.deepgram.com/docs/deploy-deepgram-services) guide.
-2. Download a copy of your chosen Docker Compose template and copies of the associated Deepgram `toml` configuration files. 
+2. Download a copy of your chosen Docker Compose template and copies of the associated Deepgram `toml` configuration files.
 3. Replace placeholder paths in your chosen Docker Compose template with the paths to your data and configuration files:
     * `/path/to/api.toml`
     * `/path/to/engine.toml`

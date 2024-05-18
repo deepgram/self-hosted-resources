@@ -13,7 +13,7 @@ spec:
   selector:
     matchLabels:
        app: deepgram-license-proxy
-       {{ include "deepgram-self-hosted.selectorLabels" . }} 
+       {{ include "deepgram-self-hosted.selectorLabels" . }}
   replicas: {{ .Values.scaling.static.licenseProxy.replicas }}
   strategy:
     type: RollingUpdate

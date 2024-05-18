@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.engine.namePrefix }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    app: deepgram-engine 
+    app: deepgram-engine
     {{- range $key, $val := .Values.engine.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
@@ -12,7 +12,7 @@ spec:
   selector:
     matchLabels:
       app: deepgram-engine
-      {{ include "deepgram-self-hosted.selectorLabels" . }} 
+      {{ include "deepgram-self-hosted.selectorLabels" . }}
   replicas: {{ .Values.scaling.static.engine.replicas }}
   strategy:
     type: RollingUpdate

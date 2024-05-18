@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.engine.namePrefix }}-config
   labels:
-{{ include "deepgram-self-hosted.labels" . | indent 4}} 
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
     {{- range $key, $val := .Values.engine.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
