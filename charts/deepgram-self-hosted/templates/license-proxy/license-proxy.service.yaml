@@ -11,7 +11,7 @@ metadata:
 spec:
   selector:
     app: deepgram-license-proxy
-    {{ include "deepgram-self-hosted.selectorLabels" . }} 
+    {{ include "deepgram-self-hosted.selectorLabels" . }}
   type: NodePort
   ports:
     - name: "status"
@@ -32,7 +32,7 @@ metadata:
 spec:
   selector:
     app: deepgram-license-proxy
-    {{ include "deepgram-self-hosted.selectorLabels" . }} 
+    {{ include "deepgram-self-hosted.selectorLabels" . }}
   ports:
     - name: "primary"
       port: {{ .Values.licenseProxy.server.port }}

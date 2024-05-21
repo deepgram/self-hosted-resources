@@ -1,0 +1,14 @@
+{{- if .Values.engine.modelManager.volumes.gcp.gpd.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
+spec:
+  storageClassName: {{ .Values.engine.modelManager.volumes.gcp.gpd.storageClassName }}
+  name: {{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pv
+  accessModes:
+    - ReadOnlyMany
+  resources:
+    requests:
+      storage: {{ .Values.engine.modelManager.volumes.gcp.gpd.storageCapacity }}
+{{- end }}

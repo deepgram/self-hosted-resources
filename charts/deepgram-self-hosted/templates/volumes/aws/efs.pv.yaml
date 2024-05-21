@@ -7,7 +7,7 @@ metadata:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
 spec:
   capacity:
-    # EFS will grow and shrink as files are added. 
+    # EFS will grow and shrink as files are added.
     # This is just a starting request.
     storage: 5Gi
   volumeMode: Filesystem
@@ -17,5 +17,5 @@ spec:
   persistentVolumeReclaimPolicy: Retain
   csi:
     driver: efs.csi.aws.com
-    volumeHandle: {{ required "Missing AWS EFS fileSystemId see `.engine.modelManager.volumes.aws.efs`" .Values.engine.modelManager.volumes.aws.efs.fileSystemId }}
+    volumeHandle: {{ required "Missing AWS EFS fileSystemId, see `.engine.modelManager.volumes.aws.efs`" .Values.engine.modelManager.volumes.aws.efs.fileSystemId }}
 {{- end }}

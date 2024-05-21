@@ -26,10 +26,10 @@ spec:
             EOF
             )
             TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
-            
+
             echo "$LINKS" | while IFS= read -r link; do
               FILE_NAME=$(basename "$link")
-              
+
               if [ "{{ .Values.engine.modelManager.volumes.aws.efs.forceDownload }}" == "true" ]; then
                 printf "[%s] [INFO] Force downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
                 wget -O "/mnt/efs/$FILE_NAME" "$link"

@@ -1,0 +1,19 @@
+{{- if .Values.engine.modelManager.volumes.gcp.gpd.enabled }}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pv
+spec:
+  storageClassName: {{ .Values.engine.modelManager.volumes.gcp.gpd.storageClassName }}
+  capacity:
+    storage: {{ .Values.engine.modelManager.volumes.gcp.gpd.storageCapacity }}
+  accessModes:
+    - ReadOnlyMany
+  claimRef:
+    name: {{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
+  csi:
+    driver: pd.csi.storage.gke.io
+    volumeHandle: {{ .Values.engine.modelManager.volumes.gcp.gpd.volumeHandle }}
+    fsType: {{ .Values.engine.modelManager.volumes.gcp.gpd.fsType }}
+    readOnly: true
+{{- end }}

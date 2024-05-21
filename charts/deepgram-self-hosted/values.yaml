@@ -15,7 +15,7 @@ global:
   pullSecretRef:
 
   # -- deepgramSecretRef is the name of the pre-configured K8s
-  # Secret containing your Deepgram onprem API key. See chart
+  # Secret containing your Deepgram self-hosted API key. See chart
   # docs for more details.
   deepgramSecretRef:
 
@@ -54,7 +54,7 @@ api:
     # -- path configures the image path to use for creating API containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-api
+    path: quay.io/deepgram/self-hosted-api
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
@@ -62,9 +62,6 @@ api:
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
-
-  # -- Labels to use as a node selection constraint
-  nodeSelector: {}
 
   updateStrategy:
     rollingUpdate:
@@ -85,11 +82,44 @@ api:
   # @default -- ``
   resources:
     requests:
-      memory: "3800Ki"
+      memory: "3800Mi"
       cpu: "1800m"
     limits:
-      memory: "7800Ki"
+      memory: "7800Mi"
       cpu: "3000m"
+
+  # -- Readiness probe customization for API pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for API pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for API pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to API pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram API Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the API component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the API deployment.
+    name:
 
   # -- Configure how the API will listen for your requests
   # @default -- ``
@@ -204,7 +234,7 @@ engine:
     # -- path configures the image path to use for creating Engine containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-engine
+    path: quay.io/deepgram/self-hosted-engine
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
@@ -212,9 +242,6 @@ engine:
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
-
-  # -- Labels to use as a node selection constraint
-  nodeSelector: {}
 
   updateStrategy:
     rollingUpdate:
@@ -261,6 +288,39 @@ engine:
     # -- failureThreshold defines how many unsuccessful startup probe attempts
     # are allowed before the container will be marked as Failed
     failureThreshold: 60
+
+  # -- Readiness probe customization for Engine pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Engine pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for Engine pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to Engine pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the Engine component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the Engine deployment.
+    name:
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``
@@ -315,6 +375,26 @@ engine:
           # -- Whether to force a fresh download of all model links provided,
           # even if models are already present in EFS.
           forceDownload: false
+      gcp:
+        gpd:
+          # -- Whether to use an [GKE Persistent Disks](https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes)
+          # to store Deepgram models for use by Engine containers.
+          # This option requires your cluster to be running in
+          # [GCP GKE](https://cloud.google.com/kubernetes-engine).
+          # See the GKE documentation on
+          # [using pre-existing persistent disks](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd).
+          enabled: false
+          # -- Name prefix for the resources associated with the model storage in GCP GPD.
+          namePrefix: dg-models
+          # -- The storageClassName of the existing persistent disk.
+          storageClassName: "standard-rwo"
+          # -- The size of your pre-existing persistent disk.
+          storageCapacity: "40G"
+          # -- The identifier of your pre-existing persistent disk.
+          # The format is projects/{project_id}/zones/{zone_name}/disks/{disk_name} for Zonal persistent disks,
+          # or projects/{project_id}/regions/{region_name}/disks/{disk_name} for Regional persistent disks.
+          volumeHandle: ""
+          fsType: "ext"
 
     models:
       # -- Links to your Deepgram models, if automatically downloading
@@ -340,14 +420,14 @@ engine:
   chunking:
     batch:
       # -- minDuration is the minimum audio duration for a STT chunk size for a batch request
-      minDuration: 7.0
+      minDuration:
       # -- minDuration is the maximum audio duration for a STT chunk size for a batch request
-      maxDuration: 10.0
+      maxDuration:
     streaming:
       # -- minDuration is the minimum audio duration for a STT chunk size for a streaming request
-      minDuration: 3.0
+      minDuration:
       # -- minDuration is the maximum audio duration for a STT chunk size for a streaming request
-      maxDuration: 5.0
+      maxDuration:
       # -- step defines how often to return interim results, in seconds.
       # This value may be lowered to increase the frequency of interim results.
       # However, this also causes a significant decrease in the number of concurrent
@@ -373,7 +453,7 @@ licenseProxy:
     # -- path configures the image path to use for creating License Proxy containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-license-proxy
+    path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
     tag: release-240426
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
@@ -382,9 +462,6 @@ licenseProxy:
 
   # -- Additional labels to add to License Proxy resources
   additionalLabels: {}
-
-  # -- Labels to use as a node selection constraint
-  nodeSelector: {}
 
   updateStrategy:
     # -- For the LicenseProxy, we only expose maxSurge and not maxUnavailable.
@@ -405,10 +482,43 @@ licenseProxy:
   resources:
     requests:
       memory: "1Gi"
-      cpu: "900m"
+      cpu: "1000m"
     limits:
       memory: "8Gi"
       cpu: "2000m"
+
+  # -- Readiness probe customization for License Proxy pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Proxy pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for License Proxy pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to License Proxy pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram License Proxy Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the LicenseProxy component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the License Proxy deployment.
+    name:
 
   # -- Configure how the license proxy will listen for licensing requests.
   # @default -- ``
@@ -426,8 +536,11 @@ licenseProxy:
     statusPort: 8080
 
 # -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
+# You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.
 gpu-operator:
   # -- Whether to install the NVIDIA GPU Operator to manage driver and/or container toolkit installation.
+  # See the list of [supported Operating Systems](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#supported-operating-systems-and-kubernetes-platforms)
+  # to verify compatibility with your cluster/nodes. Disable this option if your cluster/nodes are not compatible.
   # If disabled, you will need to self-manage NVIDIA software installation on all nodes where you want
   # to schedule Deepgram Engine pods.
   enabled: true

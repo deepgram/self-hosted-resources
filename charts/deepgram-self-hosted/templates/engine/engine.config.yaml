@@ -3,7 +3,7 @@ kind: ConfigMap
 metadata:
   name: {{ .Values.engine.namePrefix }}-config
   labels:
-{{ include "deepgram-self-hosted.labels" . | indent 4}} 
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
     {{- range $key, $val := .Values.engine.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
@@ -38,12 +38,20 @@ data:
       language_detection = {{ .Values.engine.features.languageDetection }}
 
     [chunking.batch]
+      {{- if .Values.engine.chunking.batch.minDuration }}
       min_duration = {{ .Values.engine.chunking.batch.minDuration }}
+      {{- end }}
+      {{- if .Values.engine.chunking.batch.maxDuration }}
       max_duration = {{ .Values.engine.chunking.batch.maxDuration }}
+      {{- end }}
 
     [chunking.streaming]
+      {{- if .Values.engine.chunking.streaming.minDuration }}
       min_duration = {{ .Values.engine.chunking.streaming.minDuration }}
+      {{- end }}
+      {{- if .Values.engine.chunking.streaming.maxDuration }}
       max_duration = {{ .Values.engine.chunking.streaming.maxDuration }}
+      {{- end }}
       step = {{ .Values.engine.chunking.streaming.step }}
 
     [half_precision]
