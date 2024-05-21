@@ -31,7 +31,7 @@ The Deepgram self-hosted chart requires Helm 3.7+ in order to install successful
 
 You will need to provide your [self-service Deepgram licensing and credentials](https://developers.deepgram.com/docs/on-prem-self-service-tutorial) information. See `global.deepgramSecretRef` and `global.pullSecretRef` in the [Values section](#values) for more details.
 
-You may also override any default configuration values. See [the Values section](#values) for a list of available options, and the [sample values file](./sample.values.yaml) for an example of a standard install.
+You may also override any default configuration values. See [the Values section](#values) for a list of available options, and the [samples directory](./samples) for examples of a standard install.
 
 ```
 helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 10m
