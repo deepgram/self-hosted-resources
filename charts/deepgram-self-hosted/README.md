@@ -1,10 +1,10 @@
 # deepgram-self-hosted
 
-![Version: 0.1.1](https://img.shields.io/badge/Version-0.1.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240426](https://img.shields.io/badge/AppVersion-release--240426-informational?style=flat-square)
+![Version: 0.1.0-alpha](https://img.shields.io/badge/Version-0.1.0--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240426](https://img.shields.io/badge/AppVersion-release--240426-informational?style=flat-square)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
-**Homepage:** <https://developers.deepgram.com/docs/on-prem-introduction>
+**Homepage:** <https://developers.deepgram.com/docs/self-hosted-introduction>
 
 ## Source Code
 
@@ -12,7 +12,7 @@ A Helm chart for running Deepgram services in a self-hosted environment
 
 ## Requirements
 
-Kubernetes: `>=1.19.0-0`
+Kubernetes: `>=1.27.0-0`
 
 | Repository | Name | Version |
 |------------|------|---------|
