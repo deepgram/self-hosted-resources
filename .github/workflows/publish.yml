@@ -19,13 +19,13 @@ jobs:
       - name: Configure Git
         run: |
           # Give CI a git identity for its commit message
-          git config --global user.email "ci@deepgram.com"
+          git config --global user.email "robot@deepgram.com"
           git config --global user.name "Deepgram CI"
 
       - name: Install Helm
         uses: azure/setup-helm@v4
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: "${{ secrets.DGPAT }}"
 
       - name: Add NVIDIA Helm chart repository
         run: |
