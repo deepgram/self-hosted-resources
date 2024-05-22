@@ -1,5 +1,5 @@
 # Deepgram Self-Hosted Resources
-Official Deepgram resources for running [Deepgram](https://deepgram.com) in a [self-hosted](https://developers.deepgram.com/docs/on-prem-introduction) environment.
+Official Deepgram resources for running [Deepgram](https://deepgram.com) in a [self-hosted](https://developers.deepgram.com/docs/self-hosted-introduction) environment.
 
 ## Contents
 
@@ -9,7 +9,7 @@ Official Deepgram resources for running [Deepgram](https://deepgram.com) in a [s
 
 ## Documentation
 
-You can learn more about the Deepgram API at [developers.deepgram.com](https://developers.deepgram.com/docs), and more about self-hosted Deepgram in our [self-hosted docs](https://developers.deepgram.com/docs/on-prem-introduction).
+You can learn more about the Deepgram API at [developers.deepgram.com](https://developers.deepgram.com/docs), and more about self-hosted Deepgram in our [self-hosted docs](https://developers.deepgram.com/docs/self-hosted-introduction).
 
 ## Getting Help
 

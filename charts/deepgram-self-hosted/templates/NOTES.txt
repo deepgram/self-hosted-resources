@@ -1,4 +1,11 @@
 This is an alpha Helm chart for Deepgram self-hosted deployments.
 
 Please refer to Deepgram's self-hosted documentation for further details:
-* https://developers.deepgram.com/docs/on-prem-introduction
+* https://developers.deepgram.com/docs/self-hosted-introduction
+
+This software includes the following third-party libraries:
+
+NVIDIA GPU Operator
+Copyright 2024 NVIDIA Corporation
+Licensed under the Apache-2.0 license.
+See https://github.com/NVIDIA/gpu-operator for more information.
