@@ -1,0 +1,16 @@
+### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
+### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
+
+[server]
+### The IP address to listen on. Since this is likely running in a Docker
+### container, you will probably want to listen on all interfaces.
+host = "0.0.0.0"
+
+### The port to listen on for license verification requests from Deepgram containers.
+port = 8443
+
+### The base URL (prefix) for license verification requests.
+base_url = "/"
+
+### The port to listen on for health checks.
+status_port = 8080

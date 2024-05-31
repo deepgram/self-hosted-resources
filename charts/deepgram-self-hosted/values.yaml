@@ -1,0 +1,554 @@
+global:
+  # -- When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM
+  # signal, the container will stop listening on its port, and no new requests will be routed
+  # to that container. However, the container will continue to run until all existing
+  # batch or streaming requests have completed, after which it will gracefully shut down.
+  #
+  # Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.
+  #
+  # outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully
+  # shutdown the container, terminating any outstanding connections.
+  outstandingRequestGracePeriod: 1800
+
+  # -- pullSecretRef is the name of the pre-configured K8s Secret
+  # with image repository credentials. See chart docs for more details.
+  pullSecretRef:
+
+  # -- deepgramSecretRef is the name of the pre-configured K8s
+  # Secret containing your Deepgram self-hosted API key. See chart
+  # docs for more details.
+  deepgramSecretRef:
+
+  # -- Additional labels to add to all Deepgram resources
+  additionalLabels: {}
+
+# -- Configuration options for horizontal scaling of Deepgram
+# services.
+# @default -- ``
+scaling:
+  static:
+    enabled: true
+
+    api:
+      # -- Number of API pods to deploy.
+      replicas: 1
+
+    engine:
+      # -- Number of Engine pods to deploy.
+      replicas: 1
+
+    # -- The License Proxy is optional, but highly recommended to be deployed in production
+    # to enable highly available environments.
+    # If deployed, one replica should be sufficient to support many API/Engine pods.
+    # @default -- ``
+    licenseProxy:
+      # -- Number of License Proxy pods to deploy.
+      replicas: 0
+
+api:
+  # -- namePrefix is the prefix to apply to the name of all K8s objects
+  # associated with the Deepgram API containers.
+  namePrefix: "deepgram-api"
+
+  image:
+    # -- path configures the image path to use for creating API containers.
+    # You may change this from the public Quay image path if you have imported
+    # Deepgram images into a private container registry.
+    path: quay.io/deepgram/onprem-api
+    # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
+    pullPolicy: IfNotPresent
+    # -- tag defines which Deepgram release to use for API containers
+    tag: release-240528
+
+  # -- Additional labels to add to API resources
+  additionalLabels: {}
+
+  updateStrategy:
+    rollingUpdate:
+      # -- The maximum number of API pods, relative to the number of replicas,
+      # that can go offline during a rolling update. See the
+      # [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable)
+      # for more details.
+      maxUnavailable: 0
+      # -- The maximum number of extra API pods that can be created during a rollingUpdate,
+      # relative to the number of replicas. See the
+      # [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge)
+      # for more details.
+      maxSurge: 1
+
+  # -- Configure resource limits per API container. See
+  # [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#api)
+  # for more details.
+  # @default -- ``
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+
+  # -- Readiness probe customization for API pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for API pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for API pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to API pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram API Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the API component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the API deployment.
+    name:
+
+  # -- Configure how the API will listen for your requests
+  # @default -- ``
+  server:
+    # baseUrl is the prefix requests to the API.
+    baseUrl: "/v1"
+    # -- host is the IP address to listen on. You will want to listen
+    # on all interfaces to interact with other pods in the cluster.
+    host: "0.0.0.0"
+    # -- port to listen on.
+    port: 8080
+
+    # -- callbackConnTimeout configures how long to wait for a connection to a callback URL.
+    # See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback)
+    # for more details. The value should be a humantime duration.
+    callbackConnTimeout: "1s"
+    # -- callbackTimeout configures how long to wait for a response from a callback URL.
+    # See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback)
+    # for more details. The value should be a humantime duration.
+    callbackTimeout: "10s"
+
+    # -- fetchConnTimeout configures how long to wait for a connection to a fetch URL.
+    # The value should be a humantime duration.
+    # A fetch URL is a URL passed in an inference request from which a payload should be
+    # downloaded.
+    fetchConnTimeout: "1s"
+    # -- fetchTimeout configures how long to wait for a response from a fetch URL.
+    # The value should be a humantime duration.
+    # A fetch URL is a URL passed in an inference request from which a payload should be
+    # downloaded.
+    fetchTimeout: "60s"
+
+  # -- Specify custom DNS resolution options.
+  # @default -- ``
+  resolver:
+    # -- (list) nameservers allows for specifying custom domain name server(s).
+    # A valid list item's format is "{IP} {PORT} {PROTOCOL (tcp or udp)}",
+    # e.g. `"127.0.0.1 53 udp"`.
+    # @default -- `[]`
+    nameservers:
+    # -- (int) maxTTL sets the DNS TTL value if specifying a custom DNS nameserver.
+    maxTTL:
+
+  concurrencyLimit:
+    # -- activeRequests limits the number of active requests handled by
+    # a single API container.
+    # If additional requests beyond the limit are sent, API will return
+    # a 429 HTTP status code. Set to an integer if desired, otherwise
+    # the `nil` default means no limit will be set.
+    activeRequests:
+
+  # -- Enable ancillary features
+  # @default -- ``
+  features:
+    # -- topicDetection enables topic detection *if* a valid topic detection model is available.
+    topicDetection: true
+
+    # -- summarization enable summarization *if* a valid summarization model is available.
+    summarization: true
+
+    # -- If API is receiving requests faster than Engine can process them, a request
+    # queue will form. By default, this queue is stored in memory. Under high load,
+    # the queue may grow too large and cause Out-Of-Memory errors. To avoid this,
+    # set a diskBufferPath to buffer the overflow on the request queue to disk.
+    #
+    # WARN: This is only to temporarily buffer requests during high load.
+    # If there is not enough Engine capacity to process the queued requests over time,
+    # the queue (and response time) will grow indefinitely.
+    diskBufferPath:
+
+  # -- driverPool configures the backend pool of speech engines (generically referred to as
+  # "drivers" here). The API will load-balance among drivers in the standard
+  # pool; if one standard driver fails, the next one will be tried.
+  # @default -- ``
+  driverPool:
+    # -- standard is the main driver pool to use.
+    # @default -- ``
+    standard:
+      # -- timeoutBackoff is the factor to increase the timeout by
+      # for each additional retry (for exponential backoff).
+      timeoutBackoff: 1.2
+
+      # -- retrySleep defines the initial sleep period (in humantime duration)
+      # before attempting a retry.
+      retrySleep: "2s"
+      # -- retryBackoff is the factor to increase the retrySleep
+      # by for each additional retry (for exponential backoff).
+      retryBackoff: 1.6
+
+      # -- Maximum response to deserialize from Driver (in bytes).
+      # Default is 1GB, expressed in bytes.
+      maxResponseSize: "1073741824"
+
+engine:
+  # -- namePrefix is the prefix to apply to the name of all K8s objects
+  # associated with the Deepgram Engine containers.
+  namePrefix: "deepgram-engine"
+
+  image:
+    # -- path configures the image path to use for creating Engine containers.
+    # You may change this from the public Quay image path if you have imported
+    # Deepgram images into a private container registry.
+    path: quay.io/deepgram/onprem-engine
+    # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
+    pullPolicy: IfNotPresent
+    # -- tag defines which Deepgram release to use for Engine containers
+    tag: release-240528
+
+  # -- Additional labels to add to Engine resources
+  additionalLabels: {}
+
+  updateStrategy:
+    rollingUpdate:
+      # -- The maximum number of Engine pods, relative to the number of replicas,
+      # that can go offline during a rolling update. See the
+      # [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable)
+      # for more details.
+      maxUnavailable: 0
+      # -- The maximum number of extra Engine pods that can be created during a rollingUpdate,
+      # relative to the number of replicas. See the
+      # [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge)
+      # for more details.
+      maxSurge: 1
+
+  # -- Configure resource limits per Engine container. See
+  # [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#engine)
+  # for more details.
+  # @default -- ``
+  resources:
+    requests:
+      memory: "30Gi"
+      cpu: "4000m"
+      # -- gpu maps to the nvidia.com/gpu resource parameter
+      gpu: 1
+    limits:
+      memory: "40Gi"
+      cpu: "8000m"
+      # -- gpu maps to the nvidia.com/gpu resource parameter
+      gpu: 1
+
+  # -- The startupProbe combination of `periodSeconds` and `failureThreshold` allows
+  # time for the container to load all models and start listening for incoming requests.
+  #
+  # Model load time can be affected by hardware I/O speeds, as well as network speeds
+  # if you are using a network volume mount for the models.
+  #
+  # If you are hitting the failure threshold before models are finished loading, you may
+  # want to extend the startup probe. However, this will also extend the time it takes
+  # to detect a pod that can't establish a network connection to validate its license.
+  # @default -- ``
+  startupProbe:
+    # -- periodSeconds defines how often to execute the probe. periodSeconds: 10
+    # -- failureThreshold defines how many unsuccessful startup probe attempts
+    # are allowed before the container will be marked as Failed
+    failureThreshold: 60
+
+  # -- Readiness probe customization for Engine pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Engine pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for Engine pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to Engine pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the Engine component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the Engine deployment.
+    name:
+
+  # -- Configure Engine containers to listen for requests from API containers.
+  # @default -- ``
+  server:
+    # -- host is the IP address to listen on for inference requests.
+    # You will want to listen on all interfaces to interact with
+    # other pods in the cluster.
+    host: "0.0.0.0"
+    # -- port to listen on for inference requests
+    port: 8080
+
+  # -- metricsServer exposes an endpoint on each Engine container
+  # for reporting inference-specific system metrics.
+  # See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine
+  # for more details.
+  # @default -- ``
+  metricsServer:
+    # -- host is the IP address to listen on for metrics requests.
+    # You will want to listen on all interfaces to interact with
+    # other pods in the cluster.
+    host: "0.0.0.0"
+    # -- port to listen on for metrics requests
+    port: 9991
+
+  modelManager:
+    # -- searchPaths enumerates directories where inference models may be stored.
+    searchPaths:
+      - "/models"
+
+    volumes:
+      customVolumeClaim:
+        # -- You may manually create your own PersistentVolume and PersistentVolumeClaim to store and
+        # expose model files to the Deepgram Engine. Configure your storage beforehand,
+        # and enable here.
+        # Note: Make sure the PV and PVC accessMode are set to `readWriteMany` or `readOnlyMany`
+        enabled: false
+        # -- Name of your pre-configured PersistentVolumeClaim
+        name:
+      aws:
+        efs:
+          # -- Whether to use an [AWS Elastic File Sytem](https://aws.amazon.com/efs/)
+          # to store Deepgram models for use by Engine containers.
+          # This option requires your cluster to be running in
+          # [AWS EKS](https://aws.amazon.com/eks/).
+          enabled: false
+          # -- Name prefix for the resources associated with the model storage in AWS EFS.
+          namePrefix: dg-models
+          # -- FileSystemId of existing AWS Elastic File System where
+          # Deepgram model files will be persisted.
+          # You can find it using the AWS CLI:
+          # ```
+          # $ aws efs describe-file-systems --query "FileSystems[*].FileSystemId"
+          # ```
+          fileSystemId:
+          # -- Whether to force a fresh download of all model links provided,
+          # even if models are already present in EFS.
+          forceDownload: false
+      gcp:
+        gpd:
+          # -- Whether to use an [GKE Persistent Disks](https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes)
+          # to store Deepgram models for use by Engine containers.
+          # This option requires your cluster to be running in
+          # [GCP GKE](https://cloud.google.com/kubernetes-engine).
+          # See the GKE documentation on
+          # [using pre-existing persistent disks](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd).
+          enabled: false
+          # -- Name prefix for the resources associated with the model storage in GCP GPD.
+          namePrefix: dg-models
+          # -- The storageClassName of the existing persistent disk.
+          storageClassName: "standard-rwo"
+          # -- The size of your pre-existing persistent disk.
+          storageCapacity: "40G"
+          # -- The identifier of your pre-existing persistent disk.
+          # The format is projects/{project_id}/zones/{zone_name}/disks/{disk_name} for Zonal persistent disks,
+          # or projects/{project_id}/regions/{region_name}/disks/{disk_name} for Regional persistent disks.
+          volumeHandle: ""
+          fsType: "ext4"
+
+    models:
+      # -- Links to your Deepgram models, if automatically downloading
+      # into storage backing a persistent volume.
+      # **Automatic downloads are currently supported for AWS EFS volumes only.**
+      # Insert each model link provided to you by your Deepgram
+      # Account Representative.
+      links: []
+
+  # -- Enable ancillary features
+  # @default -- ``
+  features:
+    # -- multichannel allows/disallows multichannel requests
+    multichannel: true
+    # -- languageDetection enables Deepgram language detection *if*
+    # a valid language detection model is available
+    languageDetection: true
+
+  # -- chunking defines the size of STT audio chunks to process in seconds.
+  # Adjusting these values will affect both inference performance and accuracy
+  # of results. Please contact your Deepgram Account Representative if you
+  # want to adjust any of these values.
+  # @default -- ``
+  chunking:
+    batch:
+      # -- minDuration is the minimum audio duration for a STT chunk size for a batch request
+      minDuration:
+      # -- minDuration is the maximum audio duration for a STT chunk size for a batch request
+      maxDuration:
+    streaming:
+      # -- minDuration is the minimum audio duration for a STT chunk size for a streaming request
+      minDuration:
+      # -- minDuration is the maximum audio duration for a STT chunk size for a streaming request
+      maxDuration:
+      # -- step defines how often to return interim results, in seconds.
+      # This value may be lowered to increase the frequency of interim results.
+      # However, this also causes a significant decrease in the number of concurrent
+      # streams supported by a single GPU. Please contact your Deepgram Account
+      # representative for more details.
+      step: 1.0
+
+  halfPrecision:
+    # -- Engine will automatically enable half precision operations if your GPU supports
+    # them. You can explicitly enable or disable this behavior with the state parameter
+    # which supports `"enable"`, `"disabled"`, and `"auto"`.
+    state: "auto"
+
+# -- Configuration options for the optional
+# [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy).
+# @default -- ``
+licenseProxy:
+  # -- namePrefix is the prefix to apply to the name of all K8s objects
+  # associated with the Deepgram License Proxy containers.
+  namePrefix: "deepgram-license-proxy"
+
+  image:
+    # -- path configures the image path to use for creating License Proxy containers.
+    # You may change this from the public Quay image path if you have imported
+    # Deepgram images into a private container registry.
+    path: quay.io/deepgram/onprem-license-proxy
+    # -- tag defines which Deepgram release to use for License Proxy containers
+    tag: release-240528
+    # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
+    # License Proxy image
+    pullPolicy: IfNotPresent
+
+  # -- Additional labels to add to License Proxy resources
+  additionalLabels: {}
+
+  updateStrategy:
+    # -- For the LicenseProxy, we only expose maxSurge and not maxUnavailable.
+    # This is to avoid accidentally having all LicenseProxy nodes go offline during upgrades,
+    # which could impact the entire cluster's connection to the Deepgram License Server.
+    # @default -- ``
+    rollingUpdate:
+      # -- The maximum number of extra License Proxy pods that can be created during a rollingUpdate,
+      # relative to the number of replicas. See the
+      # [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge)
+      # for more details.
+      maxSurge: 1
+
+  # -- Configure resource limits per License Proxy container. See
+  # [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements)
+  # for more details.
+  # @default -- ``
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+
+  # -- Readiness probe customization for License Proxy pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Proxy pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for License Proxy pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to License Proxy pods.
+  tolerations: []
+
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  securityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram License Proxy Deployment.
+    create: true
+    # -- Allows providing a custom service account name for the LicenseProxy component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the License Proxy deployment.
+    name:
+
+  # -- Configure how the license proxy will listen for licensing requests.
+  # @default -- ``
+  server:
+    # --host is the IP address to listen on. You will want to listen
+    # on all interfaces to interact with other pods in the cluster.
+    host: "0.0.0.0"
+    # -- port to listen on.
+    port: 8443
+
+    # -- baseUrl is the prefix for incoming license verification requests.
+    baseUrl: "/"
+
+    # -- statusPort is the port to listen on for the status/health endpoint.
+    statusPort: 8080
+
+# -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
+# You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.
+gpu-operator:
+  # -- Whether to install the NVIDIA GPU Operator to manage driver and/or container toolkit installation.
+  # See the list of [supported Operating Systems](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#supported-operating-systems-and-kubernetes-platforms)
+  # to verify compatibility with your cluster/nodes. Disable this option if your cluster/nodes are not compatible.
+  # If disabled, you will need to self-manage NVIDIA software installation on all nodes where you want
+  # to schedule Deepgram Engine pods.
+  enabled: true
+  driver:
+    # -- Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected.
+    # If your Kubernetes nodes run a base image that comes with NVIDIA drivers pre-configured,
+    # disable this option, but keep the parent `gpu-operator` and sibling `toolkit`
+    # options enabled.
+    enabled: true
+    # -- NVIDIA driver version to install.
+    version: "550.54.15"
+  toolkit:
+    # -- Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected.
+    enabled: true
+    # -- NVIDIA container toolkit to install. The default `ubuntu` image tag for the
+    # toolkit requires a dynamic runtime link to a version of GLIBC that may not be
+    # present on nodes running older Linux distribution releases, such as Ubuntu 22.04.
+    # Therefore, we specify the `ubi8` image, which statically links the GLIBC library
+    # and avoids this issue.
+    version: v1.15.0-ubi8

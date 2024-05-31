@@ -1,0 +1,48 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: deepgram-self-hosted
+  region: us-west-2
+  version: "1.29"
+
+managedNodeGroups:
+  - name: engine-node-group
+    desiredCapacity: 1
+    instanceType: g6.2xlarge
+    amiFamily: Ubuntu2204
+    labels: { deepgram/nodeType: deepgram-engine }
+    iam:
+      withAddonPolicies:
+        efs: true
+        autoScaler: true
+    taints:
+      - key: efs.csi.aws.com/agent-not-ready
+        value: "true"
+        effect: NoExecute
+  - name: api-node-group
+    desiredCapacity: 1
+    instanceType: c5n.xlarge
+    amiFamily: Ubuntu2204
+    labels: { deepgram/nodeType: deepgram-api }
+    iam:
+      withAddonPolicies:
+        efs: true
+        autoScaler: true
+    taints:
+      - key: efs.csi.aws.com/agent-not-ready
+        value: "true"
+        effect: NoExecute
+  - name: license-proxy-node-group
+    desiredCapacity: 1
+    instanceType: t3.large
+    amiFamily: Ubuntu2204
+    labels: { deepgram/nodeType: deepgram-license-proxy }
+    iam:
+      withAddonPolicies:
+        efs: true
+        autoScaler: true
+    taints:
+      - key: efs.csi.aws.com/agent-not-ready
+        value: "true"
+        effect: NoExecute

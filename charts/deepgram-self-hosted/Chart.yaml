@@ -1,0 +1,19 @@
+apiVersion: v2
+name: deepgram-self-hosted
+type: application
+version: 0.1.0-alpha
+appVersion: "release-240528"
+description: A Helm chart for running Deepgram services in a self-hosted environment
+home: "https://developers.deepgram.com/docs/self-hosted-introduction"
+sources: ["https://github.com/deepgram/self-hosted-resources"]
+kubeVersion: ">=1.27.0-0"
+maintainers:
+  - name: Deepgram Self-Hosted
+    email: self.hosted@deepgram.com
+icon: "https://www.dropbox.com/scl/fi/v4jtfbsrx881pbevcga3j/D-icon-black-square-250x250.png?rlkey=barv5jeuhd7t2lczz0m3nane7&dl=1"
+
+dependencies:
+  - name: gpu-operator
+    version: "^24.3.0"
+    repository: "https://helm.ngc.nvidia.com/nvidia"
+    condition: gpu-operator.enabled

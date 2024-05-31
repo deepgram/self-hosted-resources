@@ -1,0 +1,106 @@
+# See the Chart [README](https://github.com/deepgram/helm-charts) or
+#   [`values.yaml`](https://github.com/deepgram/helm-charts/blob/main/values.yaml)
+#   for documentation on all available options.
+
+global:
+  # pullSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
+  # ```bash
+  # docker login quay.io
+  # kubectl create secret generic dg-regcred \
+  #   --from-file=.dockerconfigjson=$HOME/.docker/config.json \
+  #   --type=kubernetes.io/dockerconfigjson
+  # ```
+  pullSecretRef: "dg-regcred"
+
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key"
+
+scaling:
+  static:
+    api:
+      replicas: 1
+    engine:
+      replicas: 1
+    licenseProxy:
+      replicas: 1
+
+api:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: deepgram/nodeType
+                operator: In
+                values:
+                  - deepgram-api
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+
+engine:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: deepgram/nodeType
+                operator: In
+                values:
+                  - deepgram-engine
+  resources:
+    requests:
+      memory: "28Gi"
+      cpu: "6000m"
+      gpu: 1
+    limits:
+      memory: "40Gi"
+      cpu: "8000m"
+      gpu: 1
+  modelManager:
+    volumes:
+      aws:
+        efs:
+          enabled: true
+          fileSystemId: fs-xxxxxxxxxxxxxxxx # Replace with your EFS ID
+    models:
+      links:
+        - https://link-to-model-1.dg # Replace these links with those provided to you
+        - https://link-to-model-2.dg #   by your Deepgram Account Representative.
+        - https://link-to-model-3.dg
+        - ...
+
+licenseProxy:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: deepgram/nodeType
+                operator: In
+                values:
+                  - deepgram-license-proxy
+  resources:
+    requests:
+      memory: "6Gi"
+      cpu: "1500m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"

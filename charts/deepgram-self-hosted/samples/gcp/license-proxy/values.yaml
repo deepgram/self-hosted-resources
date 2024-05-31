@@ -1,0 +1,106 @@
+# See the Chart [README](https://github.com/deepgram/helm-charts) or
+#   [`values.yaml`](https://github.com/deepgram/helm-charts/blob/main/values.yaml)
+#   for documentation on all available options.
+
+global:
+  # pullSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
+  # ```bash
+  # docker login quay.io
+  # kubectl create secret generic dg-regcred \
+  #   --from-file=.dockerconfigjson=$HOME/.docker/config.json \
+  #   --type=kubernetes.io/dockerconfigjson
+  # ```
+  pullSecretRef: "dg-regcred"
+
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key"
+
+scaling:
+  static:
+    api:
+      replicas: 1
+    engine:
+      replicas: 1
+    licenseProxy:
+      replicas: 1
+
+api:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: deepgram/nodeType
+                operator: In
+                values:
+                  - deepgram-api
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "12Gi"
+      cpu: "4000m"
+
+engine:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: deepgram/nodeType
+                operator: In
+                values:
+                  - deepgram-engine
+  resources:
+    requests:
+      memory: "24Gi"
+      cpu: "5000m"
+      gpu: 1
+    limits:
+      memory: "40Gi"
+      cpu: "8000m"
+      gpu: 1
+  modelManager:
+    volumes:
+      gcp:
+        gpd:
+          enabled: true
+          storageCapacity: "40G"
+          # Replace with your Google disk handle
+          volumeHandle: "projects/<your-project-id>/zones/<your-zone>/disks/<your-disk>"
+
+licenseProxy:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: deepgram/nodeType
+                operator: In
+                values:
+                  - deepgram-license-proxy
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+
+gpu-operator:
+  # GKE will manage the driver and toolkit installation for us by default.
+  enabled: false
