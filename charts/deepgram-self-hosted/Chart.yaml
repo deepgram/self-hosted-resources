@@ -11,6 +11,17 @@ maintainers:
   - name: Deepgram Self-Hosted
     email: self.hosted@deepgram.com
 icon: "https://www.dropbox.com/scl/fi/v4jtfbsrx881pbevcga3j/D-icon-black-square-250x250.png?rlkey=barv5jeuhd7t2lczz0m3nane7&dl=1"
+keywords:
+  - voice ai
+  - text-to-speech
+  - tts
+  - aura
+  - speech-to-text
+  - stt
+  - nova
+  - speech-to-speech
+  - sts
+  - self-hosted
 
 dependencies:
   - name: gpu-operator
