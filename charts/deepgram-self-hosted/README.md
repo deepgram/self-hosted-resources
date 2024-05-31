@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.1.0-alpha](https://img.shields.io/badge/Version-0.1.0--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240528](https://img.shields.io/badge/AppVersion-release--240528-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.1.1-alpha](https://img.shields.io/badge/Version-0.1.1--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240528](https://img.shields.io/badge/AppVersion-release--240528-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -23,7 +23,7 @@ Kubernetes: `>=1.27.0-0`
 ## Get Repository Info
 
 ```bash
-helm repo add deepgram https://deepgram.github.io/helm-charts
+helm repo add deepgram https://deepgram.github.io/self-hosted-resources
 helm repo update
 ```
 
