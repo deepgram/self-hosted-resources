@@ -25,7 +25,7 @@ There are several [Docker Compose](https://docs.docker.com/compose/) templates f
 
 ## Getting Help
 
-See the [Getting Help](https://github.com/deepgram/self-hosted-resources#getting-help) section in the root of this repository for a list of resources to help you troubleshoot and resolve issues.
+See the [Getting Help](../README.md#getting-help) section in the root of this repository for a list of resources to help you troubleshoot and resolve issues.
 
 ### Troubleshooting
 
