@@ -98,7 +98,11 @@ The Deepgram Helm chart takes references to two existing secrets - one containin
 
 Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
 
-## Troubleshooting
+## Getting Help
+
+See the [Getting Help](https://github.com/deepgram/self-hosted-resources#getting-help) section in the root of this repository for a list of resources to help you troubleshoot and resolve issues.
+
+### Troubleshooting
 
 If you encounter issues while deploying or using Deepgram, consider the following troubleshooting steps:
 
@@ -123,7 +127,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
        ```bash
        helm get values [RELEASE_NAME] > my-deployed-values.yaml
        ```
-   - Reach out to the Deepgram support team, providing the collected diagnostic information for assistance.
+   - Provide the collected diagnostic information to Deepgram for assistance.
 
 ## Values
 
