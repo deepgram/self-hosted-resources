@@ -22,3 +22,35 @@ There are several [Podman Compose](https://github.com/containers/podman-compose)
     $ export DEEPGRAM_API_KEY=<your api key here>
     ```
 4. Finish the walkthrough documentation by completing the [Deploy Deepgram Services](https://developers.deeps](https://developers.deepgram.com/docs/deploy-deepgram-services) guide.
+
+## Getting Help
+
+See the [Getting Help](../README.md#getting-help) section in the root of this repository for a list of resources to help you troubleshoot and resolve issues.
+
+### Troubleshooting
+
+If you encounter issues while deploying or using Deepgram, consider the following troubleshooting steps:
+
+1. Check the pod status and logs:
+   - Use `podman ps` to check the status of the Deepgram containers.
+   - Use `podman logs <container-id>` to view the logs of a specific container.
+   - Use `podman inspect <container-id>` to view the configuration and status of a specific container.
+
+2. Verify resource availability:
+   - Ensure that the host machine has sufficient CPU, memory, and storage resources to accommodate the Deepgram components.
+   - Check for any resource constraints or limits imposed by your Podman Compose file or `podman run` command.
+
+3. Check the network connectivity:
+   - Verify that the Deepgram components can communicate with each other and with the Deepgram license server (license.deepgram.com).
+   - Check the network policies and firewall rules to ensure that the necessary ports and protocols are allowed.
+
+4. Collect diagnostic information:
+   - Gather relevant logs and metrics.
+   - Collect your existing configuration files:
+     - `api.toml`
+     - `engine.toml`
+     - `podman-compose.yml`
+     - `license-proxy.toml`, if applicable
+   - Provide the collected diagnostic information to Deepgram for assistance.
+
+

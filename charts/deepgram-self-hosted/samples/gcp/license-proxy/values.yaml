@@ -1,5 +1,4 @@
-# See the Chart [README](https://github.com/deepgram/helm-charts) or
-#   [`values.yaml`](https://github.com/deepgram/helm-charts/blob/main/values.yaml)
+# See the Chart [README](https://github.com/deepgram/self-hosted-resources/blob/main/charts/deepgram-self-hosted#values)
 #   for documentation on all available options.
 
 global:

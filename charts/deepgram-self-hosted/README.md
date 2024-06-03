@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.1.0-alpha](https://img.shields.io/badge/Version-0.1.0--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240528](https://img.shields.io/badge/AppVersion-release--240528-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.1.1-alpha](https://img.shields.io/badge/Version-0.1.1--alpha-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-240528](https://img.shields.io/badge/AppVersion-release--240528-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -23,7 +23,7 @@ Kubernetes: `>=1.27.0-0`
 ## Get Repository Info
 
 ```bash
-helm repo add deepgram https://deepgram.github.io/helm-charts
+helm repo add deepgram https://deepgram.github.io/self-hosted-resources
 helm repo update
 ```
 
@@ -98,7 +98,11 @@ The Deepgram Helm chart takes references to two existing secrets - one containin
 
 Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
 
-## Troubleshooting
+## Getting Help
+
+See the [Getting Help](../../README.md#getting-help) section in the root of this repository for a list of resources to help you troubleshoot and resolve issues.
+
+### Troubleshooting
 
 If you encounter issues while deploying or using Deepgram, consider the following troubleshooting steps:
 
@@ -123,7 +127,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
        ```bash
        helm get values [RELEASE_NAME] > my-deployed-values.yaml
        ```
-   - Reach out to the Deepgram support team, providing the collected diagnostic information for assistance.
+   - Provide the collected diagnostic information to Deepgram for assistance.
 
 ## Values
 

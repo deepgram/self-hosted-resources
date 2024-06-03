@@ -16,7 +16,7 @@
 ## Get Repository Info
 
 ```bash
-helm repo add deepgram https://deepgram.github.io/helm-charts
+helm repo add deepgram https://deepgram.github.io/self-hosted-resources
 helm repo update
 ```
 
@@ -91,7 +91,11 @@ The Deepgram Helm chart takes references to two existing secrets - one containin
 
 Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
 
-## Troubleshooting
+## Getting Help
+
+See the [Getting Help](../../README.md#getting-help) section in the root of this repository for a list of resources to help you troubleshoot and resolve issues.
+
+### Troubleshooting
 
 If you encounter issues while deploying or using Deepgram, consider the following troubleshooting steps:
 
@@ -116,7 +120,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
        ```bash
        helm get values [RELEASE_NAME] > my-deployed-values.yaml
        ```
-   - Reach out to the Deepgram support team, providing the collected diagnostic information for assistance.
+   - Provide the collected diagnostic information to Deepgram for assistance.
 
 {{ template "chart.valuesSection" . }}
 
