@@ -11,9 +11,10 @@ data:
   engine.toml: |
     [license]
       server_url = [
-        {{- if gt (int .Values.scaling.static.licenseProxy.replicas) 0 -}}
+        {{- if .Values.licenseProxy.enabled -}}
         "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
-        {{- else -}}
+        {{- end -}}
+        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup -}}
         "https://license.deepgram.com"
         {{- end -}}
       ]

@@ -436,6 +436,23 @@ engine:
 # [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy).
 # @default -- ``
 licenseProxy:
+  # -- The License Proxy is optional, but highly recommended to be deployed in production
+  # to enable highly available environments.
+  enabled: false
+
+  # -- If the License Proxy is deployed, one replica should be sufficient to
+  # support many API/Engine pods.
+  # Highly available environments may wish to deploy a second replica to ensure
+  # uptime, which can be toggled with this option.
+  deploySecondReplica: false
+
+  # -- Even with a License Proxy deployed, API and Engine pods can be configured to keep the
+  # upstream `license.deepgram.com` license server as a fallback licensing option if the
+  # License Proxy is unavailable.
+  # Disable this option if you are restricting API/Engine Pod network access for security reasons,
+  # and only the License Proxy should send egress traffic to the upstream license server.
+  keepUpstreamServerAsBackup: true
+
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram License Proxy containers.
   namePrefix: "deepgram-license-proxy"
@@ -552,3 +569,12 @@ gpu-operator:
     # Therefore, we specify the `ubi8` image, which statically links the GLIBC library
     # and avoids this issue.
     version: v1.15.0-ubi8
+
+# -- Passthrough values for [Prometheus Helm chart]()
+# Prometheus (and its adapter) are only installed when pod autoscaling is enabled.
+prometheus:
+  prometheusSpec:
+    additionalScrapeConfigs:
+      - job_name: "dg_engine_scrape"
+        #static_configs:
+        #  - targets: ["deepgram-nlb-service.default.svc.cluster.local:9991"]

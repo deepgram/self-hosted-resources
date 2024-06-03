@@ -1,4 +1,4 @@
-{{- if gt (int .Values.scaling.static.licenseProxy.replicas) 0 -}}
+{{- if .Values.licenseProxy.enabled -}}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -14,7 +14,7 @@ spec:
     matchLabels:
        app: deepgram-license-proxy
        {{ include "deepgram-self-hosted.selectorLabels" . }}
-  replicas: {{ .Values.scaling.static.licenseProxy.replicas }}
+  replicas: {{ if .Values.licenseProxy.deploySecondReplica }}2{{else }}1{{ end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
