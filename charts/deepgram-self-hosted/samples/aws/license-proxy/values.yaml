@@ -33,8 +33,6 @@ scaling:
       replicas: 1
     engine:
       replicas: 1
-    licenseProxy:
-      replicas: 1
 
 api:
   affinity:
@@ -42,10 +40,10 @@ api:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: deepgram/nodeType
+              - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
-                  - deepgram-api
+                  - api
   resources:
     requests:
       memory: "4Gi"
@@ -60,10 +58,10 @@ engine:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: deepgram/nodeType
+              - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
-                  - deepgram-engine
+                  - engine
   resources:
     requests:
       memory: "28Gi"
@@ -87,15 +85,17 @@ engine:
         - ...
 
 licenseProxy:
+  enabled: true
+
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: deepgram/nodeType
+              - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
-                  - deepgram-license-proxy
+                  - license-proxy
   resources:
     requests:
       memory: "6Gi"
@@ -103,3 +103,15 @@ licenseProxy:
     limits:
       memory: "8Gi"
       cpu: "2000m"
+
+cluster-autoscaler:
+  enabled: true
+  rbac:
+    serviceAccount:
+      name: "cluster-autoscaler-sa"
+      annotations:
+        # Replace with the AWS Role ARN configured for the Cluster Autoscaler
+        eks.amazonaws.com/role-arn: "arn:aws:iam::000000000000:role/MyRoleName"
+  autoDiscovery:
+    clusterName: "deepgram-self-hosted-cluster"
+  awsRegion: "us-west-2"

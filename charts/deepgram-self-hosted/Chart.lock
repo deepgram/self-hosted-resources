@@ -2,5 +2,8 @@ dependencies:
 - name: gpu-operator
   repository: https://helm.ngc.nvidia.com/nvidia
   version: v24.3.0
-digest: sha256:bb948d8bad3f9ca1255d70a998d28aea2e3ed2f20fb2eab4bf8c676485b747db
-generated: "2024-05-16T10:44:38.204991308-04:00"
+- name: cluster-autoscaler
+  repository: https://kubernetes.github.io/autoscaler
+  version: 9.37.0
+digest: sha256:fe07cbc8ac9c44dc8c2a6511049319313e6e546acf924a8a6f51d142aae7ab11
+generated: "2024-06-04T01:51:52.775190462-04:00"

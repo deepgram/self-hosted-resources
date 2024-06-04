@@ -19,6 +19,7 @@ Kubernetes: `>=1.27.0-0`
 | Repository | Name | Version |
 |------------|------|---------|
 | https://helm.ngc.nvidia.com/nvidia | gpu-operator | ^24.3.0 |
+| https://kubernetes.github.io/autoscaler | cluster-autoscaler | ^9.37.0 |
 
 ## Get Repository Info
 
@@ -169,6 +170,10 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to API pods. |
 | api.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra API pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | api.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of API pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
+| cluster-autoscaler.autoDiscovery.clusterName | string | `nil` | Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
+| cluster-autoscaler.awsRegion | string | `nil` | Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
+| cluster-autoscaler.enabled | bool | `false` | Set to `true` if using node autoscaling with AWS EKS |
+| cluster-autoscaler.rbac.serviceAccount.annotations."eks.amazonaws.com/role-arn" | string | `nil` | Replace with the AWS Role ARN configured for the Cluster Autoscaler. See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s#creating-a-cluster) or [Cluster Autoscaler AWS documentation](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions) for details. |
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
 | engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
 | engine.chunking | object | `` | chunking defines the size of STT audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
@@ -219,9 +224,9 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
-| global.deepgramSecretRef | string | `nil` | deepgramSecretRef is the name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
+| global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
 | global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. |
-| global.pullSecretRef | string | `nil` | pullSecretRef is the name of the pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
+| global.pullSecretRef | string | `nil` | Name of the pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `{"driver":{"enabled":true,"version":"550.54.15"},"enabled":true,"toolkit":{"enabled":true,"version":"v1.15.0-ubi8"}}` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs. |
 | gpu-operator.driver.enabled | bool | `true` | Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected. If your Kubernetes nodes run a base image that comes with NVIDIA drivers pre-configured, disable this option, but keep the parent `gpu-operator` and sibling `toolkit` options enabled. |
 | gpu-operator.driver.version | string | `"550.54.15"` | NVIDIA driver version to install. |
@@ -254,10 +259,9 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra License Proxy pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | prometheus | object | `{"prometheusSpec":{"additionalScrapeConfigs":[{"job_name":"dg_engine_scrape"}]}}` | Passthrough values for [Prometheus Helm chart]() Prometheus (and its adapter) are only installed when pod autoscaling is enabled. |
 | scaling | object | `` | Configuration options for horizontal scaling of Deepgram services. |
+| scaling.static | object | `` | Set a static number of replicas for each services. |
 | scaling.static.api.replicas | int | `1` | Number of API pods to deploy. |
 | scaling.static.engine.replicas | int | `1` | Number of Engine pods to deploy. |
-| scaling.static.licenseProxy | object | `` | The License Proxy is optional, but highly recommended to be deployed in production to enable highly available environments. If deployed, one replica should be sufficient to support many API/Engine pods. |
-| scaling.static.licenseProxy.replicas | int | `0` | Number of License Proxy pods to deploy. |
 
 ## Maintainers
 

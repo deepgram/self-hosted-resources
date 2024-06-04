@@ -11,12 +11,12 @@ data:
   api.toml: |
     [license]
       server_url = [
-        {{- if .Values.licenseProxy.enabled -}}
+        {{- if .Values.licenseProxy.enabled }}
         "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
-        {{- end -}}
-        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup -}}
-        "https://license.deepgram.com"
-        {{- end -}}
+        {{- end }}
+        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup }}
+        {{- if .Values.licenseProxy.enabled -}},{{- end -}}"https://license.deepgram.com"
+        {{- end }}
       ]
 
     [server]

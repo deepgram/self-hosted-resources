@@ -29,7 +29,7 @@ You will need to provide your [self-service Deepgram licensing and credentials](
 You may also override any default configuration values. See [the Values section](#values) for a list of available options, and the [samples directory](./samples) for examples of a standard installation.
 
 ```
-helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 20m
+helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 45m
 ```
 
 ## Upgrade and Rollback Strategies
@@ -41,7 +41,7 @@ To upgrade the Deepgram components to a new version, follow these steps:
 2. Run the Helm upgrade command:
 
     ```bash
-    helm upgrade -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 30m
+    helm upgrade -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 60m
     ```
 
 If you encounter any issues during the upgrade process, you can perform a rollback to the previous version:

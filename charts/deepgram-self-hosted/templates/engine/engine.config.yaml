@@ -11,12 +11,12 @@ data:
   engine.toml: |
     [license]
       server_url = [
-        {{- if .Values.licenseProxy.enabled -}}
+        {{- if .Values.licenseProxy.enabled }}
         "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
-        {{- end -}}
-        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup -}}
-        "https://license.deepgram.com"
-        {{- end -}}
+        {{- end }}
+        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup }}
+        {{- if .Values.licenseProxy.enabled -}},{{- end -}}"https://license.deepgram.com"
+        {{- end }}
       ]
 
     [server]
@@ -29,9 +29,13 @@ data:
 
     [model_manager]
       search_paths = [
-        {{- range $index, $element := .Values.engine.modelManager.searchPaths }}
-          {{- if ne $index 0}},{{ end }}"{{ $element }}"
-        {{- end -}}
+        "/models
+        {{- if .Values.engine.modelManager.volumes.customVolumeClaim.enabled -}}
+          {{- if not (regexMatch `^\/` .Values.engine.modelManager.volumes.customVolumeClaim.modelsDirectory) -}}
+          /
+          {{- end -}}
+        {{- .Values.engine.modelManager.volumes.customVolumeClaim.modelsDirectory -}}
+        {{- end -}}"
       ]
 
     [features]

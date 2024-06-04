@@ -28,3 +28,9 @@ dependencies:
     version: "^24.3.0"
     repository: "https://helm.ngc.nvidia.com/nvidia"
     condition: gpu-operator.enabled
+  - name: cluster-autoscaler
+    version: "^9.37.0"
+    repository: "https://kubernetes.github.io/autoscaler"
+    condition: cluster-autoscaler.enabled
+
+  # use tags for prometheus and prometheus adapter

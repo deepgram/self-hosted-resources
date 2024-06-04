@@ -10,13 +10,12 @@ global:
   # shutdown the container, terminating any outstanding connections.
   outstandingRequestGracePeriod: 1800
 
-  # -- pullSecretRef is the name of the pre-configured K8s Secret
+  # -- Name of the pre-configured K8s Secret
   # with image repository credentials. See chart docs for more details.
   pullSecretRef:
 
-  # -- deepgramSecretRef is the name of the pre-configured K8s
-  # Secret containing your Deepgram self-hosted API key. See chart
-  # docs for more details.
+  # -- Name of the pre-configured K8s Secret containing your Deepgram
+  # self-hosted API key. See chart docs for more details.
   deepgramSecretRef:
 
   # -- Additional labels to add to all Deepgram resources
@@ -26,6 +25,9 @@ global:
 # services.
 # @default -- ``
 scaling:
+  # -- Set a static number of replicas for each
+  # services.
+  # @default -- ``
   static:
     enabled: true
 
@@ -37,13 +39,8 @@ scaling:
       # -- Number of Engine pods to deploy.
       replicas: 1
 
-    # -- The License Proxy is optional, but highly recommended to be deployed in production
-    # to enable highly available environments.
-    # If deployed, one replica should be sufficient to support many API/Engine pods.
-    # @default -- ``
-    licenseProxy:
-      # -- Number of License Proxy pods to deploy.
-      replicas: 0
+  auto:
+    enabled: false
 
 api:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
@@ -333,10 +330,6 @@ engine:
     port: 9991
 
   modelManager:
-    # -- searchPaths enumerates directories where inference models may be stored.
-    searchPaths:
-      - "/models"
-
     volumes:
       customVolumeClaim:
         # -- You may manually create your own PersistentVolume and PersistentVolumeClaim to store and
@@ -346,6 +339,10 @@ engine:
         enabled: false
         # -- Name of your pre-configured PersistentVolumeClaim
         name:
+        # -- Name of the directory within your pre-configured PersistentVolume
+        # where the models are stored
+        modelsDirectory: "/"
+
       aws:
         efs:
           # -- Whether to use an [AWS Elastic File Sytem](https://aws.amazon.com/efs/)
@@ -569,6 +566,28 @@ gpu-operator:
     # Therefore, we specify the `ubi8` image, which statically links the GLIBC library
     # and avoids this issue.
     version: v1.15.0-ubi8
+
+cluster-autoscaler:
+  # -- Set to `true` to enable node autoscaling with AWS EKS. Note needed for GKE, as autoscaling is enabled by a
+  # [cli option on cluster creation](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-autoscaler#creating_a_cluster_with_autoscaling).
+  enabled: false
+  rbac:
+    serviceAccount:
+      # -- Name of the IAM Service Account with the [necessary permissions](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions)
+      name: cluster-autoscaler-sa
+      annotations:
+        # -- Replace with the AWS Role ARN configured for the Cluster Autoscaler.
+        # See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s#creating-a-cluster)
+        # or [Cluster Autoscaler AWS documentation](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions)
+        # for details.
+        eks.amazonaws.com/role-arn:
+  autoDiscovery:
+    # -- Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler)
+    # on AWS requires knowledge of certain cluster metadata.
+    clusterName:
+  # -- Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler)
+  # on AWS requires knowledge of certain cluster metadata.
+  awsRegion:
 
 # -- Passthrough values for [Prometheus Helm chart]()
 # Prometheus (and its adapter) are only installed when pod autoscaling is enabled.

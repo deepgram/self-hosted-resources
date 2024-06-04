@@ -14,7 +14,7 @@ spec:
     matchLabels:
        app: deepgram-license-proxy
        {{ include "deepgram-self-hosted.selectorLabels" . }}
-  replicas: {{ if .Values.licenseProxy.deploySecondReplica }}2{{else }}1{{ end }}
+  replicas: {{ if .Values.licenseProxy.deploySecondReplica }}2{{ else }}1{{ end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -32,7 +32,9 @@ spec:
         {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
       securityContext:
         {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+      {{- if or .Values.licenseProxy.serviceAccount.create or .Values.licenseProxy.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.licenseProxy.namePrefix) .Values.licenseProxy.serviceAccount.name }}
+      {{- end }}
       containers:
       - name: {{ .Values.licenseProxy.namePrefix }}
         image: {{ .Values.licenseProxy.image.path }}:{{ .Values.licenseProxy.image.tag }}
