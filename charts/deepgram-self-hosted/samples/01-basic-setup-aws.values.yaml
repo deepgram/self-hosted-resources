@@ -28,12 +28,25 @@ global:
   deepgramSecretRef: "dg-self-hosted-api-key"
 
 scaling:
-  static:
-    api:
-      replicas: 1
+  replicas:
+    api: 1
+    engine: 1
+  auto:
+    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
+    enabled: false
     engine:
-      replicas: 1
-
+      metrics:
+        speechToText:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+          streaming:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+        textToSpeech:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+        # Discuss a reasoanble value with your Deepgram Account Representative
+        # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
+        requestCapacityRatio:
 api:
   affinity:
     nodeAffinity:
@@ -71,6 +84,12 @@ engine:
       memory: "40Gi"
       cpu: "8000m"
       gpu: 1
+  # Discuss a reasonable value with your Deepgram Account Representative
+  # If not using autoscaling, can be left empty, but must be set if using
+  # autoscaling with scaling.auto.engine.metrics.requestCapacityRatio
+  concurrencyLimit:
+    activeRequests:
+
   modelManager:
     volumes:
       aws:

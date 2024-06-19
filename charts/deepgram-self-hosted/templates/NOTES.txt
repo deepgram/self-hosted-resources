@@ -14,3 +14,8 @@ Kubernetes Autoscaler
 Copyright 2024 The Linux Foundation
 Licensed under the Apache-2.0 license.
 See https://github.com/kubernetes/autoscaler for more information.
+
+Prometheus Helm Charts
+Copyright 2024 The Linux Foundation
+Licensed under the Apache-2.0 license.
+See https://github.com/prometheus-community/helm-charts for more information.

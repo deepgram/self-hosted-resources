@@ -13,7 +13,7 @@ spec:
     matchLabels:
       app: deepgram-api
       {{ include "deepgram-self-hosted.selectorLabels" . }}
-  replicas: {{ .Values.scaling.static.api.replicas }}
+  replicas: {{ .Values.scaling.replicas.api }}
   strategy:
     type: RollingUpdate
     rollingUpdate:

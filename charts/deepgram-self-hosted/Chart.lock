@@ -5,5 +5,11 @@ dependencies:
 - name: cluster-autoscaler
   repository: https://kubernetes.github.io/autoscaler
   version: 9.37.0
-digest: sha256:fe07cbc8ac9c44dc8c2a6511049319313e6e546acf924a8a6f51d142aae7ab11
-generated: "2024-06-04T01:51:52.775190462-04:00"
+- name: kube-prometheus-stack
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 60.2.0
+- name: prometheus-adapter
+  repository: https://prometheus-community.github.io/helm-charts
+  version: 4.10.0
+digest: sha256:e68498ec97b15d90257562a3d25c33f2bde71447b963c893e49bfa97c3352773
+generated: "2024-06-18T21:48:47.225872139-04:00"

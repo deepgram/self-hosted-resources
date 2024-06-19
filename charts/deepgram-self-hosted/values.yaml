@@ -1,4 +1,15 @@
 global:
+  # -- (string) Name of the pre-configured K8s Secret
+  # with image repository credentials. See chart docs for more details.
+  pullSecretRef:
+
+  # -- (string) Name of the pre-configured K8s Secret containing your Deepgram
+  # self-hosted API key. See chart docs for more details.
+  deepgramSecretRef:
+
+  # -- Additional labels to add to all Deepgram resources
+  additionalLabels: {}
+
   # -- When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM
   # signal, the container will stop listening on its port, and no new requests will be routed
   # to that container. However, the container will continue to run until all existing
@@ -7,40 +18,84 @@ global:
   # Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.
   #
   # outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully
-  # shutdown the container, terminating any outstanding connections.
+  # shutdown the container, terminating any outstanding connections. 1800 / 60 sec/min = 30 mins
   outstandingRequestGracePeriod: 1800
 
-  # -- Name of the pre-configured K8s Secret
-  # with image repository credentials. See chart docs for more details.
-  pullSecretRef:
-
-  # -- Name of the pre-configured K8s Secret containing your Deepgram
-  # self-hosted API key. See chart docs for more details.
-  deepgramSecretRef:
-
-  # -- Additional labels to add to all Deepgram resources
-  additionalLabels: {}
-
 # -- Configuration options for horizontal scaling of Deepgram
-# services.
+# services. Only one of `static` and `auto` options can be enabled.
 # @default -- ``
 scaling:
-  # -- Set a static number of replicas for each
-  # services.
+  # -- Number of replicas to set during initial installation.
   # @default -- ``
-  static:
-    enabled: true
+  replicas:
+    api: 1
+    engine: 1
 
-    api:
-      # -- Number of API pods to deploy.
-      replicas: 1
-
-    engine:
-      # -- Number of Engine pods to deploy.
-      replicas: 1
-
+  # -- Enable pod autoscaling based on system load/traffic.
+  # @default -- ``
   auto:
     enabled: false
+
+    api:
+      metrics:
+        # -- Scale the API deployment to this Engine-to-Api pod ratio
+        engineToApiRatio: 4
+        # -- (list) If you have custom metrics you would like to scale with, you may add them here.
+        # See the [k8s docs](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+        # for how to structure a list of metrics
+        custom:
+
+        # -- [Configurable scaling behavior](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior)
+      # @default -- "*See values.yaml file for default*"
+      behavior:
+        scaleDown:
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+            - type: Percent
+              value: 25
+              periodSeconds: 60
+
+    engine:
+      # -- Minimum number of Engine replicas.
+      minReplicas: 1
+      # -- Maximum number of Engine replicas.
+      maxReplicas: 10
+      metrics:
+        # -- If `engine.concurrencyLimit.activeRequests` is set, this variable will
+        # define the ratio of current active requests to maximum active requests at which
+        # the Engine pods will scale. Setting this value too close to 1.0 may lead to a situation where
+        # the cluster is at max capacity and rejects incoming requests. Setting the ratio too close to 0.0
+        # will over-optimistically scale your cluster and increase compute costs unnecessarily.
+        requestCapacityRatio:
+        speechToText:
+          batch:
+            # -- (int) Scale the Engine pods based on a static desired number of speech-to-text batch requests per pod
+            requestsPerPod:
+          streaming:
+            # -- (int) Scale the Engine pods based on a static desired number of speech-to-text streaming requests per pod
+            requestsPerPod:
+        textToSpeech:
+          batch:
+            # -- (int) Scale the Engine pods based on a static desired number of text-to-speech batch requests per pod
+            requestsPerPod:
+        # -- If you have custom metrics you would like to scale with, you may add them here.
+        # See the [k8s docs](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/)
+        # for how to structure a list of metrics
+        custom: []
+
+      # -- [Configurable scaling behavior](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior)
+      # @default -- "*See values.yaml file for default*"
+      behavior:
+        scaleDown:
+          policies:
+            - type: Pods
+              value: 1
+              periodSeconds: 60
+            - type: Percent
+              value: 25
+              periodSeconds: 60
 
 api:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
@@ -111,7 +166,7 @@ api:
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram API Deployment.
     create: true
-    # -- Allows providing a custom service account name for the API component.
+    # -- (string) Allows providing a custom service account name for the API component.
     # If left empty, the default service account name will be used.
     # If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account.
     # If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account
@@ -152,21 +207,12 @@ api:
   # -- Specify custom DNS resolution options.
   # @default -- ``
   resolver:
-    # -- (list) nameservers allows for specifying custom domain name server(s).
+    # -- nameservers allows for specifying custom domain name server(s).
     # A valid list item's format is "{IP} {PORT} {PROTOCOL (tcp or udp)}",
     # e.g. `"127.0.0.1 53 udp"`.
-    # @default -- `[]`
-    nameservers:
+    nameservers: []
     # -- (int) maxTTL sets the DNS TTL value if specifying a custom DNS nameserver.
     maxTTL:
-
-  concurrencyLimit:
-    # -- activeRequests limits the number of active requests handled by
-    # a single API container.
-    # If additional requests beyond the limit are sent, API will return
-    # a 429 HTTP status code. Set to an integer if desired, otherwise
-    # the `nil` default means no limit will be set.
-    activeRequests:
 
   # -- Enable ancillary features
   # @default -- ``
@@ -268,7 +314,8 @@ engine:
   # to detect a pod that can't establish a network connection to validate its license.
   # @default -- ``
   startupProbe:
-    # -- periodSeconds defines how often to execute the probe. periodSeconds: 10
+    # -- periodSeconds defines how often to execute the probe.
+    periodSeconds: 10
     # -- failureThreshold defines how many unsuccessful startup probe attempts
     # are allowed before the container will be marked as Failed
     failureThreshold: 60
@@ -299,12 +346,21 @@ engine:
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
     create: true
-    # -- Allows providing a custom service account name for the Engine component.
+    # -- (string) Allows providing a custom service account name for the Engine component.
     # If left empty, the default service account name will be used.
     # If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account.
     # If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account
     # you wish to attach to the Engine deployment.
     name:
+
+  concurrencyLimit:
+    # -- (int) activeRequests limits the number of active requests handled by
+    # a single Engine container.
+    # If additional requests beyond the limit are sent, the API container
+    # forming the request will try a different Engine pod. If no Engine pods
+    # are able to accept the request, the API will return a 429 HTTP response
+    # to the client. The `nil` default means no limit will be set.
+    activeRequests:
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``
@@ -337,7 +393,7 @@ engine:
         # and enable here.
         # Note: Make sure the PV and PVC accessMode are set to `readWriteMany` or `readOnlyMany`
         enabled: false
-        # -- Name of your pre-configured PersistentVolumeClaim
+        # -- (string) Name of your pre-configured PersistentVolumeClaim
         name:
         # -- Name of the directory within your pre-configured PersistentVolume
         # where the models are stored
@@ -352,7 +408,7 @@ engine:
           enabled: false
           # -- Name prefix for the resources associated with the model storage in AWS EFS.
           namePrefix: dg-models
-          # -- FileSystemId of existing AWS Elastic File System where
+          # -- (string) FileSystemId of existing AWS Elastic File System where
           # Deepgram model files will be persisted.
           # You can find it using the AWS CLI:
           # ```
@@ -400,28 +456,29 @@ engine:
     # a valid language detection model is available
     languageDetection: true
 
-  # -- chunking defines the size of STT audio chunks to process in seconds.
+  # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
   # of results. Please contact your Deepgram Account Representative if you
   # want to adjust any of these values.
   # @default -- ``
   chunking:
-    batch:
-      # -- minDuration is the minimum audio duration for a STT chunk size for a batch request
-      minDuration:
-      # -- minDuration is the maximum audio duration for a STT chunk size for a batch request
-      maxDuration:
-    streaming:
-      # -- minDuration is the minimum audio duration for a STT chunk size for a streaming request
-      minDuration:
-      # -- minDuration is the maximum audio duration for a STT chunk size for a streaming request
-      maxDuration:
-      # -- step defines how often to return interim results, in seconds.
-      # This value may be lowered to increase the frequency of interim results.
-      # However, this also causes a significant decrease in the number of concurrent
-      # streams supported by a single GPU. Please contact your Deepgram Account
-      # representative for more details.
-      step: 1.0
+    speechToText:
+      batch:
+        # -- (float) minDuration is the minimum audio duration for a STT chunk size for a batch request
+        minDuration:
+        # -- (float) minDuration is the maximum audio duration for a STT chunk size for a batch request
+        maxDuration:
+      streaming:
+        # -- (float) minDuration is the minimum audio duration for a STT chunk size for a streaming request
+        minDuration:
+        # -- (float) minDuration is the maximum audio duration for a STT chunk size for a streaming request
+        maxDuration:
+        # -- step defines how often to return interim results, in seconds.
+        # This value may be lowered to increase the frequency of interim results.
+        # However, this also causes a significant decrease in the number of concurrent
+        # streams supported by a single GPU. Please contact your Deepgram Account
+        # representative for more details.
+        step: 1.0
 
   halfPrecision:
     # -- Engine will automatically enable half precision operations if your GPU supports
@@ -518,7 +575,7 @@ licenseProxy:
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram License Proxy Deployment.
     create: true
-    # -- Allows providing a custom service account name for the LicenseProxy component.
+    # -- (string) Allows providing a custom service account name for the LicenseProxy component.
     # If left empty, the default service account name will be used.
     # If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account.
     # If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account
@@ -576,24 +633,143 @@ cluster-autoscaler:
       # -- Name of the IAM Service Account with the [necessary permissions](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions)
       name: cluster-autoscaler-sa
       annotations:
-        # -- Replace with the AWS Role ARN configured for the Cluster Autoscaler.
+        # -- (string) Replace with the AWS Role ARN configured for the Cluster Autoscaler.
         # See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s#creating-a-cluster)
         # or [Cluster Autoscaler AWS documentation](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions)
         # for details.
         eks.amazonaws.com/role-arn:
   autoDiscovery:
-    # -- Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler)
+    # -- (string) Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler)
     # on AWS requires knowledge of certain cluster metadata.
     clusterName:
-  # -- Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler)
+  # -- (string) Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler)
   # on AWS requires knowledge of certain cluster metadata.
   awsRegion:
 
-# -- Passthrough values for [Prometheus Helm chart]()
-# Prometheus (and its adapter) are only installed when pod autoscaling is enabled.
-prometheus:
-  prometheusSpec:
-    additionalScrapeConfigs:
-      - job_name: "dg_engine_scrape"
-        #static_configs:
-        #  - targets: ["deepgram-nlb-service.default.svc.cluster.local:9991"]
+# -- Passthrough values for [Prometheus k8s stack Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack).
+# Prometheus (and its adapter) should be configured when scaling.auto is enabled.
+# You may choose to use the installation/configuration bundled in this Helm chart,
+# or you may configure an existing Prometheus installation in your cluster to expose
+# the needed values.
+# See source Helm chart for explanation of available values. Default values provided in this chart are used
+# to provide pod autoscaling for Deepgram pods.
+# @default -- ``
+kube-prometheus-stack:
+  # -- (bool) Normally, this chart will be installed if `scaling.auto.enabled` is true. However, if you wish
+  # to manage the Prometheus adapter in your cluster on your own and not as part of the Deepgram Helm chart,
+  # you can force it to not be installed by setting this to `false`.
+  includeDependency:
+
+  fullnameOverride: "dg-prometheus-stack"
+  prometheus:
+    prometheusSpec:
+      additionalScrapeConfigs:
+        - job_name: "dg_engine_metrics"
+          scrape_interval: "2s"
+          kubernetes_sd_configs:
+            - role: endpoints
+              namespaces:
+                names:
+                  - "{{ .Release.Namespace }}"
+          relabel_configs:
+            - source_labels: [__meta_kubernetes_service_name]
+              regex: "(.*)-metrics"
+              action: keep
+            - source_labels: [__meta_kubernetes_endpoint_port_name]
+              regex: "metrics"
+              action: keep
+            - source_labels: [__meta_kubernetes_namespace]
+              target_label: namespace
+            - source_labels: [__meta_kubernetes_service_name]
+              target_label: service
+            - source_labels: [__meta_kubernetes_pod_name]
+              target_label: pod
+
+  prometheusOperator:
+    enabled: true
+
+  alertmanager:
+    enabled: false
+
+  grafana:
+    enabled: true
+
+  nodeExporter:
+    enabled: false
+
+  kube-state-metrics:
+    enabled: true
+    metricLabelsAllowlist:
+      - namespaces=[{{ .Release.Namespace }}],deployments=[app]
+
+# -- Passthrough values for [Prometheus Adapter Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-adapter).
+# Prometheus, and its adapter here, should be configured when scaling.auto is enabled.
+# You may choose to use the installation/configuration bundled in this Helm chart,
+# or you may configure an existing Prometheus installation in your cluster to expose
+# the needed values.
+# See source Helm chart for explanation of available values. Default values provided in this chart are used
+# to provide pod autoscaling for Deepgram pods.
+# @default -- ``
+prometheus-adapter:
+  # -- Normally, this chart will be installed if `scaling.auto.enabled` is true. However, if you wish
+  # to manage the Prometheus adapter in your cluster on your own and not as part of the Deepgram Helm chart,
+  # you can force it to not be installed by setting this to `false`.
+  includeDependency:
+  prometheus:
+    url: http://dg-prometheus-stack-prometheus.{{ .Release.Namespace }}.svc
+  rules:
+    default: false
+    external:
+      - name:
+          as: "engine_active_requests_stt_streaming"
+        seriesQuery: 'engine_active_requests{kind="stream"}'
+        metricsQuery: 'avg(engine_active_requests{kind="stream"})'
+        resources:
+          overrides:
+            namespace: { resource: "namespace" }
+            pod: { resource: "pod" }
+            service: { resource: "service" }
+      - name:
+          as: "engine_active_requests_stt_batch"
+        seriesQuery: 'engine_active_requests{kind="batch"}'
+        metricsQuery: 'avg(engine_active_requests{kind="batch"})'
+        resources:
+          overrides:
+            namespace: { resource: "namespace" }
+            pod: { resource: "pod" }
+            service: { resource: "service" }
+      - name:
+          as: "engine_active_requests_tts_batch"
+        seriesQuery: 'engine_active_requests{kind="tts"}'
+        metricsQuery: 'avg(engine_active_requests{kind="tts"})'
+        resources:
+          overrides:
+            namespace: { resource: "namespace" }
+            pod: { resource: "pod" }
+            service: { resource: "service" }
+      - name:
+          as: "engine_estimated_stream_capacity"
+        seriesQuery: 'engine_active_requests{kind="stream"}'
+        metricsQuery: 'avg_over_time((sum(engine_active_requests{kind="stream"}) / sum(engine_estimated_stream_capacity) * 100)[1m:1m])'
+        resources:
+          overrides:
+            namespace: { resource: "namespace" }
+            pod: { resource: "pod" }
+            service: { resource: "service" }
+      - name:
+          as: "engine_requests_active_to_max_ratio"
+        seriesQuery: "engine_max_active_requests"
+        metricsQuery: "avg_over_time((sum(engine_active_requests) / sum(engine_max_active_requests) * 100)[1m:1m])"
+        resources:
+          overrides:
+            namespace: { resource: "namespace" }
+            pod: { resource: "pod" }
+            service: { resource: "service" }
+      - name:
+          as: "engine_to_api_pod_ratio"
+        seriesQuery: 'kube_deployment_labels{label_app="deepgram-engine"}'
+        metricsQuery: '(sum(kube_deployment_status_replicas and on(deployment) kube_deployment_labels{label_app="deepgram-engine"})) / (sum(kube_deployment_status_replicas and on(deployment) kube_deployment_labels{label_app="deepgram-api"}))'
+        resources:
+          overrides:
+            namespace: { resource: "namespace" }
+            pod: { resource: "pod" }

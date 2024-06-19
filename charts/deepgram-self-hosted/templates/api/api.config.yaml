@@ -42,11 +42,6 @@ data:
       max_ttl = {{ .Values.api.resolver.maxTTL }}
       {{- end }}
 
-    [concurrency_limit]
-      {{- if .Values.api.concurrencyLimit.activeRequests }}
-      active_requests = {{ .Values.api.concurrencyLimit.activeRequests }}
-      {{- end }}
-
     [features]
       topic_detection = {{ .Values.api.features.topicDetection }}
       summarization = {{ .Values.api.features.summarization }}

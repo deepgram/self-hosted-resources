@@ -18,9 +18,9 @@ keywords:
   - aura
   - speech-to-text
   - stt
+  - asr
   - nova
-  - speech-to-speech
-  - sts
+  - voice agent
   - self-hosted
 
 dependencies:
@@ -32,5 +32,11 @@ dependencies:
     version: "^9.37.0"
     repository: "https://kubernetes.github.io/autoscaler"
     condition: cluster-autoscaler.enabled
-
-  # use tags for prometheus and prometheus adapter
+  - name: kube-prometheus-stack
+    version: "^60.2.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: kube-prometheus-stack.includeDependency,scaling.auto.enabled
+  - name: prometheus-adapter
+    version: "^4.10.0"
+    repository: "https://prometheus-community.github.io/helm-charts"
+    condition: prometheus-adapter.includeDependency,scaling.auto.enabled

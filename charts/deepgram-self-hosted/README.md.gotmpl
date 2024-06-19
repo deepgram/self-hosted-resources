@@ -13,14 +13,16 @@
 
 {{ template "chart.requirementsSection" . }}
 
-## Get Repository Info
+## Using the Chart
+
+### Get Repository Info
 
 ```bash
 helm repo add deepgram https://deepgram.github.io/self-hosted-resources
 helm repo update
 ```
 
-## Installing the Chart
+### Installing the Chart
 
 The Deepgram self-hosted chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
 
@@ -32,7 +34,7 @@ You may also override any default configuration values. See [the Values section]
 helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 45m
 ```
 
-## Upgrade and Rollback Strategies
+### Upgrade and Rollback Strategies
 
 To upgrade the Deepgram components to a new version, follow these steps:
 
@@ -52,7 +54,7 @@ helm rollback deepgram
 
 Before upgrading, ensure that you have reviewed the release notes and any migration guides provided by Deepgram for the specific version you are upgrading to.
 
-## Uninstalling the Chart
+### Uninstalling the Chart
 
 ```bash
 helm uninstall [RELEASE_NAME]
@@ -60,7 +62,15 @@ helm uninstall [RELEASE_NAME]
 
 This removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Persistent Storage Options
+## Changelog
+
+See the [chart CHANGELOG](./CHANGELOG.md) for a list of relevant changes for each version of the Helm chart.
+
+For more details on changes to the underlying Deepgram resources, such as the container images or available models, see the [official Deepgram changelog](https://deepgram.com/changelog) ([RSS feed](https://deepgram.com/changelog.xml)).
+
+## Chart Configuration
+
+### Persistent Storage Options
 
 The Deepgram Helm chart supports different persistent storage options for storing Deepgram models and data. The available options include:
 
@@ -72,7 +82,38 @@ To configure a specific storage option, see the `engine.modelManager.volumes` [c
 
 For detailed instructions on setting up and configuring each storage option, refer to the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes) and the respective cloud provider's documentation.
 
-## RBAC Configuration
+### Autoscaling
+
+Autoscaling your cluster's capacity to meet incoming traffic demands involves both node autoscaling and pod autoscaling. Node autoscaling for supported cloud providers is setup by default when using this Helm chart and creating your cluster with the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes). Pod autoscaling can be enabled via the `scaling.auto.enabled` configuration option in this chart.
+
+#### Engine
+
+The Engine component is the core of the Deepgram self-hosted platform, responsible for performing inference using your deployed models. Autoscaling increases the number of Engine replicas to maintain consistent performance for incoming traffic. 
+
+There are currently two primary ways to scale the Engine component: scaling with a hard request limit per Engine Pod, or scaling with a soft request limit per Engine pod. 
+
+To set a hard limit on which to scale, configure `engine.concurrencyLimit.activeRequests` and `scaling.auto.engine.metrics.requestCapacityRatio`. The `activeRequests` parameter will set a hard limit of how many requests any given Engine pod will accept, and the `requestCapacityRatio` will govern scaling the Engine deployment when a certain percentage of "available request slots" is filled. For example, a requestCapacityRatio of `0.8` will scale the Engine deployment when the current number of active requests is >=80% of the active request concurrency limit. If the cluster is not able to scale in time and current active requests hits 100% of the preset limit, additional client requests to the API will return a `429 Too Many Requests` HTTP response to clients. This hard limit means that if a request is accepted for inference, it will have consistent performance, as the cluster will refuse surplus requests that could overload the cluster and degrade performance, at the expense of possibly rejecting some incoming requests if capacity does not scale in time. 
+
+To set a soft limit on which to scale, configure `scaling.auto.engine.metrics.{speechToText,textToSpeech}.{batch,streaming}.requestsPerPod`, depending on the primary traffic source for your environment. The cluster will attempt to scale to meet this target for number of requests per Engine pod, but will not reject extra requests with a `429 Too Many Request` HTTP response like the hard limit will. If the number of extra requests increases faster than the cluster can scale additional capacity, all incoming requests will still be accepted, but the performance of individual requests may degrade.
+
+> [!NOTE]
+> Deepgram recommends provisioning separate environments for batch speech-to-text, streaming speech-to-text, and text-to-speech workloads because typical latency and throughput tradeoffs are different for each of those use cases. 
+
+There is also a `scaling.auto.engine.metrics.custom` configuration value available to define your own custom scaling metric, if needed.
+
+#### API
+
+The API component is responsible for accepting incoming requests and forming responses, delegating inference work to the Deepgram Engine as needed. A single API pod can typically handle delegating requests to multiple Engine pods, so it is more compute efficient to deploy fewer API pods relative to the number of Engine pods. The `scaling.auto.api.metrics.engineToApiRatio` configuration value defines the ratio between Engine to API pods. The default value is appropriate for most deployments.
+
+There is also a `scaling.auto.api.metrics.custom` configuration value available to define your own custom scaling metric, if needed.
+
+#### License Proxy
+
+The [License Proxy](https://developers.deepgram.com/docs/license-proxy) is intended to be deployed as a fixed-scale deployment the proxies all licensing requests from your environment. It should not be upscaled with the traffic demands of your environment.
+
+This chart deploys one License Proxy Pod per environment by default. If you wish to deploy a second License Proxy Pod for redundancy, set `licenseProxy.deploySecondReplica` to `true`. 
+
+### RBAC Configuration
 
 Role-Based Access Control (RBAC) is used to control access to Kubernetes resources based on the roles and permissions assigned to users or service accounts. The Deepgram Helm chart includes default RBAC roles and bindings for the API, Engine, and License Proxy components.
 
@@ -85,7 +126,7 @@ To use custom RBAC roles and bindings based on your specific security requiremen
 
 Make sure to review and adjust the RBAC configuration according to the principle of least privilege, granting only the necessary permissions for each component.
 
-## Secret Management
+### Secret Management
 
 The Deepgram Helm chart takes references to two existing secrets - one containing your distribution credentials to pull container images from Deepgram's image repository, and one containing your Deepgram self-hosted API key.
 

@@ -25,6 +25,16 @@ iam:
       roleOnly: true
 
 managedNodeGroups:
+  - name: control-plane-node-group
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 3
+    instanceType: t3.large
+    amiFamily: Ubuntu2204
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    propagateASGTags: true
   - name: engine-node-group
     minSize: 0
     desiredCapacity: 0
@@ -63,16 +73,6 @@ managedNodeGroups:
     amiFamily: Ubuntu2204
     labels:
       k8s.deepgram.com/node-type: license-proxy
-    iam:
-      withAddonPolicies:
-        autoScaler: true
-    propagateASGTags: true
-  - name: control-plane-node-group
-    minSize: 1
-    desiredCapacity: 1
-    maxSize: 2
-    instanceType: t3.large
-    amiFamily: Ubuntu2204
     iam:
       withAddonPolicies:
         autoScaler: true

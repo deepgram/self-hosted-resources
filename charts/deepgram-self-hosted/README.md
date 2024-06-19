@@ -14,21 +14,25 @@ A Helm chart for running Deepgram services in a self-hosted environment
 
 ## Requirements
 
-Kubernetes: `>=1.27.0-0`
+Kubernetes: `>=1.28.0-0`
 
 | Repository | Name | Version |
 |------------|------|---------|
 | https://helm.ngc.nvidia.com/nvidia | gpu-operator | ^24.3.0 |
 | https://kubernetes.github.io/autoscaler | cluster-autoscaler | ^9.37.0 |
+| https://prometheus-community.github.io/helm-charts | kube-prometheus-stack | ^60.2.0 |
+| https://prometheus-community.github.io/helm-charts | prometheus-adapter | ^4.10.0 |
 
-## Get Repository Info
+## Using the Chart
+
+### Get Repository Info
 
 ```bash
 helm repo add deepgram https://deepgram.github.io/self-hosted-resources
 helm repo update
 ```
 
-## Installing the Chart
+### Installing the Chart
 
 The Deepgram self-hosted chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
 
@@ -37,10 +41,10 @@ You will need to provide your [self-service Deepgram licensing and credentials](
 You may also override any default configuration values. See [the Values section](#values) for a list of available options, and the [samples directory](./samples) for examples of a standard installation.
 
 ```
-helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 20m
+helm install -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 45m
 ```
 
-## Upgrade and Rollback Strategies
+### Upgrade and Rollback Strategies
 
 To upgrade the Deepgram components to a new version, follow these steps:
 
@@ -49,7 +53,7 @@ To upgrade the Deepgram components to a new version, follow these steps:
 2. Run the Helm upgrade command:
 
     ```bash
-    helm upgrade -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 30m
+    helm upgrade -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 60m
     ```
 
 If you encounter any issues during the upgrade process, you can perform a rollback to the previous version:
@@ -60,7 +64,7 @@ helm rollback deepgram
 
 Before upgrading, ensure that you have reviewed the release notes and any migration guides provided by Deepgram for the specific version you are upgrading to.
 
-## Uninstalling the Chart
+### Uninstalling the Chart
 
 ```bash
 helm uninstall [RELEASE_NAME]
@@ -68,7 +72,15 @@ helm uninstall [RELEASE_NAME]
 
 This removes all the Kubernetes components associated with the chart and deletes the release.
 
-## Persistent Storage Options
+## Changelog
+
+See the [chart CHANGELOG](./CHANGELOG.md) for a list of relevant changes for each version of the Helm chart.
+
+For more details on changes to the underlying Deepgram resources, such as the container images or available models, see the [official Deepgram changelog](https://deepgram.com/changelog) ([RSS feed](https://deepgram.com/changelog.xml)).
+
+## Chart Configuration
+
+### Persistent Storage Options
 
 The Deepgram Helm chart supports different persistent storage options for storing Deepgram models and data. The available options include:
 
@@ -80,7 +92,38 @@ To configure a specific storage option, see the `engine.modelManager.volumes` [c
 
 For detailed instructions on setting up and configuring each storage option, refer to the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes) and the respective cloud provider's documentation.
 
-## RBAC Configuration
+### Autoscaling
+
+Autoscaling your cluster's capacity to meet incoming traffic demands involves both node autoscaling and pod autoscaling. Node autoscaling for supported cloud providers is setup by default when using this Helm chart and creating your cluster with the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes). Pod autoscaling can be enabled via the `scaling.auto.enabled` configuration option in this chart.
+
+#### Engine
+
+The Engine component is the core of the Deepgram self-hosted platform, responsible for performing inference using your deployed models. Autoscaling increases the number of Engine replicas to maintain consistent performance for incoming traffic.
+
+There are currently two primary ways to scale the Engine component: scaling with a hard request limit per Engine Pod, or scaling with a soft request limit per Engine pod.
+
+To set a hard limit on which to scale, configure `engine.concurrencyLimit.activeRequests` and `scaling.auto.engine.metrics.requestCapacityRatio`. The `activeRequests` parameter will set a hard limit of how many requests any given Engine pod will accept, and the `requestCapacityRatio` will govern scaling the Engine deployment when a certain percentage of "available request slots" is filled. For example, a requestCapacityRatio of `0.8` will scale the Engine deployment when the current number of active requests is >=80% of the active request concurrency limit. If the cluster is not able to scale in time and current active requests hits 100% of the preset limit, additional client requests to the API will return a `429 Too Many Requests` HTTP response to clients. This hard limit means that if a request is accepted for inference, it will have consistent performance, as the cluster will refuse surplus requests that could overload the cluster and degrade performance, at the expense of possibly rejecting some incoming requests if capacity does not scale in time.
+
+To set a soft limit on which to scale, configure `scaling.auto.engine.metrics.{speechToText,textToSpeech}.{batch,streaming}.requestsPerPod`, depending on the primary traffic source for your environment. The cluster will attempt to scale to meet this target for number of requests per Engine pod, but will not reject extra requests with a `429 Too Many Request` HTTP response like the hard limit will. If the number of extra requests increases faster than the cluster can scale additional capacity, all incoming requests will still be accepted, but the performance of individual requests may degrade.
+
+> [!NOTE]
+> Deepgram recommends provisioning separate environments for batch speech-to-text, streaming speech-to-text, and text-to-speech workloads because typical latency and throughput tradeoffs are different for each of those use cases.
+
+There is also a `scaling.auto.engine.metrics.custom` configuration value available to define your own custom scaling metric, if needed.
+
+#### API
+
+The API component is responsible for accepting incoming requests and forming responses, delegating inference work to the Deepgram Engine as needed. A single API pod can typically handle delegating requests to multiple Engine pods, so it is more compute efficient to deploy fewer API pods relative to the number of Engine pods. The `scaling.auto.api.metrics.engineToApiRatio` configuration value defines the ratio between Engine to API pods. The default value is appropriate for most deployments.
+
+There is also a `scaling.auto.api.metrics.custom` configuration value available to define your own custom scaling metric, if needed.
+
+#### License Proxy
+
+The [License Proxy](https://developers.deepgram.com/docs/license-proxy) is intended to be deployed as a fixed-scale deployment the proxies all licensing requests from your environment. It should not be upscaled with the traffic demands of your environment.
+
+This chart deploys one License Proxy Pod per environment by default. If you wish to deploy a second License Proxy Pod for redundancy, set `licenseProxy.deploySecondReplica` to `true`.
+
+### RBAC Configuration
 
 Role-Based Access Control (RBAC) is used to control access to Kubernetes resources based on the roles and permissions assigned to users or service accounts. The Deepgram Helm chart includes default RBAC roles and bindings for the API, Engine, and License Proxy components.
 
@@ -93,7 +136,7 @@ To use custom RBAC roles and bindings based on your specific security requiremen
 
 Make sure to review and adjust the RBAC configuration according to the principle of least privilege, granting only the necessary permissions for each component.
 
-## Secret Management
+### Secret Management
 
 The Deepgram Helm chart takes references to two existing secrets - one containing your distribution credentials to pull container images from Deepgram's image repository, and one containing your Deepgram self-hosted API key.
 
@@ -136,7 +179,6 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 |-----|------|---------|-------------|
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
 | api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
-| api.concurrencyLimit.activeRequests | string | `nil` | activeRequests limits the number of active requests handled by a single API container. If additional requests beyond the limit are sent, API will return a 429 HTTP status code. Set to an integer if desired, otherwise the `nil` default means no limit will be set. |
 | api.driverPool | object | `` | driverPool configures the backend pool of speech engines (generically referred to as "drivers" here). The API will load-balance among drivers in the standard pool; if one standard driver fails, the next one will be tried. |
 | api.driverPool.standard | object | `` | standard is the main driver pool to use. |
 | api.driverPool.standard.maxResponseSize | string | `"1073741824"` | Maximum response to deserialize from Driver (in bytes). Default is 1GB, expressed in bytes. |
@@ -172,16 +214,18 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of API pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | cluster-autoscaler.autoDiscovery.clusterName | string | `nil` | Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
 | cluster-autoscaler.awsRegion | string | `nil` | Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
-| cluster-autoscaler.enabled | bool | `false` | Set to `true` if using node autoscaling with AWS EKS |
+| cluster-autoscaler.enabled | bool | `false` | Set to `true` to enable node autoscaling with AWS EKS. Note needed for GKE, as autoscaling is enabled by a [cli option on cluster creation](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-autoscaler#creating_a_cluster_with_autoscaling). |
 | cluster-autoscaler.rbac.serviceAccount.annotations."eks.amazonaws.com/role-arn" | string | `nil` | Replace with the AWS Role ARN configured for the Cluster Autoscaler. See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s#creating-a-cluster) or [Cluster Autoscaler AWS documentation](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions) for details. |
+| cluster-autoscaler.rbac.serviceAccount.name | string | `"cluster-autoscaler-sa"` | Name of the IAM Service Account with the [necessary permissions](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions) |
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
 | engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
-| engine.chunking | object | `` | chunking defines the size of STT audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
-| engine.chunking.batch.maxDuration | string | `nil` | minDuration is the maximum audio duration for a STT chunk size for a batch request |
-| engine.chunking.batch.minDuration | string | `nil` | minDuration is the minimum audio duration for a STT chunk size for a batch request |
-| engine.chunking.streaming.maxDuration | string | `nil` | minDuration is the maximum audio duration for a STT chunk size for a streaming request |
-| engine.chunking.streaming.minDuration | string | `nil` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
-| engine.chunking.streaming.step | float | `1` | step defines how often to return interim results, in seconds. This value may be lowered to increase the frequency of interim results. However, this also causes a significant decrease in the number of concurrent streams supported by a single GPU. Please contact your Deepgram Account representative for more details. |
+| engine.chunking | object | `` | chunking defines the size of audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
+| engine.chunking.speechToText.batch.maxDuration | float | `nil` | minDuration is the maximum audio duration for a STT chunk size for a batch request |
+| engine.chunking.speechToText.batch.minDuration | float | `nil` | minDuration is the minimum audio duration for a STT chunk size for a batch request |
+| engine.chunking.speechToText.streaming.maxDuration | float | `nil` | minDuration is the maximum audio duration for a STT chunk size for a streaming request |
+| engine.chunking.speechToText.streaming.minDuration | float | `nil` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
+| engine.chunking.speechToText.streaming.step | float | `1` | step defines how often to return interim results, in seconds. This value may be lowered to increase the frequency of interim results. However, this also causes a significant decrease in the number of concurrent streams supported by a single GPU. Please contact your Deepgram Account representative for more details. |
+| engine.concurrencyLimit.activeRequests | int | `nil` | activeRequests limits the number of active requests handled by a single Engine container. If additional requests beyond the limit are sent, the API container forming the request will try a different Engine pod. If no Engine pods are able to accept the request, the API will return a 429 HTTP response to the client. The `nil` default means no limit will be set. |
 | engine.features | object | `` | Enable ancillary features |
 | engine.features.languageDetection | bool | `true` | languageDetection enables Deepgram language detection *if* a valid language detection model is available |
 | engine.features.multichannel | bool | `true` | multichannel allows/disallows multichannel requests |
@@ -194,12 +238,12 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.metricsServer.host | string | `"0.0.0.0"` | host is the IP address to listen on for metrics requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.metricsServer.port | int | `9991` | port to listen on for metrics requests |
 | engine.modelManager.models.links | list | `[]` | Links to your Deepgram models, if automatically downloading into storage backing a persistent volume. **Automatic downloads are currently supported for AWS EFS volumes only.** Insert each model link provided to you by your Deepgram Account Representative. |
-| engine.modelManager.searchPaths | list | `["/models"]` | searchPaths enumerates directories where inference models may be stored. |
 | engine.modelManager.volumes.aws.efs.enabled | bool | `false` | Whether to use an [AWS Elastic File Sytem](https://aws.amazon.com/efs/) to store Deepgram models for use by Engine containers. This option requires your cluster to be running in [AWS EKS](https://aws.amazon.com/eks/). |
 | engine.modelManager.volumes.aws.efs.fileSystemId | string | `nil` | FileSystemId of existing AWS Elastic File System where Deepgram model files will be persisted. You can find it using the AWS CLI: ``` $ aws efs describe-file-systems --query "FileSystems[*].FileSystemId" ``` |
 | engine.modelManager.volumes.aws.efs.forceDownload | bool | `false` | Whether to force a fresh download of all model links provided, even if models are already present in EFS. |
 | engine.modelManager.volumes.aws.efs.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in AWS EFS. |
 | engine.modelManager.volumes.customVolumeClaim.enabled | bool | `false` | You may manually create your own PersistentVolume and PersistentVolumeClaim to store and expose model files to the Deepgram Engine. Configure your storage beforehand, and enable here. Note: Make sure the PV and PVC accessMode are set to `readWriteMany` or `readOnlyMany` |
+| engine.modelManager.volumes.customVolumeClaim.modelsDirectory | string | `"/"` | Name of the directory within your pre-configured PersistentVolume where the models are stored |
 | engine.modelManager.volumes.customVolumeClaim.name | string | `nil` | Name of your pre-configured PersistentVolumeClaim |
 | engine.modelManager.volumes.gcp.gpd.enabled | bool | `false` | Whether to use an [GKE Persistent Disks](https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes) to store Deepgram models for use by Engine containers. This option requires your cluster to be running in [GCP GKE](https://cloud.google.com/kubernetes-engine). See the GKE documentation on [using pre-existing persistent disks](https://cloud.google.com/kubernetes-engine/docs/how-to/persistent-volumes/preexisting-pd). |
 | engine.modelManager.volumes.gcp.gpd.fsType | string | `"ext4"` |  |
@@ -220,12 +264,13 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the Engine component. If left empty, the default service account name will be used. If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the Engine deployment. |
 | engine.startupProbe | object | `` | The startupProbe combination of `periodSeconds` and `failureThreshold` allows time for the container to load all models and start listening for incoming requests.  Model load time can be affected by hardware I/O speeds, as well as network speeds if you are using a network volume mount for the models.  If you are hitting the failure threshold before models are finished loading, you may want to extend the startup probe. However, this will also extend the time it takes to detect a pod that can't establish a network connection to validate its license. |
 | engine.startupProbe.failureThreshold | int | `60` | failureThreshold defines how many unsuccessful startup probe attempts are allowed before the container will be marked as Failed |
+| engine.startupProbe.periodSeconds | int | `10` | periodSeconds defines how often to execute the probe. |
 | engine.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to Engine pods. |
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
-| global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. |
+| global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. 1800 / 60 sec/min = 30 mins |
 | global.pullSecretRef | string | `nil` | Name of the pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `{"driver":{"enabled":true,"version":"550.54.15"},"enabled":true,"toolkit":{"enabled":true,"version":"v1.15.0-ubi8"}}` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs. |
 | gpu-operator.driver.enabled | bool | `true` | Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected. If your Kubernetes nodes run a base image that comes with NVIDIA drivers pre-configured, disable this option, but keep the parent `gpu-operator` and sibling `toolkit` options enabled. |
@@ -233,6 +278,8 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | gpu-operator.enabled | bool | `true` | Whether to install the NVIDIA GPU Operator to manage driver and/or container toolkit installation. See the list of [supported Operating Systems](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#supported-operating-systems-and-kubernetes-platforms) to verify compatibility with your cluster/nodes. Disable this option if your cluster/nodes are not compatible. If disabled, you will need to self-manage NVIDIA software installation on all nodes where you want to schedule Deepgram Engine pods. |
 | gpu-operator.toolkit.enabled | bool | `true` | Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected. |
 | gpu-operator.toolkit.version | string | `"v1.15.0-ubi8"` | NVIDIA container toolkit to install. The default `ubuntu` image tag for the toolkit requires a dynamic runtime link to a version of GLIBC that may not be present on nodes running older Linux distribution releases, such as Ubuntu 22.04. Therefore, we specify the `ubi8` image, which statically links the GLIBC library and avoids this issue. |
+| kube-prometheus-stack | object | `` | Passthrough values for [Prometheus k8s stack Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack). Prometheus (and its adapter) should be configured when scaling.auto is enabled. You may choose to use the installation/configuration bundled in this Helm chart, or you may configure an existing Prometheus installation in your cluster to expose the needed values. See source Helm chart for explanation of available values. Default values provided in this chart are used to provide pod autoscaling for Deepgram pods. |
+| kube-prometheus-stack.includeDependency | bool | `nil` | Normally, this chart will be installed if `scaling.auto.enabled` is true. However, if you wish to manage the Prometheus adapter in your cluster on your own and not as part of the Deepgram Helm chart, you can force it to not be installed by setting this to `false`. |
 | licenseProxy | object | `` | Configuration options for the optional [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy). |
 | licenseProxy.additionalLabels | object | `{}` | Additional labels to add to License Proxy resources |
 | licenseProxy.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for License Proxy pods. |
@@ -257,11 +304,21 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to License Proxy pods. |
 | licenseProxy.updateStrategy.rollingUpdate | object | `` | For the LicenseProxy, we only expose maxSurge and not maxUnavailable. This is to avoid accidentally having all LicenseProxy nodes go offline during upgrades, which could impact the entire cluster's connection to the Deepgram License Server. |
 | licenseProxy.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra License Proxy pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
-| prometheus | object | `{"prometheusSpec":{"additionalScrapeConfigs":[{"job_name":"dg_engine_scrape"}]}}` | Passthrough values for [Prometheus Helm chart]() Prometheus (and its adapter) are only installed when pod autoscaling is enabled. |
-| scaling | object | `` | Configuration options for horizontal scaling of Deepgram services. |
-| scaling.static | object | `` | Set a static number of replicas for each services. |
-| scaling.static.api.replicas | int | `1` | Number of API pods to deploy. |
-| scaling.static.engine.replicas | int | `1` | Number of Engine pods to deploy. |
+| prometheus-adapter | object | `` | Passthrough values for [Prometheus Adapter Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/prometheus-adapter). Prometheus, and its adapter here, should be configured when scaling.auto is enabled. You may choose to use the installation/configuration bundled in this Helm chart, or you may configure an existing Prometheus installation in your cluster to expose the needed values. See source Helm chart for explanation of available values. Default values provided in this chart are used to provide pod autoscaling for Deepgram pods. |
+| prometheus-adapter.includeDependency | string | `nil` | Normally, this chart will be installed if `scaling.auto.enabled` is true. However, if you wish to manage the Prometheus adapter in your cluster on your own and not as part of the Deepgram Helm chart, you can force it to not be installed by setting this to `false`. |
+| scaling | object | `` | Configuration options for horizontal scaling of Deepgram services. Only one of `static` and `auto` options can be enabled. |
+| scaling.auto | object | `` | Enable pod autoscaling based on system load/traffic. |
+| scaling.auto.api.metrics.custom | list | `nil` | If you have custom metrics you would like to scale with, you may add them here. See the [k8s docs](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) for how to structure a list of metrics |
+| scaling.auto.api.metrics.engineToApiRatio | int | `4` | Scale the API deployment to this Engine-to-Api pod ratio |
+| scaling.auto.engine.behavior | object | "*See values.yaml file for default*" | [Configurable scaling behavior](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/#configurable-scaling-behavior) |
+| scaling.auto.engine.maxReplicas | int | `10` | Maximum number of Engine replicas. |
+| scaling.auto.engine.metrics.custom | list | `[]` | If you have custom metrics you would like to scale with, you may add them here. See the [k8s docs](https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/) for how to structure a list of metrics |
+| scaling.auto.engine.metrics.requestCapacityRatio | string | `nil` | If `engine.concurrencyLimit.activeRequests` is set, this variable will define the ratio of current active requests to maximum active requests at which the Engine pods will scale. Setting this value too close to 1.0 may lead to a situation where the cluster is at max capacity and rejects incoming requests. Setting the ratio too close to 0.0 will over-optimistically scale your cluster and increase compute costs unnecessarily. |
+| scaling.auto.engine.metrics.speechToText.batch.requestsPerPod | int | `nil` | Scale the Engine pods based on a static desired number of speech-to-text batch requests per pod |
+| scaling.auto.engine.metrics.speechToText.streaming.requestsPerPod | int | `nil` | Scale the Engine pods based on a static desired number of speech-to-text streaming requests per pod |
+| scaling.auto.engine.metrics.textToSpeech.batch.requestsPerPod | int | `nil` | Scale the Engine pods based on a static desired number of text-to-speech batch requests per pod |
+| scaling.auto.engine.minReplicas | int | `1` | Minimum number of Engine replicas. |
+| scaling.replicas | object | `` | Number of replicas to set during initial installation. |
 
 ## Maintainers
 
