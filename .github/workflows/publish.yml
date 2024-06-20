@@ -28,9 +28,11 @@ jobs:
         env:
           GITHUB_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
 
-      - name: Add NVIDIA Helm chart repository
+      - name: Add Helm chart repositories for chart dependencies
         run: |
           helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
+          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+          helm repo add autoscaler https://kubernetes.github.io/autoscaler
           helm repo update
 
       - name: Run chart-releaser
