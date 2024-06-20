@@ -14,7 +14,7 @@
 [license]
 ### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
 ### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
-server_url = ["https://license-proxy:8443"]
+server_url = ["https://license-proxy:8443", "https://license.deepgram.com"]
 
 
 ### Configure the server to listen for requests from the API.
