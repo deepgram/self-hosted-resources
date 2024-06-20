@@ -95,7 +95,6 @@ engine:
       gcp:
         gpd:
           enabled: true
-          storageCapacity: "40G"
           # Replace with your Google disk handle
           volumeHandle: "projects/<your-project-id>/zones/<your-zone>/disks/<your-disk>"
 
