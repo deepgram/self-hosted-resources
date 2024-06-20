@@ -11,11 +11,12 @@ data:
   api.toml: |
     [license]
       server_url = [
-        {{- if gt (int .Values.scaling.static.licenseProxy.replicas) 0 -}}
+        {{- if .Values.licenseProxy.enabled }}
         "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
-        {{- else -}}
-        "https://license.deepgram.com"
-        {{- end -}}
+        {{- end }}
+        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup }}
+        {{- if .Values.licenseProxy.enabled -}},{{- end -}}"https://license.deepgram.com"
+        {{- end }}
       ]
 
     [server]
@@ -39,11 +40,6 @@ data:
       {{- end }}
       {{- if .Values.api.resolver.maxTTL }}
       max_ttl = {{ .Values.api.resolver.maxTTL }}
-      {{- end }}
-
-    [concurrency_limit]
-      {{- if .Values.api.concurrencyLimit.activeRequests }}
-      active_requests = {{ .Values.api.concurrencyLimit.activeRequests }}
       {{- end }}
 
     [features]

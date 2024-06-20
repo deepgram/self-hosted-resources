@@ -13,7 +13,7 @@ spec:
     matchLabels:
       app: deepgram-api
       {{ include "deepgram-self-hosted.selectorLabels" . }}
-  replicas: {{ .Values.scaling.static.api.replicas }}
+  replicas: {{ .Values.scaling.replicas.api }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -32,7 +32,9 @@ spec:
         {{- toYaml .Values.api.tolerations | nindent 8 }}
       securityContext:
         {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+      {{- if or .Values.api.serviceAccount.create or .Values.api.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.api.namePrefix) .Values.api.serviceAccount.name }}
+      {{- end }}
       containers:
       - name: {{ .Values.api.namePrefix }}
         image: {{ .Values.api.image.path }}:{{ .Values.api.image.tag }}

@@ -8,10 +8,12 @@ metadata:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
   annotations:
     "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": hook-succeeded
+    "helm.sh/hook-delete-policy": before-hook-creation
 spec:
   template:
     spec:
+      affinity:
+        {{- toYaml .Values.engine.affinity | nindent 8 }}
       containers:
       - name: model-download
         image: alpine
@@ -26,7 +28,7 @@ spec:
             EOF
             )
             TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
-
+            
             echo "$LINKS" | while IFS= read -r link; do
               FILE_NAME=$(basename "$link")
 

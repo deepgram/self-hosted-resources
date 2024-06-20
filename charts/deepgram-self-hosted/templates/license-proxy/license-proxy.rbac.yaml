@@ -1,4 +1,4 @@
-{{- if .Values.licenseProxy.serviceAccount.create }}
+{{- if and .Values.licenseProxy.enabled .Values.licenseProxy.serviceAccount.create }}
 apiVersion: v1
 kind: ServiceAccount
 metadata:

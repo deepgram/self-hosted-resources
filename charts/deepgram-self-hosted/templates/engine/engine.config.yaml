@@ -9,13 +9,18 @@ metadata:
     {{- end}}
 data:
   engine.toml: |
+    {{- if .Values.engine.concurrencyLimit.activeRequests }}
+    max_active_requests = {{ .Values.engine.concurrencyLimit.activeRequests }}
+    {{- end }}
+
     [license]
       server_url = [
-        {{- if gt (int .Values.scaling.static.licenseProxy.replicas) 0 -}}
+        {{- if .Values.licenseProxy.enabled }}
         "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
-        {{- else -}}
-        "https://license.deepgram.com"
-        {{- end -}}
+        {{- end }}
+        {{- if or (not .Values.licenseProxy.enabled) .Values.licenseProxy.keepUpstreamServerAsBackup }}
+        {{- if .Values.licenseProxy.enabled -}},{{- end -}}"https://license.deepgram.com"
+        {{- end }}
       ]
 
     [server]
@@ -28,9 +33,13 @@ data:
 
     [model_manager]
       search_paths = [
-        {{- range $index, $element := .Values.engine.modelManager.searchPaths }}
-          {{- if ne $index 0}},{{ end }}"{{ $element }}"
-        {{- end -}}
+        "/models
+        {{- if .Values.engine.modelManager.volumes.customVolumeClaim.enabled -}}
+          {{- if not (regexMatch `^\/` .Values.engine.modelManager.volumes.customVolumeClaim.modelsDirectory) -}}
+          /
+          {{- end -}}
+        {{- .Values.engine.modelManager.volumes.customVolumeClaim.modelsDirectory -}}
+        {{- end -}}"
       ]
 
     [features]
@@ -38,21 +47,21 @@ data:
       language_detection = {{ .Values.engine.features.languageDetection }}
 
     [chunking.batch]
-      {{- if .Values.engine.chunking.batch.minDuration }}
-      min_duration = {{ .Values.engine.chunking.batch.minDuration }}
+      {{- if .Values.engine.chunking.speechToText.batch.minDuration }}
+      min_duration = {{ .Values.engine.chunking.speechToText.batch.minDuration }}
       {{- end }}
-      {{- if .Values.engine.chunking.batch.maxDuration }}
-      max_duration = {{ .Values.engine.chunking.batch.maxDuration }}
+      {{- if .Values.engine.chunking.speechToText.batch.maxDuration }}
+      max_duration = {{ .Values.engine.chunking.speechToText.batch.maxDuration }}
       {{- end }}
 
     [chunking.streaming]
-      {{- if .Values.engine.chunking.streaming.minDuration }}
-      min_duration = {{ .Values.engine.chunking.streaming.minDuration }}
+      {{- if .Values.engine.chunking.speechToText.streaming.minDuration }}
+      min_duration = {{ .Values.engine.chunking.speechToText.streaming.minDuration }}
       {{- end }}
-      {{- if .Values.engine.chunking.streaming.maxDuration }}
-      max_duration = {{ .Values.engine.chunking.streaming.maxDuration }}
+      {{- if .Values.engine.chunking.speechToText.streaming.maxDuration }}
+      max_duration = {{ .Values.engine.chunking.speechToText.streaming.maxDuration }}
       {{- end }}
-      step = {{ .Values.engine.chunking.streaming.step }}
+      step = {{ .Values.engine.chunking.speechToText.streaming.step }}
 
     [half_precision]
       state = "{{ .Values.engine.halfPrecision.state }}"

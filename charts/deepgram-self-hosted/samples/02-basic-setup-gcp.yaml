@@ -28,13 +28,25 @@ global:
   deepgramSecretRef: "dg-self-hosted-api-key"
 
 scaling:
-  static:
-    api:
-      replicas: 1
+  replicas:
+    api: 1
+    engine: 1
+  auto:
+    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
+    enabled: false
     engine:
-      replicas: 1
-    licenseProxy:
-      replicas: 1
+      metrics:
+        speechToText:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+          streaming:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+        textToSpeech:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+        # Discuss a reasoanble value with your Deepgram Account Representative
+        # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
+        requestCapacityRatio:
 
 api:
   affinity:
@@ -42,16 +54,16 @@ api:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: deepgram/nodeType
+              - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
-                  - deepgram-api
+                  - api
   resources:
     requests:
       memory: "4Gi"
       cpu: "2000m"
     limits:
-      memory: "8Gi"
+      memory: "12Gi"
       cpu: "4000m"
 
 engine:
@@ -60,46 +72,52 @@ engine:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: deepgram/nodeType
+              - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
-                  - deepgram-engine
+                  - engine
   resources:
     requests:
-      memory: "28Gi"
-      cpu: "6000m"
+      memory: "24Gi"
+      cpu: "5000m"
       gpu: 1
     limits:
       memory: "40Gi"
       cpu: "8000m"
       gpu: 1
+  # Discuss a reasonable value with your Deepgram Account Representative
+  # If not using autoscaling, can be left empty, but must be set if using
+  # autoscaling with scaling.auto.engine.metrics.requestCapacityRatio
+  concurrencyLimit:
+    activeRequests:
   modelManager:
     volumes:
-      aws:
-        efs:
+      gcp:
+        gpd:
           enabled: true
-          fileSystemId: fs-xxxxxxxxxxxxxxxx # Replace with your EFS ID
-    models:
-      links:
-        - https://link-to-model-1.dg # Replace these links with those provided to you
-        - https://link-to-model-2.dg #   by your Deepgram Account Representative.
-        - https://link-to-model-3.dg
-        - ...
+          # Replace with your Google disk handle
+          volumeHandle: "projects/<your-project-id>/zones/<your-zone>/disks/<your-disk>"
 
 licenseProxy:
+  enabled: true
+
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
           - matchExpressions:
-              - key: deepgram/nodeType
+              - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
-                  - deepgram-license-proxy
+                  - license-proxy
   resources:
     requests:
-      memory: "6Gi"
-      cpu: "1500m"
+      memory: "4Gi"
+      cpu: "1000m"
     limits:
       memory: "8Gi"
       cpu: "2000m"
+
+gpu-operator:
+  # GKE will manage the driver and toolkit installation for us by default.
+  enabled: false
