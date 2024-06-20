@@ -6,7 +6,7 @@ appVersion: "release-240528"
 description: A Helm chart for running Deepgram services in a self-hosted environment
 home: "https://developers.deepgram.com/docs/self-hosted-introduction"
 sources: ["https://github.com/deepgram/self-hosted-resources"]
-kubeVersion: ">=1.27.0-0"
+kubeVersion: ">=1.28.0-0"
 maintainers:
   - name: Deepgram Self-Hosted
     email: self.hosted@deepgram.com
