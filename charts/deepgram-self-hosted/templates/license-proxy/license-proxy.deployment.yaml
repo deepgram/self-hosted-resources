@@ -23,6 +23,8 @@ spec:
   template:
     metadata:
       labels: *labels
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/license-proxy/license-proxy.config.yaml") . | sha256sum }}
     spec:
       imagePullSecrets:
       - name: {{ required "Missing image repository credentials - see `global.pullSecretRef`" .Values.global.pullSecretRef }}

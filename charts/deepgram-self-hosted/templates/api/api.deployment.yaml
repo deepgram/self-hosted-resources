@@ -22,6 +22,8 @@ spec:
   template:
     metadata:
       labels: *labels
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/api/api.config.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.global.outstandingRequestGracePeriod }}
       imagePullSecrets:

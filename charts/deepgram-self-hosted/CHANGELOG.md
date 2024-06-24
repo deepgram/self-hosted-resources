@@ -4,9 +4,11 @@ All notable changes to this Helm chart will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.2.1-beta] - 2024-06-24
 
-*Nothing at this time*
+### Added
+
+- Restart Deepgram containers automatically when underlying ConfigMaps have been modified.
 
 ## [0.2.0-beta] - 2024-06-20
 
@@ -36,7 +38,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.1-alpha...HEAD
+[0.2.1-beta]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.0-beta...deepgram-self-hosted-0.2.1-beta
 [0.2.0-beta]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.1-alpha...deepgram-self-hosted-0.2.0-beta
 [0.1.1-alpha]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.0-alpha...deepgram-self-hosted-0.1.1-alpha
 [0.1.0-alpha]: https://github.com/deepgram/self-hosted-resources/releases/tag/deepgram-self-hosted-0.1.0-alpha
