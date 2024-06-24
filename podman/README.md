@@ -21,7 +21,7 @@ There are several [Podman Compose](https://github.com/containers/podman-compose)
     ```bash
     $ export DEEPGRAM_API_KEY=<your api key here>
     ```
-4. Finish the walkthrough documentation by completing the [Deploy Deepgram Services](https://developers.deeps](https://developers.deepgram.com/docs/deploy-deepgram-services) guide.
+4. Finish the walkthrough documentation by completing the [Deploy Deepgram Service](https://developers.deepgram.com/docs/deploy-deepgram-services) guide.
 
 ## Getting Help
 
