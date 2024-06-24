@@ -35,6 +35,10 @@ services:
           cpus: "1.80"
           memory: 3800M
 
+    # Make sure the License Proxy is available for licensing
+    depends_on:
+      - license-proxy
+
   # The speech engine service.
   engine:
     image: quay.io/deepgram/onprem-engine:release-240528
@@ -72,6 +76,10 @@ services:
           devices:
             - capabilities: ["gpu"]
               count: 1
+
+    # Make sure the License Proxy is available for licensing
+    depends_on:
+      - license-proxy
 
   # The service to validate your Deepgram license
   license-proxy:
