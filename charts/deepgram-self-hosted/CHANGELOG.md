@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- More verbose logging for audio content length.
+- Adds more verbose logging for audio content length.
 - Keeps our software up-to-date.
 - See the [changelog](https://deepgram.com/changelog/deepgram-on-premises-june-2024-release-240627) associated with this routine monthly release.
 
