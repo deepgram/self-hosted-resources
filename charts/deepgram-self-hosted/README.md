@@ -36,7 +36,7 @@ helm repo update
 
 The Deepgram self-hosted chart requires Helm 3.7+ in order to install successfully. Please check your helm release before installation.
 
-You will need to provide your [self-service Deepgram licensing and credentials](https://developers.deepgram.com/docs/on-prem-self-service-tutorial) information. See `global.deepgramSecretRef` and `global.pullSecretRef` in the [Values section](#values) for more details.
+You will need to provide your [self-service Deepgram licensing and credentials](https://developers.deepgram.com/docs/on-prem-self-service-tutorial) information. See `global.deepgramSecretRef` and `global.pullSecretRef` in the [Values section](#values) for more details, and the [Deepgram Self-Hosted Kubernetes Guides](https://developers.deepgram.com/docs/kubernetes) for instructions on how to create these secrets.
 
 You may also override any default configuration values. See [the Values section](#values) for a list of available options, and the [samples directory](./samples) for examples of a standard installation.
 
@@ -271,7 +271,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
 | global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. 1800 / 60 sec/min = 30 mins |
-| global.pullSecretRef | string | `nil` | Name of the pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
+| global.pullSecretRef | string | `nil` | If using images from the Deepgram Quay image repositories, or another private registry to which your cluster doesn't have default access, you will need to provide a pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `{"driver":{"enabled":true,"version":"550.54.15"},"enabled":true,"toolkit":{"enabled":true,"version":"v1.15.0-ubi8"}}` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs. |
 | gpu-operator.driver.enabled | bool | `true` | Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected. If your Kubernetes nodes run a base image that comes with NVIDIA drivers pre-configured, disable this option, but keep the parent `gpu-operator` and sibling `toolkit` options enabled. |
 | gpu-operator.driver.version | string | `"550.54.15"` | NVIDIA driver version to install. |
