@@ -26,8 +26,10 @@ spec:
         checksum/config: {{ include (print $.Template.BasePath "/api/api.config.yaml") . | sha256sum }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.global.outstandingRequestGracePeriod }}
+      {{- if .Values.global.pullSecretRef }}
       imagePullSecrets:
-      - name: {{ required "Missing image repository credentials - see `global.pullSecretRef`" .Values.global.pullSecretRef }}
+      - name: {{ .Values.global.pullSecretRef }}
+      {{- end }}
       affinity:
         {{- toYaml .Values.api.affinity | nindent 8 }}
       tolerations:

@@ -1,5 +1,7 @@
 global:
-  # -- (string) Name of the pre-configured K8s Secret
+  # -- (string) If using images from the Deepgram Quay image repositories,
+  # or another private registry to which your cluster doesn't have default access,
+  # you will need to provide a pre-configured K8s Secret
   # with image repository credentials. See chart docs for more details.
   pullSecretRef:
 
