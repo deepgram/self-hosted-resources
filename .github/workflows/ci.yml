@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -20,9 +20,9 @@ jobs:
         run: helm lint ./charts/deepgram-self-hosted
 
       - name: Set up Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.17
+          go-version: 1.22
 
       - name: Install helm-docs
         run: |
