@@ -8,7 +8,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteMany
-  storageClassName: aws-efs-sc
+  storageClassName: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-sc
   resources:
     requests:
       storage: 5Gi
