@@ -38,3 +38,25 @@ jobs:
             echo "README.md is out of date. Please run helm-docs and commit the changes."
             exit 1
           fi
+
+      - name: Check that chart version is bumped if chart appVersion is bumped
+        run: |
+          CHART_DIR="charts/deepgram-self-hosted"
+          if [ ! -f "$CHART_DIR/Chart.yaml" ]; then
+            echo "Error: Chart.yaml not found in $CHART_DIR"
+            exit 1
+          fi
+
+          OLD_VERSION=$(git show $GITHUB_BASE_REF:$CHART_DIR/Chart.yaml | grep '^version:' | awk '{print $2}')
+          NEW_VERSION=$(grep '^version:' $CHART_DIR/Chart.yaml | awk '{print $2}')
+          OLD_APP_VERSION=$(git show $GITHUB_BASE_REF:$CHART_DIR/Chart.yaml | grep '^appVersion:' | awk '{print $2}')
+          NEW_APP_VERSION=$(grep '^appVersion:' $CHART_DIR/Chart.yaml | awk '{print $2}')
+
+          if [[ "$OLD_VERSION" = "$NEW_VERSION" ]] && [[ "$OLD_APP_VERSION" != "$NEW_APP_VERSION" ]]; then
+            echo "Error: In $CHART_DIR/Chart.yaml, appVersion has been changed but version has not been bumped"
+            echo "Old appVersion: $OLD_APP_VERSION"
+            echo "New appVersion: $NEW_APP_VERSION"
+            echo "Chart version: $NEW_VERSION"
+            echo "Chart version should be bumped anytime the application version is bumped."
+            exit 1
+          fi
