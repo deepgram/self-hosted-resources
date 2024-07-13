@@ -60,3 +60,18 @@ jobs:
             echo "Chart version should be bumped anytime the application version is bumped."
             exit 1
           fi
+
+      - name: Check that the chart changelog has been updated if the chart has changes
+        run: |
+          CHART_DIR="charts/deepgram-self-hosted"
+
+          echo "Non-documentation files changed in chart directory:"
+          # If there are changes to the chart directory besides the changelog file or documentation...
+          if git diff --name-only "$GITHUB_BASE_REF"... $CHART_DIR | grep -vE "^$CHART_DIR/(CHANGELOG\.md|README\.md(\..*)?)"; then
+          # ...make sure the changelog file is updated as well
+            if ! git diff --name-only "$GITHUB_BASE_REF"... "$CHART_DIR/CHANGELOG.md" | grep -q "$CHART_DIR/CHANGELOG.md"; then
+              echo "Detected changes to non-documentation files the helm chart directory, but the chart CHANGELOG.md was not updated."
+              echo "Please add a short desription of changes to the changelog under the \"Unreleased\" header."
+              exit 1
+            fi
+          fi
