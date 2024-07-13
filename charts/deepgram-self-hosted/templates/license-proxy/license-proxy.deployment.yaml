@@ -36,7 +36,7 @@ spec:
         {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
       securityContext:
         {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
-      {{- if or .Values.licenseProxy.serviceAccount.create or .Values.licenseProxy.serviceAccount.name }}
+      {{- if or .Values.licenseProxy.serviceAccount.create .Values.licenseProxy.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.licenseProxy.namePrefix) .Values.licenseProxy.serviceAccount.name }}
       {{- end }}
       containers:

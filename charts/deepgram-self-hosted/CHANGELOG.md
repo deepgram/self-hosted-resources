@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Resolves a mismatch between PVC and SC prefix naming convention.
+- Resolves error when specifying custom service account names.
 
 ## [0.2.2-beta] - 2024-06-27
 
