@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Resolves a mismatch between PVC and SC prefix naming convention.
 - Resolves error when specifying custom service account names.
+- Sample `values.yaml` file for on-premises/self-managed Kubernetes clusters.
 
 ### Changed
 
