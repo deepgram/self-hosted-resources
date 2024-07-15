@@ -177,6 +177,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| api.additionalAnnotations | object | `nil` | Additional annotations to add to the API deployment |
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
 | api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
 | api.driverPool | object | `` | driverPool configures the backend pool of speech engines (generically referred to as "drivers" here). The API will load-balance among drivers in the standard pool; if one standard driver fails, the next one will be tried. |
@@ -217,6 +218,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | cluster-autoscaler.enabled | bool | `false` | Set to `true` to enable node autoscaling with AWS EKS. Note needed for GKE, as autoscaling is enabled by a [cli option on cluster creation](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-autoscaler#creating_a_cluster_with_autoscaling). |
 | cluster-autoscaler.rbac.serviceAccount.annotations."eks.amazonaws.com/role-arn" | string | `nil` | Replace with the AWS Role ARN configured for the Cluster Autoscaler. See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s#creating-a-cluster) or [Cluster Autoscaler AWS documentation](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions) for details. |
 | cluster-autoscaler.rbac.serviceAccount.name | string | `"cluster-autoscaler-sa"` | Name of the IAM Service Account with the [necessary permissions](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#permissions) |
+| engine.additionalAnnotations | object | `nil` | Additional annotations to add to the Engine deployment |
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
 | engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
 | engine.chunking | object | `` | chunking defines the size of audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
@@ -281,6 +283,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | kube-prometheus-stack | object | `` | Passthrough values for [Prometheus k8s stack Helm chart](https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack). Prometheus (and its adapter) should be configured when scaling.auto is enabled. You may choose to use the installation/configuration bundled in this Helm chart, or you may configure an existing Prometheus installation in your cluster to expose the needed values. See source Helm chart for explanation of available values. Default values provided in this chart are used to provide pod autoscaling for Deepgram pods. |
 | kube-prometheus-stack.includeDependency | bool | `nil` | Normally, this chart will be installed if `scaling.auto.enabled` is true. However, if you wish to manage the Prometheus adapter in your cluster on your own and not as part of the Deepgram Helm chart, you can force it to not be installed by setting this to `false`. |
 | licenseProxy | object | `` | Configuration options for the optional [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy). |
+| licenseProxy.additionalAnnotations | object | `nil` | Additional annotations to add to the LicenseProxy deployment |
 | licenseProxy.additionalLabels | object | `{}` | Additional labels to add to License Proxy resources |
 | licenseProxy.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for License Proxy pods. |
 | licenseProxy.deploySecondReplica | bool | `false` | If the License Proxy is deployed, one replica should be sufficient to support many API/Engine pods. Highly available environments may wish to deploy a second replica to ensure uptime, which can be toggled with this option. |

@@ -8,6 +8,10 @@ metadata:
     {{- range $key, $val := .Values.engine.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
+  {{- with .Values.api.additionalAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     matchLabels:

@@ -8,7 +8,11 @@ metadata:
     app: deepgram-license-proxy
     {{- range $key, $val := .Values.licenseProxy.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
-    {{- end}}
+    {{- end }}
+  {{- with .Values.licenseProxy.additionalAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   selector:
     matchLabels:
