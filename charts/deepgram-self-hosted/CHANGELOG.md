@@ -12,9 +12,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Introduced entity detection feature flag for API containers (`false` by default).
 - Updated default container tags to July 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-july-2024-release-240725) for additional details. Highlights include:
   - Support for Deepgram's new English/Spanish multilingual code-switching model
-  - Beta support for entity detection
-  - Beta support for improved redaction for pre-recorded audio
-  - Beta support for improved entity formatting for streaming audio
+  - Beta support for entity detection for pre-recorded English audio
+  - Beta support for improved redaction for pre-recorded English audio
+  - Beta support for improved entity formatting for streaming English audio
 
 ### Removed
 
