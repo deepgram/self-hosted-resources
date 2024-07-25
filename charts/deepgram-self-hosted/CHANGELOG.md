@@ -6,6 +6,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.4.0] - 2024-07-25
+
+### Added
+- Introduced entity detection feature flag for API containers (`false` by default).
+- Updated default container tags to July 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-july-2024-release-240725) for additional details. Highlights include:
+  - Support for Deepgram's new English/Spanish multilingual code-switching model
+  - Beta support for entity detection
+  - Beta support for improved redaction for pre-recorded audio
+  - Beta support for improved entity formatting for streaming audio
+
+### Removed
+
+- Removed some items nested under `api.features` and `engine.features` sections in favor of opinionated defaults.
+
 ## [0.3.0] - 2024-07-18
 
 ### Added
@@ -16,9 +30,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Sample `values.yaml` file for on-premises/self-managed Kubernetes clusters.
+
+### Fixed
+
 - Resolves a mismatch between PVC and SC prefix naming convention.
 - Resolves error when specifying custom service account names.
-- Sample `values.yaml` file for on-premises/self-managed Kubernetes clusters.
 
 ### Changed
 
@@ -66,7 +83,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.3.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.4.0...HEAD
+[0.4.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.3.0...deepgram-self-hosted-0.4.0
 [0.3.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.3...deepgram-self-hosted-0.3.0
 [0.2.3]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.2-beta...deepgram-self-hosted-0.2.3
 [0.2.2-beta]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.1-beta...deepgram-self-hosted-0.2.2-beta

@@ -66,6 +66,12 @@ topic_detection = true # or false
 ### Enables summarization *if* a valid summarization model is available
 summarization = true # or false
 
+### Enables pre-recorded entity detection *if* a valid entity detection model is available
+entity_detection = false # or true
+
+### Enables pre-recorded entity-based redaction *if* a valid entity detection model is available
+entity_redaction = false # or true
+
 ### If API is receiving requests faster than Engine can process them, a request
 ### queue will form. By default, this queue is stored in memory. Under high load,
 ### the queue may grow too large and cause Out-Of-Memory errors. To avoid this,

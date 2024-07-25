@@ -43,8 +43,8 @@ data:
       ]
 
     [features]
-      multichannel = {{ .Values.engine.features.multichannel }}
-      language_detection = {{ .Values.engine.features.languageDetection }}
+      multichannel = true
+      language_detection = true
 
     [chunking.batch]
       {{- if .Values.engine.chunking.speechToText.batch.minDuration }}
