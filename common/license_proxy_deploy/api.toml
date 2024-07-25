@@ -67,9 +67,11 @@ topic_detection = true # or false
 summarization = true # or false
 
 ### Enables pre-recorded entity detection *if* a valid entity detection model is available
+### *WARNING*: Beta functionality.
 entity_detection = false # or true
 
 ### Enables pre-recorded entity-based redaction *if* a valid entity detection model is available
+### *WARNING*: Beta functionality.
 entity_redaction = false # or true
 
 ### If API is receiving requests faster than Engine can process them, a request
