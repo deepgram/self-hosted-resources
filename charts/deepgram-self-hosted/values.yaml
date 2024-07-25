@@ -112,7 +112,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-240627
+    tag: release-240725
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -222,11 +222,15 @@ api:
   # -- Enable ancillary features
   # @default -- ``
   features:
-    # -- topicDetection enables topic detection *if* a valid topic detection model is available.
-    topicDetection: true
+    # -- Enables entity detection on pre-recorded audio
+    # *if* a valid entity detection model is available.
+    # *WARNING*: Beta functionality.
+    entityDetection: false
 
-    # -- summarization enable summarization *if* a valid summarization model is available.
-    summarization: true
+    # -- Enables entity-based redaction on pre-recorded audio
+    # *if* a valid entity detection model is available.
+    # *WARNING*: Beta functionality.
+    entityRedaction: false
 
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,
@@ -274,7 +278,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-240627
+    tag: release-240725
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -455,15 +459,6 @@ engine:
       # Account Representative.
       links: []
 
-  # -- Enable ancillary features
-  # @default -- ``
-  features:
-    # -- multichannel allows/disallows multichannel requests
-    multichannel: true
-    # -- languageDetection enables Deepgram language detection *if*
-    # a valid language detection model is available
-    languageDetection: true
-
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
   # of results. Please contact your Deepgram Account Representative if you
@@ -525,7 +520,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/onprem-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-240627
+    tag: release-240725
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent

@@ -5,7 +5,7 @@ version: "3.7"
 services:
   # The speech API service.
   api:
-    image: quay.io/deepgram/onprem-api:release-240627
+    image: quay.io/deepgram/onprem-api:release-240725
 
     # Here we expose the API port to the host machine. The container port
     # (right-hand side) must match the port that the API service is listening
@@ -37,7 +37,7 @@ services:
 
   # The speech engine service.
   engine:
-    image: quay.io/deepgram/onprem-engine:release-240627
+    image: quay.io/deepgram/onprem-engine:release-240725
 
     # Utilize a GPU, if available.
     devices:

@@ -43,8 +43,11 @@ data:
       {{- end }}
 
     [features]
-      topic_detection = {{ .Values.api.features.topicDetection }}
-      summarization = {{ .Values.api.features.summarization }}
+      topic_detection = true
+      summarization = true
+      entity_detection = {{ .Values.api.features.entityDetection }}
+      entity_redaction = {{ .Values.api.features.entityRedaction }}
+
       {{- if .Values.api.features.diskBufferPath }}
       disk_buffer_path = "{{ .Values.api.features.diskBufferPath }}"
       {{- end }}
