@@ -1,7 +1,5 @@
 # Make sure to replace placeholder paths to config files and model directories
 
-version: "3.7"
-
 services:
   # The speech API service.
   api:
