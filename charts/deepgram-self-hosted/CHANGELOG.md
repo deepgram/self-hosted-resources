@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Fixed a misleading comment in the `03-basic-setup-onprem.yaml` sample file that wrongly suggested `engine.modelManager.volumes.customVolumeClaim.name` should be a `PersistentVolume` instead of a `PersistentVolumeClaim`
+
 ## [0.4.0] - 2024-07-25
 
 ### Added

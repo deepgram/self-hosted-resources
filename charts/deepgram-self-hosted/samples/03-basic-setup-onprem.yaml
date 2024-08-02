@@ -40,7 +40,7 @@ engine:
     volumes:
       customVolumeClaim:
         enabled: true
-        name: deepgram-models-pv # Replace with the name of the local PersistentVolume you have created
+        name: deepgram-models-pvc # Replace with the name of a PersistentVolumeClaim that maps to the PersistentVolume you have created
         modelsDirectory: "/"
 
 licenseProxy:
