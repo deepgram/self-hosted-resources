@@ -19,7 +19,5 @@ We love to hear from you so if you have questions, comments or find a bug in thi
 - If you're interested in learning more about self-hosting Deepgram products, [contact us here](https://deepgram.com/contact-us)!
 - If you have a specific bug or feature request for these resources, [you can open an issue in this repo](https://github.com/deepgram/self-hosted-resources/issues/new/choose).
 - The [Deepgram documentation](https://developers.deepgram.com) and [Deepgram Help Center](https://deepgram.gitbook.io/help-center) have answers to many common questions.
-- Deepgram also has a developer community!
-  - [Join the Deepgram Github Discussions Community](https://github.com/orgs/deepgram/discussions)
-  - [Join the Deepgram Discord Community](https://discord.gg/xWRaCDBtW4)
+- Deepgram also has a [developer community](https://community.deepgram.com/)!
 
