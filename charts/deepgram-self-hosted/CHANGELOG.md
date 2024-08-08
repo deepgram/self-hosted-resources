@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## [0.4.0] - 2024-07-25
 
 ### Added
+
 - Introduced entity detection feature flag for API containers (`false` by default).
 - Updated default container tags to July 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-july-2024-release-240725) for additional details. Highlights include:
   - Support for Deepgram's new English/Spanish multilingual code-switching model
