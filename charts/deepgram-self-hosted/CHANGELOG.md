@@ -6,9 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.5.0] - 2024-08-27
+
+### Added
+
+- Updated default container tags to August 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-august-2024-release-240827) for additional details. Highlights include:
+  - GA support for entity detection for pre-recorded English audio
+  - GA support for improved redaction for pre-recorded English audio
+
 ### Fixed
 
 - Fixed a misleading comment in the `03-basic-setup-onprem.yaml` sample file that wrongly suggested `engine.modelManager.volumes.customVolumeClaim.name` should be a `PersistentVolume` instead of a `PersistentVolumeClaim`
+
+### Changed
+
+- Deepgram's core products are available to host both on-premises and in the cloud. Official resources have been updated to refer to a ["self-hosted" product offering](https://deepgram.com/self-hosted), instead of an "onprem" product offering, to align the product name with industry naming standards. The Deepgram Quay image repository names have been updated to reflect this.
 
 ## [0.4.0] - 2024-07-25
 
@@ -88,7 +100,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.4.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.5.0...HEAD
+[0.5.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.4.0...deepgram-self-hosted-0.5.0
 [0.4.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.3.0...deepgram-self-hosted-0.4.0
 [0.3.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.3...deepgram-self-hosted-0.3.0
 [0.2.3]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.2-beta...deepgram-self-hosted-0.2.3
