@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: julia2-deepgram-self-hosted-cluster
+  name: deepgram-self-hosted-cluster
   region: us-west-2
   version: "1.30"
 
@@ -10,14 +10,14 @@ iam:
   withOIDC: true
   serviceAccounts:
     - metadata:
-        name: cluster-autoscaler-sa-julia
+        name: cluster-autoscaler-sa
         namespace: dg-self-hosted
       wellKnownPolicies:
         autoScaler: true
       roleName: cluster-autoscaler-role
       roleOnly: true
     - metadata:
-        name: efs-csi-controller-sa-julia
+        name: efs-csi-controller-sa
         namespace: kube-system
       wellKnownPolicies:
         efsCSIController: true
@@ -25,7 +25,7 @@ iam:
       roleOnly: true
 
 managedNodeGroups:
-  - name: control-plane-node-group-julia
+  - name: control-plane-node-group
     minSize: 1
     desiredCapacity: 1
     maxSize: 3
@@ -35,7 +35,7 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     propagateASGTags: true
-  - name: engine-node-group-julia
+  - name: engine-node-group
     minSize: 0
     desiredCapacity: 0
     maxSize: 8
@@ -53,7 +53,7 @@ managedNodeGroups:
         value: "true"
         effect: NoExecute
     propagateASGTags: true
-  - name: api-node-group-julia
+  - name: api-node-group
     minSize: 0
     desiredCapacity: 0
     maxSize: 2
@@ -65,7 +65,7 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     propagateASGTags: true
-  - name: license-proxy-node-group-julia
+  - name: license-proxy-node-group
     minSize: 0
     desiredCapacity: 0
     maxSize: 2
