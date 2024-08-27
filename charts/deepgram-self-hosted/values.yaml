@@ -108,11 +108,11 @@ api:
     # -- path configures the image path to use for creating API containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-api
+    path: quay.io/deepgram/self-hosted-api
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-240725
+    tag: release-240827
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -134,7 +134,7 @@ api:
       maxSurge: 1
 
   # -- Configure resource limits per API container. See
-  # [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#api)
+  # [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#api)
   # for more details.
   # @default -- ``
   resources:
@@ -274,11 +274,11 @@ engine:
     # -- path configures the image path to use for creating Engine containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-engine
+    path: quay.io/deepgram/self-hosted-engine
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-240725
+    tag: release-240827
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -300,7 +300,7 @@ engine:
       maxSurge: 1
 
   # -- Configure resource limits per Engine container. See
-  # [Deepgram's documentation](https://developers.deepgram.com/docs/on-prem-deployment-environments#engine)
+  # [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine)
   # for more details.
   # @default -- ``
   resources:
@@ -518,9 +518,9 @@ licenseProxy:
     # -- path configures the image path to use for creating License Proxy containers.
     # You may change this from the public Quay image path if you have imported
     # Deepgram images into a private container registry.
-    path: quay.io/deepgram/onprem-license-proxy
+    path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-240725
+    tag: release-240827
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
