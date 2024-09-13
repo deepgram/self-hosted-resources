@@ -10,9 +10,10 @@ global:
   # with the following commands:
   # ```bash
   # docker login quay.io
-  # kubectl create secret generic dg-regcred \
-  #   --from-file=.dockerconfigjson=$HOME/.docker/config.json \
-  #   --type=kubernetes.io/dockerconfigjson
+  # kubectl create secret docker-registry dg-regcred \
+  #   --docker-server=quay.io \
+  #   --docker-username='QUAY_DG_USER' \
+  #   --docker-password='QUAY_DG_PASSWORD'
   # ```
   pullSecretRef: "dg-regcred"
 
