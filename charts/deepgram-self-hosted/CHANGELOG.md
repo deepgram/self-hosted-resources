@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Update sample files to fix an issue with sample command for Kubernetes Secret creation storing Quay credential
+  - Previous command used `--from-file` with the user's Docker configuration file. Some local secret managers, like
+    Apple Keychain, scrub this file for sensitive information, which would result in an empty secret being created.
+
 ## [0.5.0] - 2024-08-27
 
 ### Added
