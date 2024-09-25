@@ -1,9 +1,9 @@
 {{- if .Values.engine.modelManager.volumes.aws.efs.enabled }}
-{{- if .Values.engine.modelManager.models.links }}
+{{- if or .Values.engine.modelManager.models.links .Values.engine.modelManager.models.add .Values.engine.modelManager.models.remove }}
 apiVersion: batch/v1
 kind: Job
 metadata:
-  name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-models-download
+  name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-models-management
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
   annotations:
@@ -15,33 +15,52 @@ spec:
       affinity:
         {{- toYaml .Values.engine.affinity | nindent 8 }}
       containers:
-      - name: model-download
+      - name: model-management
         image: alpine
         command:
           - /bin/sh
           - -c
           - |
-            LINKS=$(cat <<EOF
+            TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
+            
+            ADD_LINKS=$(cat <<EOF
+            {{- range .Values.engine.modelManager.models.add }}
+            {{ . }}
+            {{- end }}
             {{- range .Values.engine.modelManager.models.links }}
             {{ . }}
             {{- end }}
             EOF
             )
-            TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
-            
-            echo "$LINKS" | while IFS= read -r link; do
-              FILE_NAME=$(basename "$link")
 
-              if [ "{{ .Values.engine.modelManager.volumes.aws.efs.forceDownload }}" == "true" ]; then
-                printf "[%s] [INFO] Force downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
-                wget -O "/mnt/efs/$FILE_NAME" "$link"
-                printf "[%s] [INFO] Downloaded model file (force download): %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
-              elif [ ! -f "/mnt/efs/$FILE_NAME" ]; then
+            echo "$ADD_LINKS" | while IFS= read -r link; do
+              [ -z "$link" ] && continue
+              FILE_NAME=$(basename "$link")
+              if [ "{{ .Values.engine.modelManager.volumes.aws.efs.forceDownload }}" == "true" ] || [ ! -f "/mnt/efs/$FILE_NAME" ]; then
                 printf "[%s] [INFO] Downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
                 wget -O "/mnt/efs/$FILE_NAME" "$link"
                 printf "[%s] [INFO] Downloaded model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
               else
                 printf "[%s] [INFO] Model file already exists in EFS storage: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+              fi
+            done
+
+            REMOVE_LINKS=$(cat <<EOF
+            {{- range .Values.engine.modelManager.models.remove }}
+            {{ . }}
+            {{- end }}
+            EOF
+            )
+
+            echo "$REMOVE_LINKS" | while IFS= read -r link; do
+              [ -z "$link" ] && continue
+              FILE_NAME=$(basename "$link")
+              if [ -f "/mnt/efs/$FILE_NAME" ]; then
+                printf "[%s] [INFO] Removing model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                rm "/mnt/efs/$FILE_NAME"
+                printf "[%s] [INFO] Removed model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+              else
+                printf "[%s] [INFO] Model file not found in EFS storage: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
               fi
             done
         volumeMounts:
@@ -54,4 +73,3 @@ spec:
             claimName: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
 {{- end }}
 {{- end }}
-

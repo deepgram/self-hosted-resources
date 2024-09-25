@@ -452,12 +452,21 @@ engine:
           fsType: "ext4"
 
     models:
-      # -- Links to your Deepgram models, if automatically downloading
+      # -- Deprecated field to automatically download models. Functionality still supported,
+      # but migration to use `engine.modelManager.models.add.links` is strongly recommended.
+      links: []
+      # -- Links to your Deepgram models to automatically download
       # into storage backing a persistent volume.
-      # **Automatic downloads are currently supported for AWS EFS volumes only.**
+      # **Automatic model management is currently supported for AWS EFS volumes only.**
       # Insert each model link provided to you by your Deepgram
       # Account Representative.
-      links: []
+      add: []
+      # -- If desiring to remove a model from storage (to reduce number of models loaded by
+      # Engine on startup), move a link from the `engine.modelManager.models.add` section
+      # to this section. You can also use a model name instead of the full link to designate
+      # for removal.
+      # **Automatic model management is currently supported for AWS EFS volumes only.**
+      remove: []
 
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
