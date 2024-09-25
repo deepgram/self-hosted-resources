@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Automatic model management on AWS now supports model removal. See the `engine.modelManager.models.remove` section in the `values.yaml` file for details.
+
+### Changed
+
+- Automatic model downloads on AWS are moved from `engine.modelManager.models.links` to `engine.modelManager.models.add`. The old `links` field is still supported, but migration is recommended.
+
 ### Fixed
 
 - Update sample files to fix an issue with sample command for Kubernetes Secret creation storing Quay credential

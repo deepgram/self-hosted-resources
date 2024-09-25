@@ -1,15 +1,15 @@
 dependencies:
 - name: gpu-operator
   repository: https://helm.ngc.nvidia.com/nvidia
-  version: v24.3.0
+  version: v24.6.2
 - name: cluster-autoscaler
   repository: https://kubernetes.github.io/autoscaler
-  version: 9.37.0
+  version: 9.40.0
 - name: kube-prometheus-stack
   repository: https://prometheus-community.github.io/helm-charts
   version: 60.5.0
 - name: prometheus-adapter
   repository: https://prometheus-community.github.io/helm-charts
-  version: 4.10.0
-digest: sha256:38ff59bc00f2cd88c2f06a844f0309d3fea593dd0a8877a7667288fa9f5c53b8
-generated: "2024-07-15T11:42:44.763681334-04:00"
+  version: 4.11.0
+digest: sha256:015d3cb08c7419ea94d643fbb4848a67a2d199b4f8d0fb76baaa6129567f6f09
+generated: "2024-09-25T13:42:10.032220779-04:00"
