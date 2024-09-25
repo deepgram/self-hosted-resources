@@ -453,7 +453,7 @@ engine:
 
     models:
       # -- Deprecated field to automatically download models. Functionality still supported,
-      # but migration to use `engine.modelManager.models.add.links` is strongly recommended.
+      # but migration to use `engine.modelManager.models.add` is strongly recommended.
       links: []
       # -- Links to your Deepgram models to automatically download
       # into storage backing a persistent volume.
