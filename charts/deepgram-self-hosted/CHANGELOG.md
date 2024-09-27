@@ -6,8 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.6.0] - 2024-09-27
+
 ### Added
 
+- Updated default container tags to September 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-september-2024-release-240927) for additional details. Highlights include:
+  - Adds broader support in Engine container for model auto-loading during runtime.
+    - Filesystems that don't support `inotify`, such as `nfs`/`csi` PersistentVolumes in Kubernetes, can now load and unload models during runtime without requiring a Pod restart.
 - Automatic model management on AWS now supports model removal. See the `engine.modelManager.models.remove` section in the `values.yaml` file for details.
 - Container orchestrator environment variable added to improve support.
 
@@ -115,7 +120,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.5.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.6.0...HEAD
+[0.6.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.5.0...deepgram-self-hosted-0.6.0
 [0.5.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.4.0...deepgram-self-hosted-0.5.0
 [0.4.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.3.0...deepgram-self-hosted-0.4.0
 [0.3.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.3...deepgram-self-hosted-0.3.0
