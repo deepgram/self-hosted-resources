@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Automatic model management on AWS now supports model removal. See the `engine.modelManager.models.remove` section in the `values.yaml` file for details.
+- Container orchestrator environment variable added to improve support.
 
 ### Changed
 

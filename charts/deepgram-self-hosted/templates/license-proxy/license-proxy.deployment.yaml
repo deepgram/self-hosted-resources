@@ -50,6 +50,9 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        env:
+        - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+          value: helm-{{ include "deepgram-self-hosted.chart" . }}
         command: [ "hermes" ]
         args: ["-v", "serve", "/etc/config/license-proxy.toml"]
         resources:
