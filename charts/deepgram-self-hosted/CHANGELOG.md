@@ -119,7 +119,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.5.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.6.0...HEAD
+[0.6.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.5.0...deepgram-self-hosted-0.6.0
 [0.5.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.4.0...deepgram-self-hosted-0.5.0
 [0.4.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.3.0...deepgram-self-hosted-0.4.0
 [0.3.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.2.3...deepgram-self-hosted-0.3.0
