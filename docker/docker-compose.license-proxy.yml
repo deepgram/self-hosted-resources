@@ -1,5 +1,11 @@
 # Make sure to replace placeholder paths to config files and model directories
 
+x-env: &env
+  environment:
+    # Make sure you `export` your self-hosted API key secret in your local environment
+    DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+    DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "docker-compose"
+
 services:
   # The speech API service.
   api:
@@ -11,9 +17,7 @@ services:
     ports:
       - "8080:8080"
 
-    # Make sure you `export` your self-hosted API key secret in your local environment
-    environment:
-      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+    <<: *env
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path
@@ -47,9 +51,7 @@ services:
     ports:
       - "9991:9991"
 
-    # Make sure you `export` your self-hosted API key secret in your local environment
-    environment:
-      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+    <<: *env
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.
@@ -89,9 +91,7 @@ services:
     ports:
       - "8089:8080"
 
-    # Make sure you `export` your self-hosted API key secret in your local environment
-    environment:
-      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+    <<: *env
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path

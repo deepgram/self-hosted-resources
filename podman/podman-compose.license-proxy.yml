@@ -14,6 +14,7 @@ services:
     # Make sure you `export` your self-hosted API key secret in your local environment
     environment:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+      DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path
@@ -51,6 +52,7 @@ services:
     # Make sure you `export` your self-hosted API key secret in your local environment
     environment:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+      DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.
@@ -93,6 +95,7 @@ services:
     # Make sure you `export` your self-hosted API key secret in your local environment
     environment:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+      DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path

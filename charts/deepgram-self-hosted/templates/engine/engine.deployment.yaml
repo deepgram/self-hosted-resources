@@ -50,8 +50,10 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {{- if le (int .Values.engine.resources.requests.gpu) 0 }}
         env:
+        - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+          value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        {{- if le (int .Values.engine.resources.requests.gpu) 0 }}
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
         {{- end }}
