@@ -68,6 +68,7 @@ check_file_errors() {
 			printf "Suggested fix: Check DNS resolution for the target service.\n"
 		elif grep -qE "^.*Aegis request to .* failed.*401.*$" "$file"; then
 			printf "Suggested fix: Your API key is unauthorized. Check console.deepgram.com to ensure that your API key is active and has self-hosted access.\n"
+			printf "See https://developers.deepgram.com/docs/self-hosted-self-service-tutorial for details"
 		elif grep -qE "^.*Aegis request to .* failed:.*[TimedOut|Connection refused].*$" "$file"; then
 			printf "Suggested fix: "
 			if [[ "$target_url" =~ ^.*license.deepgram.com.*$ ]]; then
@@ -82,7 +83,7 @@ check_file_errors() {
 
 	if grep -q "impeller::config: Using devices: CPU" "$file"; then
 		printf "%bWarning%b: Engine container was unable to detect a GPU, and is running in CPU mode.\n" "$YELLOW" "$NC"
-		printf "CPU mode is significantly less efficient than using a GPU. If not intended, ensure all GPU setup steps have been completed from the Deepgram developer documentation.\n"
+		printf "CPU mode is critically less efficient than using a GPU, and likely not intended. Ensure all GPU setup steps have been completed from the Deepgram developer documentation.\n"
 		error_found=true
 	elif grep -q "half_precision=false" "$file"; then
 		printf "%bWarning%b: GPU not running in half precision mode. Inference efficiency will be significantly impacted with this setting disabled.\n" "$YELLOW" "$NC"
