@@ -75,3 +75,47 @@ jobs:
               exit 1
             fi
           fi
+
+  diagnostic-scripts-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Check for changes in diagnostic directory
+        id: check_changes
+        run: |
+          git diff --name-only origin/${{ github.base_ref }}..HEAD -- diagnostics/*.sh > changed_files.txt
+          if [ -s changed_files.txt ]; then
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+          else
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          fi
+      - name: Install ShellCheck
+        if: steps.check_changes.outputs.changes_detected == 'true'
+        run: sudo apt-get install -y shellcheck
+      - name: Install shfmt
+        if: steps.check_changes.outputs.changes_detected == 'true'
+        run: |
+          go install mvdan.cc/sh/v3/cmd/shfmt@latest
+          echo "$HOME/go/bin" >> $GITHUB_PATH
+      - name: Run ShellCheck
+        if: steps.check_changes.outputs.changes_detected == 'true'
+        run: |
+          while IFS= read -r file; do
+            if [[ "$file" == *.sh ]]; then
+              shellcheck "$file"
+            fi
+          done < changed_files.txt
+      - name: Run shfmt
+        if: steps.check_changes.outputs.changes_detected == 'true'
+        run: |
+          while IFS= read -r file; do
+            if [[ "$file" == *.sh ]]; then
+              if ! shfmt -d "$file"; then
+                echo "Error: $file is not correctly formatted. Run 'shfmt -w $file' to fix."
+                exit 1
+              fi
+            fi
+          done < changed_files.txt

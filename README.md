@@ -6,6 +6,7 @@ Official resources for running [Deepgram](https://deepgram.com) in a [self-hoste
 * [Helm Chart](charts/deepgram-self-hosted/README.md) for Kubernetes deployments
 * [Docker Compose Files](./docker/README.md) for deploying with Docker
 * [Podman Compose Files](./podman/README.md) for deploying with Podman
+* [Diagnostic](./diagnostics/README.md) tools and scripts for troubleshooting deployments
 
 ## Documentation
 
