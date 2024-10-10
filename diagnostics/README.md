@@ -18,18 +18,15 @@ Collecting log files for analysis will vary depending on your container orchestr
 
 #### Docker
 ```bash
-```bash
 docker ps # Note the container ID of the relevant Deepgram container
 docker logs <container_id> > dg_container.log 2>&1
 ```
 #### Podman
 ```bash
-```bash
 podman ps # Note the container ID of the relevant Deepgram container
 podman logs <container_id> > dg_container.log 2>&1
 ```
 #### Kubernetes
-```bash
 ```bash
 kubectl get pods -n <namespace> # Note the name of the Pod containing the relevant Deepgram container
 kubectl logs <pod_name> > dg_container.log 2>&1
