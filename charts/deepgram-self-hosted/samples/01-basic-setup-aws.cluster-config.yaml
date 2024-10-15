@@ -40,7 +40,7 @@ managedNodeGroups:
     desiredCapacity: 0
     maxSize: 8
     instanceType: g6.2xlarge
-    amiFamily: Ubuntu2204
+    amiFamily: AmazonLinux2023
     labels:
       k8s.deepgram.com/node-type: engine
       k8s.amazonaws.com/accelerator: nvidia-l4
@@ -58,7 +58,7 @@ managedNodeGroups:
     desiredCapacity: 0
     maxSize: 2
     instanceType: c5n.xlarge
-    amiFamily: Ubuntu2204
+    amiFamily: AmazonLinux2023
     labels:
       k8s.deepgram.com/node-type: api
     iam:
@@ -70,7 +70,7 @@ managedNodeGroups:
     desiredCapacity: 0
     maxSize: 2
     instanceType: t3.large
-    amiFamily: Ubuntu2204
+    amiFamily: AmazonLinux2023
     labels:
       k8s.deepgram.com/node-type: license-proxy
     iam:

@@ -140,3 +140,15 @@ cluster-autoscaler:
   autoDiscovery:
     clusterName: "deepgram-self-hosted-cluster"
   awsRegion: "us-west-2"
+
+gpu-operator:
+  enabled: true
+
+  # If using EKS accelerated AMIs based on Amazon Linux 2023 (default with Deepgram guides as of Oct 2024),
+  # driver and toolkit come bundled with the AMI.
+  #
+  # If using other AMIs, such as Ubuntu, you should re-enable the driver and toolkit below.
+  driver:
+    enabled: false
+  toolkit:
+    enabled: false

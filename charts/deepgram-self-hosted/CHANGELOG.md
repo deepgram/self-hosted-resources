@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- AWS samples updated to take advantage of new [EKS accelerated AMIs](https://github.com/awslabs/amazon-eks-ami/releases/tag/v20240928), which bundle the required NVIDIA driver and toolkit instead of being installed by the NVIDIA GPU operator 
+
 ## [0.6.0] - 2024-09-27
 
 ### Added
