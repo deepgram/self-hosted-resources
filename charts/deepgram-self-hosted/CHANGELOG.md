@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Updated default container tags to October 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-october-2024-release-241024) for additional details. Highlights include:
-  - Adds new [streaming websocket TTS](https://deepgram.com/changelog/websocket-text-to-speech-api)! This is a software feature, so no new TTS models are required. To enable, add the feature flag `speak_streaming = true` in your `api.toml` file. See the [help center guide](https://deepgram.gitbook.io/help-center/self-hosted/how-can-i-enable-streaming-text-to-speech-in-my-self-hosted-deployment) for further details.
+  - Adds new [streaming websocket TTS](https://deepgram.com/changelog/websocket-text-to-speech-api)! This is a software feature, so no new TTS models are required.
 
 ### Changed
 
