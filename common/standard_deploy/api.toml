@@ -82,6 +82,8 @@ entity_redaction = false # or true
 ### the queue (and response time) will grow indefinitely.
 # disk_buffer_path = "/path/to/disk/buffer/directory"
 
+### Enables streaming TTS *if* a valid Aura TTS model is available
+speak_streaming = true # or false
 
 ### Configure the backend pool of speech engines (generically referred to as
 ### "drivers" here). The API will load-balance among drivers in the standard

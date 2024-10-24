@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [0.7.0] - 2024-10-24
+
+### Added
+
+- Updated default container tags to October 2024 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-october-2024-release-241024) for additional details. Highlights include:
+  - Adds new [streaming websocket TTS](https://deepgram.com/changelog/websocket-text-to-speech-api)! This is a software feature, so no new TTS models are required.
+
 ### Changed
 
 - AWS samples updated to take advantage of new [EKS accelerated AMIs](https://aws.amazon.com/about-aws/whats-new/2024/10/amazon-eks-nvidia-aws-neuron-instance-types-al2023/), which bundle the required NVIDIA driver and toolkit instead of being installed by the NVIDIA GPU operator 
@@ -124,7 +131,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.6.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.7.0...HEAD
+[0.7.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.6.0...deepgram-self-hosted-0.7.0
 [0.6.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.5.0...deepgram-self-hosted-0.6.0
 [0.5.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.4.0...deepgram-self-hosted-0.5.0
 [0.4.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.3.0...deepgram-self-hosted-0.4.0
