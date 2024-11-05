@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Add the Engine Deployment tolerations to the Engine's model download Job.
+
 ## [0.7.0] - 2024-10-24
 
 ### Added
