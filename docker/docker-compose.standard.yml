@@ -28,15 +28,6 @@ services:
     # Invoke the API server
     command: -v serve /api.toml
 
-    # Default resource limits. Increase as needed.
-    # For more details, see:
-    #     https://developers.deepgram.com/docs/self-hosted-deployment-environments#hardware-specifications
-    deploy:
-      resources:
-        limits:
-          cpus: "1.80"
-          memory: 3800M
-
   # The speech engine service.
   engine:
     image: quay.io/deepgram/self-hosted-engine:release-241121
@@ -59,16 +50,3 @@ services:
 
     # Invoke the Engine service
     command: -v serve /engine.toml
-
-    # Default resource limits. Increase as needed.
-    # For more details, see:
-    #     https://developers.deepgram.com/docs/self-hosted-deployment-environments#hardware-specifications
-    deploy:
-      resources:
-        limits:
-          cpus: "3.80"
-          memory: 30G
-        reservations:
-          devices:
-            - capabilities: ["gpu"]
-              count: 1
