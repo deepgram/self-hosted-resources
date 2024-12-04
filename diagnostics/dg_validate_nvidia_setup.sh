@@ -53,10 +53,11 @@ fi
 
 # Check if NVIDIA driver version is compatible with most recent Deepgram self-hosted release
 MINIMUM_DRIVER_VERSION="530.30.02"
+MAXIMUM_DRIVER_VERSION="561.00.00"
 nvidia_driver_version=$(nvidia-smi --query-gpu=driver_version --format=csv,noheader)
-if [[ "$(printf '%s\n' "$nvidia_driver_version" "$MINIMUM_DRIVER_VERSION" | sort -V | head -n1)" != "$MINIMUM_DRIVER_VERSION" ]]; then
+if [[ "$(printf '%s\n' "$nvidia_driver_version" "$MINIMUM_DRIVER_VERSION" | sort -V | head -n1)" != "$MINIMUM_DRIVER_VERSION" ]] || [[ "$(printf '%s\n' "$nvidia_driver_version" "$MAXIMUM_DRIVER_VERSION" | sort -V | tail -n1)" != "$MAXIMUM_DRIVER_VERSION" ]]; then
 	error "Issue: The installed NVIDIA driver version is not compatible with the most recent Deepgram self-hosted release."
-	error "Please install a driver on version $MINIMUM_DRIVER_VERSION+."
+	error "Please install a driver with version >=$MINIMUM_DRIVER_VERSION and <$MAXIMUM_DRIVER_VERSION."
 	direct_to_documentation "https://developers.deepgram.com/docs/drivers-and-containerization-platforms#download-and-install-the-official-drivers"
 	exit 1
 else
