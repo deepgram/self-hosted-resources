@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Changed
+
+- Fixed default ratio metrics in Prometheus Adapter chart values to use 0.0 to 1.0 scale to match autoscaling documentation
+
 ## [0.8.0] - 2024-11-21
 
 ### Added
