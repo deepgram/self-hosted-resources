@@ -766,7 +766,7 @@ prometheus-adapter:
       - name:
           as: "engine_estimated_stream_capacity"
         seriesQuery: 'engine_active_requests{kind="stream"}'
-        metricsQuery: 'avg_over_time((sum(engine_active_requests{kind="stream"}) / sum(engine_estimated_stream_capacity) * 100)[1m:1m])'
+        metricsQuery: 'avg_over_time((sum(engine_active_requests{kind="stream"}) / sum(engine_estimated_stream_capacity))[1m:1m])'
         resources:
           overrides:
             namespace: { resource: "namespace" }
@@ -775,7 +775,7 @@ prometheus-adapter:
       - name:
           as: "engine_requests_active_to_max_ratio"
         seriesQuery: "engine_max_active_requests"
-        metricsQuery: "avg_over_time((sum(engine_active_requests) / sum(engine_max_active_requests) * 100)[1m:1m])"
+        metricsQuery: "avg_over_time((sum(engine_active_requests) / sum(engine_max_active_requests))[1m:1m])"
         resources:
           overrides:
             namespace: { resource: "namespace" }
