@@ -3,7 +3,7 @@
 services:
   # The speech API service.
   api:
-    image: quay.io/deepgram/self-hosted-api:release-241121
+    image: quay.io/deepgram/self-hosted-api:release-241226
 
     # Here we expose the API port to the host machine. The container port
     # (right-hand side) must match the port that the API service is listening
@@ -31,7 +31,7 @@ services:
 
   # The speech engine service.
   engine:
-    image: quay.io/deepgram/self-hosted-engine:release-241121
+    image: quay.io/deepgram/self-hosted-engine:release-241226
 
     # Utilize a GPU, if available.
     devices:
@@ -62,7 +62,7 @@ services:
 
   # The service to validate your Deepgram license
   license-proxy:
-    image: quay.io/deepgram/self-hosted-license-proxy:release-241121
+    image: quay.io/deepgram/self-hosted-license-proxy:release-241226
 
     # Here we expose the License Proxy status port to the host machine. The container port
     # (right-hand side) must match the port that the License Proxy service is listening
