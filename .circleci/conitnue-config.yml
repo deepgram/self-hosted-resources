@@ -1,0 +1,40 @@
+version: 2.1
+
+parameters:
+  modified_charts:
+    type: string
+    default: ""
+  is_prerelease:
+    type: boolean
+    default: false
+
+orbs:
+  vfcommon: voiceflow/common@0.93.0
+
+workflows:
+  publish-charts:
+    when: << pipeline.parameters.modified_charts >>
+    jobs:
+      - vfcommon/validate-chart-version-bump:
+          context: dev-test
+          charts: << pipeline.parameters.modified_charts >>
+          chart_directory: .
+      - vfcommon/helm-publish-charts:
+          context: dev-test
+          chart_directory: .
+          charts: << pipeline.parameters.modified_charts >>
+          requires:
+            - vfcommon/validate-chart-version-bump 
+          filters:
+            branches:
+              only: master
+
+  publish-prerelease-charts:
+    when: << pipeline.parameters.is_prerelease >>
+    jobs:
+      - vfcommon/helm-publish-prerelease:
+          context: dev-test
+          working_directory: .
+          filters:
+            branches:
+              ignore: master

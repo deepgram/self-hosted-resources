@@ -28,6 +28,9 @@ spec:
       labels: *labels
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/engine/engine.config.yaml") . | sha256sum }}
+        {{- with .Values.engine.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.global.outstandingRequestGracePeriod }}
       {{- if .Values.global.pullSecretRef }}
@@ -58,7 +61,7 @@ spec:
           value: "void"
         {{- end }}
         command: [ "impeller" ]
-        args: ["-v", "serve", "/etc/config/engine.toml"]
+        args: {{ .Values.engine.args | default (list "-v" "serve" "/etc/config/engine.toml") | toYaml | nindent 8 }}
         resources:
           requests:
             memory: "{{ .Values.engine.resources.requests.memory }}"
