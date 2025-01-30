@@ -13,8 +13,7 @@ orbs:
 
 jobs:
   helm-publish-prerelease:
-    # executor: vfcommon/default-executor
-    executor: vfcommon/node-executor
+    executor: vfcommon/build-executor
     parameters:
       working_directory:
         description: Directory containing chart directories
