@@ -11,6 +11,69 @@ parameters:
 orbs:
   vfcommon: voiceflow/common@0.93.0
 
+jobs:
+  helm-publish-prerelease:
+    executor: vfcommon/default-executor
+    parameters:
+      working_directory:
+        description: Directory containing chart directories
+        type: string
+        default: "./"
+      prepublish_steps:
+        description: Steps to run on repo before publishing charts
+        type: steps
+        default: []
+    steps:
+      - checkout
+      - vfcommon/set-beta-version:
+          working_directory: << parameters.working_directory >>
+      - steps: << parameters.prepublish_steps >>
+      - vfcommon/helm-add-repos
+      - run:
+          name: Package and publish charts
+          working_directory: << parameters.working_directory >>
+          command: |
+            #!/bin/bash
+            
+            # Expected environment variables:
+            echo "BETA_VERSION: ${BETA_VERSION:?}"
+            echo "AWS_REGION: ${AWS_REGION:?}"
+            
+            # Set a default value for ECR_REPOSITORY_URI if not set
+            ECR_REPOSITORY_URI=${ECR_REPOSITORY_URI:-"168387678261.dkr.ecr.us-east-1.amazonaws.com"}
+            
+            echo "ECR_REPOSITORY_URI: ${ECR_REPOSITORY_URI}"
+            
+            # Enable experimental OCI support in Helm
+            export HELM_EXPERIMENTAL_OCI=1
+            
+            # Login to ECR
+            aws ecr get-login-password --region "$AWS_REGION" | helm registry login --username AWS --password-stdin "$ECR_REPOSITORY_URI"
+            
+            # For single chart repository structure
+            CHART_DIR="charts/deepgram-self-hosted"
+            if [[ -d "$CHART_DIR" ]]; then
+                echo "Packaging $CHART_DIR"
+                helm dep update "$CHART_DIR"
+                
+                echo "Packaging version $BETA_VERSION"
+                helm package "$CHART_DIR" --version "$BETA_VERSION"
+                
+                CHART_NAME=$(basename "$CHART_DIR")
+                CHART="$CHART_NAME-$BETA_VERSION.tgz"
+                
+                if [ ! -f "$CHART" ]; then
+                    echo "Packaged chart does not have expected name $CHART"
+                    exit 3
+                fi
+                
+                # Push the chart to ECR
+                helm push "$CHART" "oci://$ECR_REPOSITORY_URI/voiceflow-charts-beta"
+            else
+                echo "Chart directory $CHART_DIR not found"
+                exit 1
+            fi
+
 workflows:
   publish-charts:
     when: << pipeline.parameters.modified_charts >>
@@ -32,9 +95,6 @@ workflows:
   publish-prerelease-charts:
     when: << pipeline.parameters.is_prerelease >>
     jobs:
-      - vfcommon/helm-publish-prerelease:
-          context: dev-test
-          working_directory: .
-          filters:
-            branches:
-              ignore: master
+      - helm-publish-prerelease:
+          working_directory: "./"
+          prepublish_steps: []
