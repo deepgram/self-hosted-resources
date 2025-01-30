@@ -96,5 +96,6 @@ workflows:
     when: << pipeline.parameters.is_prerelease >>
     jobs:
       - helm-publish-prerelease:
+          context: dev-test
           working_directory: "./"
           prepublish_steps: []
