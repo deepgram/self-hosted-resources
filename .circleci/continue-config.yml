@@ -37,9 +37,9 @@ jobs:
             dist="$(mktemp -d)"
             helm package "$CHART_DIR" --destination "$dist"
             
-            # Get channel from chart annotations
+            # Get channel from chart annotations, default to "public" if not found
             LOCAL_CHART="$(cat "${CHART_DIR}/Chart.yaml")"
-            CHANNEL="$(yq --raw-output '.annotations."release-repository"' \<<< "$LOCAL_CHART")"
+            CHANNEL="$(yq --raw-output '.annotations."release-repository" // "public"' \<<< "$LOCAL_CHART")"
             echo "Publishing in $CHANNEL channel"
             
             # Determine repository
