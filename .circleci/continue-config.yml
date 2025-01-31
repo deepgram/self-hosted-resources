@@ -116,9 +116,9 @@ workflows:
           charts: charts/deepgram-self-hosted
           requires:
             - validate-chart-version
-          filters:
-            branches:
-              only: master
+          # filters:
+          #   branches:
+          #     only: master
 
   publish-prerelease-charts:
     when: << pipeline.parameters.is_prerelease >>
