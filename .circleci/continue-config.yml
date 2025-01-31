@@ -81,14 +81,14 @@ jobs:
             for CHART in ${CHARTS}; do
               echo "Checking if chart ${CHART} has been modified"
               LOCAL_CHART="$(cat "${CHART}/Chart.yaml")"
-              CHANNEL="$(yq --raw-output '.annotations."release-repository"' <<< "$LOCAL_CHART")"
+              CHANNEL="$(yq --raw-output '.annotations."release-repository"' \<<< "$LOCAL_CHART")"
               
               REPO="voiceflow-charts-s3-$CHANNEL"
               if [[ "$CHANNEL" == "public" ]]; then
                 REPO="voiceflow-charts-s3"
               fi
               
-              LOCAL_VERSION="$(yq --raw-output .version <<< "$LOCAL_CHART")"
+              LOCAL_VERSION="$(yq --raw-output .version \<<< "$LOCAL_CHART")"
               REMOTE_VERSION="$(helm show chart "$REPO/$(basename $CHART)" | yq --raw-output .version)" || true
               
               if [[ -z "$REMOTE_VERSION" ]]; then
