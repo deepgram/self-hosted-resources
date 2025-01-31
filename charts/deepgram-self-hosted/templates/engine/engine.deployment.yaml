@@ -60,6 +60,12 @@ spec:
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
         {{- end }}
+        {{- if .Values.engine.env }}
+        {{- range .Values.engine.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        {{- end }}
         command: [ "impeller" ]
         args: {{ .Values.engine.args | default (list "-v" "serve" "/etc/config/engine.toml") | toYaml | nindent 8 }}
         resources:

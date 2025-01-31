@@ -53,6 +53,12 @@ spec:
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        {{- if .Values.api.env }}
+        {{- range .Values.api.env }}
+        - name: {{ .name }}
+          value: {{ .value | quote }}
+        {{- end }}
+        {{- end }}
         command: [ "stem" ]
         args: {{ .Values.api.args | default (list "-v" "serve" "/etc/config/api.toml") | toYaml | nindent 8 }}
         resources:

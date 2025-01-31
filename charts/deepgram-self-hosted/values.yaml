@@ -108,6 +108,12 @@ api:
     - "serve"
     - "/etc/config/api.toml"
 
+  env: []  # Empty array
+      # - name: ENGINE_CUSTOM_VAR
+      #   value: "engine-value"
+      # - name: DEBUG_MODE
+      #   value: "true"
+
   podAnnotations:
     ad.datadoghq.com/deepgram-engine.checks: |
       {
@@ -294,6 +300,12 @@ engine:
   args:
     - "serve"
     - "/etc/config/engine.toml"
+
+  env: []  # Empty array
+      # - name: ENGINE_CUSTOM_VAR
+      #   value: "engine-value"
+      # - name: DEBUG_MODE
+      #   value: "true"
 
   image:
     # -- path configures the image path to use for creating Engine containers.
