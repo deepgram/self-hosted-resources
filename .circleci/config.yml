@@ -1,0 +1,38 @@
+version: 2.1
+
+# Setup configuration to generate dynamic pipeline parameters
+setup: true
+
+orbs:
+  continuation: circleci/continuation@0.3.1
+  vfcommon: voiceflow/common@0.93.0
+
+workflows:
+  generate-config:
+    jobs:
+      - generate-config:
+          context: dev-test
+
+jobs:
+  generate-config:
+    executor: vfcommon/default-executor
+    steps:
+      - checkout
+      - vfcommon/check_commit_message:
+          commit_message: "[pre-release]"
+          match_env_var: IS_PRERELEASE
+          should_halt: false
+      - run:
+          name: Set parameters
+          shell: /bin/bash -o pipefail
+          command: |
+            # Always set the chart as modified, but check for pre-release
+            if [[ "$IS_PRERELEASE" == "true" ]]; then
+              echo "Pre-release build detected"
+            else
+              echo "Regular build detected"
+            fi
+            echo "{\"modified_charts\": \"charts/deepgram-self-hosted\", \"is_prerelease\": $IS_PRERELEASE}" > "/tmp/pipeline-parameters.json"
+      - continuation/continue:
+          configuration_path: ".circleci/continue-config.yml"
+          parameters: "/tmp/pipeline-parameters.json"

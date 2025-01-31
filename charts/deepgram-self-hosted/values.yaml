@@ -104,6 +104,31 @@ api:
   # associated with the Deepgram API containers.
   namePrefix: "deepgram-api"
 
+  args:
+    - "serve"
+    - "/etc/config/api.toml"
+
+  env:
+    - name: DD_SERVICE
+      value: "deepgram-api"
+
+  podAnnotations:
+    ad.datadoghq.com/deepgram-engine.checks: |
+      {
+        "openmetrics": {
+          "instances": [
+            {
+              "openmetrics_endpoint": "http://%%host%%:%%port%%/metrics",
+              "namespace": "deepgram",
+              "metrics": [".*"],
+              "port": {{ .Values.engine.metricsServer.port | quote }}
+            }
+          ]
+        }
+      }
+    ad.datadoghq.com/deepgram-engine.check_names: '["openmetrics"]'
+    ad.datadoghq.com/deepgram-engine.init_configs: '[{}]'
+
   image:
     # -- path configures the image path to use for creating API containers.
     # You may change this from the public Quay image path if you have imported
@@ -269,6 +294,14 @@ engine:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram Engine containers.
   namePrefix: "deepgram-engine"
+
+  args:
+    - "serve"
+    - "/etc/config/engine.toml"
+
+  env:
+    - name: DD_SERVICE
+      value: "deepgram-engine"
 
   image:
     # -- path configures the image path to use for creating Engine containers.

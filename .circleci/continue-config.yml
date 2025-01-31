@@ -1,0 +1,129 @@
+version: 2.1
+
+parameters:
+  modified_charts:
+    type: string
+    default: ""
+  is_prerelease:
+    type: boolean
+    default: false
+
+orbs:
+  vfcommon: voiceflow/common@0.93.0
+
+jobs:
+  helm-publish-prerelease:
+    executor: vfcommon/build-executor
+    parameters:
+      working_directory:
+        description: Directory containing chart directories
+        type: string
+        default: "./"
+      prepublish_steps:
+        description: Steps to run on repo before publishing charts
+        type: steps
+        default: []
+    steps:
+      - checkout
+      - vfcommon/set-beta-version:
+          working_directory: << parameters.working_directory >>
+      - steps: << parameters.prepublish_steps >>
+      - vfcommon/helm-add-repos
+      - run:
+          name: Package and publish charts
+          working_directory: << parameters.working_directory >>
+          command: |
+            #!/bin/bash
+            
+            # Expected environment variables:
+            echo "BETA_VERSION: ${BETA_VERSION:?}"
+            
+            # For single chart repository structure
+            CHART_DIR="charts/deepgram-self-hosted"
+            if [[ -d "$CHART_DIR" ]]; then
+                echo "Packaging $CHART_DIR"
+                helm dep update "$CHART_DIR"
+                
+                echo "Packaging version $BETA_VERSION"
+                helm package "$CHART_DIR" --version "$BETA_VERSION"
+                
+                CHART_NAME=$(basename "$CHART_DIR")
+                CHART="$CHART_NAME-$BETA_VERSION.tgz"
+                
+                if [ ! -f "$CHART" ]; then
+                    echo "Packaged chart does not have expected name $CHART"
+                    exit 3
+                fi
+                
+                # Push the chart to S3
+                helm s3 push --force "$CHART" voiceflow-charts-s3-beta
+            else
+                echo "Chart directory $CHART_DIR not found"
+                exit 1
+            fi
+
+  validate-chart-version:
+    executor: vfcommon/build-executor
+    parameters:
+      charts:
+        type: string
+      chart_directory:
+        type: string
+        default: "."
+    steps:
+      - checkout
+      - vfcommon/helm-add-repos
+      - run:
+          name: Validate chart version bump
+          command: |
+            #!/bin/bash -e
+            
+            for CHART in ${CHARTS}; do
+              echo "Checking if chart ${CHART} has been modified"
+              LOCAL_CHART="$(cat "${CHART}/Chart.yaml")"
+              CHANNEL="$(yq --raw-output '.annotations."release-repository"' \<<< "$LOCAL_CHART")"
+              
+              REPO="voiceflow-charts-s3-$CHANNEL"
+              if [[ "$CHANNEL" == "public" ]]; then
+                REPO="voiceflow-charts-s3"
+              fi
+              
+              LOCAL_VERSION="$(yq --raw-output .version \<<< "$LOCAL_CHART")"
+              REMOTE_VERSION="$(helm show chart "$REPO/$(basename $CHART)" | yq --raw-output .version)" || true
+              
+              if [[ -z "$REMOTE_VERSION" ]]; then
+                echo "Chart $CHART does not exist in $REPO. Assuming this is a new chart."
+                continue
+              fi
+              
+              if echo -e "$LOCAL_VERSION\n$REMOTE_VERSION" | sort -c -V 2> /dev/null; then
+                echo "ERROR: Chart version has not been updated. Remote is at $REMOTE_VERSION while local is at $LOCAL_VERSION" >&2
+                exit 1
+              fi
+            done
+
+workflows:
+  publish-charts:
+    when: << pipeline.parameters.modified_charts >>
+    jobs:
+      - validate-chart-version:
+          context: dev-test
+          charts: << pipeline.parameters.modified_charts >>
+          chart_directory: .
+      - vfcommon/helm-publish-charts:
+          context: dev-test
+          chart_directory: .
+          charts: << pipeline.parameters.modified_charts >>
+          requires:
+            - validate-chart-version
+          filters:
+            branches:
+              only: master
+
+  publish-prerelease-charts:
+    when: << pipeline.parameters.is_prerelease >>
+    jobs:
+      - helm-publish-prerelease:
+          context: dev-test
+          working_directory: "./"
+          prepublish_steps: []
