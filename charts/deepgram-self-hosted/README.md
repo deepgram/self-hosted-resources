@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.9.0](https://img.shields.io/badge/Version-0.9.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-241226](https://img.shields.io/badge/AppVersion-release--241226-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.11.0](https://img.shields.io/badge/Version-0.11.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-250131-va-ea](https://img.shields.io/badge/AppVersion-release--250131--va--ea-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -192,7 +192,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.entityRedaction | bool | `false` | Enables entity-based redaction on pre-recorded audio *if* a valid entity detection model is available. *WARNING*: Beta functionality. |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-241226"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"1.133.0-rc.0"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.readinessProbe | object | `` | Readiness probe customization for API pods. |
@@ -231,7 +231,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-241226"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"3.79.6-rc.0"` | tag defines which Deepgram release to use for Engine containers |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
 | engine.metricsServer | object | `` | metricsServer exposes an endpoint on each Engine container for reporting inference-specific system metrics. See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine for more details. |
 | engine.metricsServer.host | string | `"0.0.0.0"` | host is the IP address to listen on for metrics requests. You will want to listen on all interfaces to interact with other pods in the cluster. |

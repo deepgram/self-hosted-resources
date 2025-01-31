@@ -53,11 +53,41 @@ data:
       disk_buffer_path = "{{ .Values.api.features.diskBufferPath }}"
       {{- end }}
 
+    {{- if .Values.agent.enabled }}
+    [[driver_pool.standard]]
+      url = "https://{{ .Values.engine.namePrefix }}-stt-internal:{{ .Values.engine.server.port}}/v2"
+      timeout_backoff = {{ .Values.api.driverPool.standard.timeoutBackoff }}
+      retry_sleep = "{{ .Values.api.driverPool.standard.retrySleep }}"
+      retry_backoff = {{ .Values.api.driverPool.standard.retryBackoff }}
+      max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
+
+    [[driver_pool.standard]]
+      url = "https://{{ .Values.engine.namePrefix }}-tts-internal:{{ .Values.engine.server.port}}/v2"
+      timeout_backoff = {{ .Values.api.driverPool.standard.timeoutBackoff }}
+      retry_sleep = "{{ .Values.api.driverPool.standard.retrySleep }}"
+      retry_backoff = {{ .Values.api.driverPool.standard.retryBackoff }}
+      max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
+
+      eot_endpoint = "ws://{{ .Values.engine.namePrefix }}-eot-internal:{{ .Values.engine.server.port}}/v2/eot2024"
+    {{- else }}
     [[driver_pool.standard]]
       url = "https://{{ .Values.engine.namePrefix }}-internal:{{ .Values.engine.server.port}}/v2"
       timeout_backoff = {{ .Values.api.driverPool.standard.timeoutBackoff }}
       retry_sleep = "{{ .Values.api.driverPool.standard.retrySleep }}"
       retry_backoff = {{ .Values.api.driverPool.standard.retryBackoff }}
       max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
+    {{- end }}
 
-
+    [agent]
+    {{- if .Values.agent.enabled }}
+    eot_timeout_ms = {{ .Values.agent.eotTimeoutMs }}
+    max_conversation_chars_sent_to_llm = {{ .Values.agent.maxConversationChars }}
+    {{- range $provider, $config := .Values.agent.llmProviders }}
+    [voice_agent.llm_providers.{{ $provider }}]
+      name = {{ $config.name | quote }}
+      [voice_agent.llm_providers.{{ $provider }}.models]
+      {{- range $modelId, $model := $config.models }}
+        {{ $modelId }} = { name = {{ $model.name | quote }}, tier = {{ $model.tier | quote }}, public = {{ $model.public }} }
+      {{- end }}
+    {{- end }}
+    {{- end }}

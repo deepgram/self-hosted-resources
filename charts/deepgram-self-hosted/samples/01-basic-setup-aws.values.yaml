@@ -28,6 +28,13 @@ global:
   # ```
   deepgramSecretRef: "dg-self-hosted-api-key"
 
+  # Third-party providers for voice agent
+  openAiSecretRef: "openai-api-key"
+  anthropicSecretRef: "anthropic-api-key"
+  groqSecretRef: "groq-api-key"
+  elevenLabsSecretRef: "elevenlabs-api-key"
+  cartesiaSecretRef: "cartesia-api-key"
+
 scaling:
   replicas:
     api: 1
@@ -48,6 +55,73 @@ scaling:
         # Discuss a reasoanble value with your Deepgram Account Representative
         # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
         requestCapacityRatio:
+
+agent:
+  enabled: true
+  eotTimeoutMs: 3500
+  maxConversationChars: 15000
+  llmProviders:
+    open_ai:
+      name: "OpenAI"
+      models:
+        gpt-4o-mini:
+          name: "GPT-4o mini"
+          tier: "standard"
+          public: true
+        gpt-3-5-turbo:
+          name: "GPT-3.5 Turbo"
+          tier: "standard"
+          public: false
+        gpt-4o:
+          name: "GPT-4o"
+          tier: "advanced"
+          public: false
+    anthropic:
+      name: "Anthropic"
+      models:
+        claude-3-haiku-20240307:
+          name: "Claude 3 Haiku"
+          tier: "standard"
+          public: true
+        claude-3-opus-20240229:
+          name: "Claude 3 Opus"
+          tier: "advanced"
+          public: false
+        claude-3-5-haiku-20241022:
+          name: "Claude 3.5 Haiku"
+          tier: "standard"
+          public: false
+        claude-3-5-sonnet-20240620:
+          name: "Claude 3.5 Sonnet"
+          tier: "advanced"
+          public: false
+        claude-3-5-sonnet-latest:
+          name: "Claude 3.5 Sonnet"
+          tier: "advanced"
+          public: false
+    groq:
+      name: "Groq"
+      models:
+        mixtral-8x7b-32768:
+          name: "Mixtral 8x7B"
+          tier: "standard"
+          public: false
+        llama3-8b-8192:
+          name: "Llama 3 8B"
+          tier: "standard"
+          public: false
+        llama3-70b-8192:
+          name: "Llama 3 70B"
+          tier: "advanced"
+          public: false
+    deepgram:
+      name: "Deepgram"
+      models:
+        llama-3-1-8b-instruct:
+          name: "Llama 3.1 8B Instruct"
+          tier: "standard"
+          public: false
+
 api:
   affinity:
     nodeAffinity:
@@ -130,7 +204,7 @@ licenseProxy:
       cpu: "2000m"
 
 cluster-autoscaler:
-  enabled: true
+  enabled: false
   rbac:
     serviceAccount:
       name: "cluster-autoscaler-sa"
@@ -138,7 +212,7 @@ cluster-autoscaler:
         # Replace with the AWS Role ARN configured for the Cluster Autoscaler
         eks.amazonaws.com/role-arn: "arn:aws:iam::000000000000:role/MyRoleName"
   autoDiscovery:
-    clusterName: "deepgram-self-hosted-cluster"
+    clusterName: "deepgram-self-hosted-cluster-va"
   awsRegion: "us-west-2"
 
 gpu-operator:

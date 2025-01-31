@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: deepgram-self-hosted-cluster
+  name: deepgram-self-hosted-cluster-va
   region: us-west-2
   version: "1.30"
 
@@ -36,8 +36,8 @@ managedNodeGroups:
         autoScaler: true
     propagateASGTags: true
   - name: engine-node-group
-    minSize: 0
-    desiredCapacity: 0
+    minSize: 3
+    desiredCapacity: 3
     maxSize: 8
     instanceType: g6.2xlarge
     amiFamily: AmazonLinux2023
@@ -54,8 +54,8 @@ managedNodeGroups:
         effect: NoExecute
     propagateASGTags: true
   - name: api-node-group
-    minSize: 0
-    desiredCapacity: 0
+    minSize: 1
+    desiredCapacity: 1
     maxSize: 2
     instanceType: c5n.xlarge
     amiFamily: AmazonLinux2023
@@ -66,8 +66,8 @@ managedNodeGroups:
         autoScaler: true
     propagateASGTags: true
   - name: license-proxy-node-group
-    minSize: 0
-    desiredCapacity: 0
+    minSize: 1
+    desiredCapacity: 1
     maxSize: 2
     instanceType: t3.large
     amiFamily: AmazonLinux2023

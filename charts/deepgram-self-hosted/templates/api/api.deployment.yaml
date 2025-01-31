@@ -50,6 +50,16 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        - secretRef:
+            name: {{ required "Missing OpenAI API key" .Values.global.openAiSecretRef }}
+        - secretRef:
+            name: {{ required "Missing Anthropic API key" .Values.global.anthropicSecretRef }}
+        - secretRef:
+            name: {{ required "Missing Groq API key" .Values.global.groqSecretRef }}
+        - secretRef:
+            name: {{ required "Missing ElevenLabs API key" .Values.global.elevenLabsSecretRef }}
+        - secretRef:
+            name: {{ required "Missing Cartesia API key" .Values.global.cartesiaSecretRef }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
