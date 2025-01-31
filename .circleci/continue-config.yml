@@ -37,18 +37,6 @@ jobs:
             
             # Expected environment variables:
             echo "BETA_VERSION: ${BETA_VERSION:?}"
-            echo "AWS_REGION: ${AWS_REGION:?}"
-            
-            # Set a default value for ECR_REPOSITORY_URI if not set
-            ECR_REPOSITORY_URI=${ECR_REPOSITORY_URI:-"168387678261.dkr.ecr.us-east-1.amazonaws.com"}
-            
-            echo "ECR_REPOSITORY_URI: ${ECR_REPOSITORY_URI}"
-            
-            # Enable experimental OCI support in Helm
-            export HELM_EXPERIMENTAL_OCI=1
-            
-            # Login to ECR
-            aws ecr get-login-password --region "$AWS_REGION" | helm registry login --username AWS --password-stdin "$ECR_REPOSITORY_URI"
             
             # For single chart repository structure
             CHART_DIR="charts/deepgram-self-hosted"
@@ -67,8 +55,8 @@ jobs:
                     exit 3
                 fi
                 
-                # Push the chart to ECR
-                helm push "$CHART" "oci://$ECR_REPOSITORY_URI/voiceflow-charts-beta"
+                # Push the chart to S3
+                helm s3 push --force "$CHART" voiceflow-charts-s3-beta
             else
                 echo "Chart directory $CHART_DIR not found"
                 exit 1
