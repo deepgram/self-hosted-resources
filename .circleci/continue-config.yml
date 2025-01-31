@@ -78,7 +78,7 @@ workflows:
             - vfcommon/validate-chart-version-bump 
           filters:
             branches:
-              only: master
+              only: main
 
   publish-prerelease-charts:
     when: << pipeline.parameters.is_prerelease >>
