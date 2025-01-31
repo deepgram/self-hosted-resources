@@ -108,8 +108,8 @@ workflows:
     jobs:
       - validate-chart-version:
           context: dev-test
-          charts: charts/deepgram-self-hosted
-          chart_directory: .
+          charts: deepgram-self-hosted
+          chart_directory: charts
       - vfcommon/helm-publish-charts:
           context: dev-test
           chart_directory: charts
