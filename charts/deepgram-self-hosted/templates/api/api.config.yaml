@@ -56,6 +56,8 @@ data:
     {{- if .Values.agent.enabled }}
     [[driver_pool.standard]]
       url = "https://{{ .Values.engine.namePrefix }}-stt-internal:{{ .Values.engine.server.port}}/v2"
+      streaming_stt = true
+      tts = false
       timeout_backoff = {{ .Values.api.driverPool.standard.timeoutBackoff }}
       retry_sleep = "{{ .Values.api.driverPool.standard.retrySleep }}"
       retry_backoff = {{ .Values.api.driverPool.standard.retryBackoff }}
@@ -63,12 +65,13 @@ data:
 
     [[driver_pool.standard]]
       url = "https://{{ .Values.engine.namePrefix }}-tts-internal:{{ .Values.engine.server.port}}/v2"
+      streaming_stt = false
+      tts = true
       timeout_backoff = {{ .Values.api.driverPool.standard.timeoutBackoff }}
       retry_sleep = "{{ .Values.api.driverPool.standard.retrySleep }}"
       retry_backoff = {{ .Values.api.driverPool.standard.retryBackoff }}
       max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
 
-      eot_endpoint = "ws://{{ .Values.engine.namePrefix }}-eot-internal:{{ .Values.engine.server.port}}/v2/eot2024"
     {{- else }}
     [[driver_pool.standard]]
       url = "https://{{ .Values.engine.namePrefix }}-internal:{{ .Values.engine.server.port}}/v2"
@@ -78,8 +81,9 @@ data:
       max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
     {{- end }}
 
-    [agent]
+    [voice_agent]
     {{- if .Values.agent.enabled }}
+    eot_endpoint = "ws://{{ .Values.engine.namePrefix }}-eot-internal:{{ .Values.engine.server.port}}/v2/eot2024"
     eot_timeout_ms = {{ .Values.agent.eotTimeoutMs }}
     max_conversation_chars_sent_to_llm = {{ .Values.agent.maxConversationChars }}
     {{- range $provider, $config := .Values.agent.llmProviders }}
