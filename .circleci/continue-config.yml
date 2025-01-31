@@ -112,8 +112,8 @@ workflows:
           chart_directory: .
       - vfcommon/helm-publish-charts:
           context: dev-test
-          charts: charts/deepgram-self-hosted
           chart_directory: .
+          charts: charts
           requires:
             - validate-chart-version
 
