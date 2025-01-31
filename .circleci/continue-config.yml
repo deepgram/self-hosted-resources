@@ -112,8 +112,8 @@ workflows:
           chart_directory: .
       - vfcommon/helm-publish-charts:
           context: dev-test
-          chart_directory: .
-          charts: << pipeline.parameters.modified_charts >>
+          chart_directory: charts
+          charts: deepgram-self-hosted
           requires:
             - validate-chart-version
           filters:
