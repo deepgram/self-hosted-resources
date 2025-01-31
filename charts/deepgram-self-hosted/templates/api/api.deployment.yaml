@@ -50,19 +50,49 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        {{- if .Values.global.openAiSecretRef }}
         - secretRef:
-            name: {{ required "Missing OpenAI API key" .Values.global.openAiSecretRef }}
+            name: {{ .Values.global.openAiSecretRef }}
+        {{- end }}
+        {{- if .Values.global.anthropicSecretRef }}
         - secretRef:
-            name: {{ required "Missing Anthropic API key" .Values.global.anthropicSecretRef }}
+            name: {{ .Values.global.anthropicSecretRef }}
+        {{- end }}
+        {{- if .Values.global.groqSecretRef }}
         - secretRef:
-            name: {{ required "Missing Groq API key" .Values.global.groqSecretRef }}
+            name: {{ .Values.global.groqSecretRef }}
+        {{- end }}
+        {{- if .Values.global.elevenLabsSecretRef }}
         - secretRef:
-            name: {{ required "Missing ElevenLabs API key" .Values.global.elevenLabsSecretRef }}
+            name: {{ .Values.global.elevenLabsSecretRef }}
+        {{- end }}
+        {{- if .Values.global.cartesiaSecretRef }}
         - secretRef:
-            name: {{ required "Missing Cartesia API key" .Values.global.cartesiaSecretRef }}
+            name: {{ .Values.global.cartesiaSecretRef }}
+        {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        {{- if not .Values.global.openAiSecretRef }}
+        - name: OPENAI_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.anthropicSecretRef }}
+        - name: ANTHROPIC_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.groqSecretRef }}
+        - name: GROQ_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.elevenLabsSecretRef }}
+        - name: ELEVENLABS_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.cartesiaSecretRef }}
+        - name: CARTESIA_API_KEY
+          value: ""
+        {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
