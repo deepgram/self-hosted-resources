@@ -153,10 +153,16 @@ workflows:
           context: dev-test
           charts: charts/deepgram-self-hosted
           chart_directory: .
+          filters:
+            branches:
+              only: master
       - helm-publish:
           context: dev-test
           requires:
             - validate-chart-version
+          filters:
+            branches:
+              only: master
 
   publish-prerelease-charts:
     when: << pipeline.parameters.is_prerelease >>
