@@ -12,6 +12,49 @@ orbs:
   vfcommon: voiceflow/common@0.93.0
 
 jobs:
+  helm-publish:
+    executor: vfcommon/build-executor
+    steps:
+      - checkout
+      - vfcommon/helm-add-repos
+      - run:
+          name: Package and publish chart
+          command: |
+            #!/bin/bash -eo pipefail
+            
+            CHART_DIR="charts/deepgram-self-hosted"
+            if [[ ! -d "$CHART_DIR" ]]; then
+                echo "Chart directory $CHART_DIR not found"
+                exit 1
+            fi
+            
+            echo "Packaging $CHART_DIR"
+            
+            # Update dependencies
+            helm dep update "$CHART_DIR"
+            
+            # Create temp directory for packaged chart
+            dist="$(mktemp -d)"
+            helm package "$CHART_DIR" --destination "$dist"
+            
+            # Get channel from chart annotations
+            LOCAL_CHART="$(cat "${CHART_DIR}/Chart.yaml")"
+            CHANNEL="$(yq --raw-output '.annotations."release-repository"' <<< "$LOCAL_CHART")"
+            echo "Publishing in $CHANNEL channel"
+            
+            # Determine repository
+            REPO="voiceflow-charts-s3-$CHANNEL"
+            if [[ "$CHANNEL" == "public" ]]; then
+                REPO="voiceflow-charts-s3"
+            fi
+            
+            # Push to repository
+            PACKAGED_CHART="$(ls "$dist")"
+            helm s3 push --force "$dist/$PACKAGED_CHART" "$REPO"
+            
+            # Cleanup
+            rm -rf "$dist"
+
   helm-publish-prerelease:
     executor: vfcommon/build-executor
     parameters:
@@ -110,10 +153,8 @@ workflows:
           context: dev-test
           charts: charts/deepgram-self-hosted
           chart_directory: .
-      - vfcommon/helm-publish-charts:
+      - helm-publish:
           context: dev-test
-          chart_directory: .
-          charts: deepgram-self-hosted
           requires:
             - validate-chart-version
 
