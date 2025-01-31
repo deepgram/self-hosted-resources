@@ -108,17 +108,14 @@ workflows:
     jobs:
       - validate-chart-version:
           context: dev-test
-          charts: deepgram-self-hosted
-          chart_directory: charts
+          charts: charts/deepgram-self-hosted
+          chart_directory: .
       - vfcommon/helm-publish-charts:
           context: dev-test
-          chart_directory: charts
-          charts: deepgram-self-hosted
+          charts: charts/deepgram-self-hosted
+          chart_directory: .
           requires:
             - validate-chart-version
-          # filters:
-          #   branches:
-          #     only: master
 
   publish-prerelease-charts:
     when: << pipeline.parameters.is_prerelease >>
