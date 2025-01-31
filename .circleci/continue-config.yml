@@ -39,7 +39,7 @@ jobs:
             
             # Get channel from chart annotations
             LOCAL_CHART="$(cat "${CHART_DIR}/Chart.yaml")"
-            CHANNEL="$(yq --raw-output '.annotations."release-repository"' <<< "$LOCAL_CHART")"
+            CHANNEL="$(yq --raw-output '.annotations."release-repository"' \<<< "$LOCAL_CHART")"
             echo "Publishing in $CHANNEL channel"
             
             # Determine repository
