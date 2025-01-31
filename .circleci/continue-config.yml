@@ -113,7 +113,7 @@ workflows:
       - vfcommon/helm-publish-charts:
           context: dev-test
           chart_directory: .
-          charts: charts
+          charts: deepgram-self-hosted
           requires:
             - validate-chart-version
 
