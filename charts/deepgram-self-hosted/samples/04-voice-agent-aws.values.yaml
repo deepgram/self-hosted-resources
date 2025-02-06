@@ -34,6 +34,7 @@ global:
   groqSecretRef: "groq-api-key"
   elevenLabsSecretRef: "elevenlabs-api-key"
   cartesiaSecretRef: "cartesia-api-key"
+  xaiSecretRef: "xai-secret-ref"
 
 scaling:
   replicas:
@@ -99,28 +100,35 @@ agent:
           name: "Claude 3.5 Sonnet"
           tier: "advanced"
           public: false
-    # groq:
-    #   name: "Groq"
-    #   models:
-    #     mixtral-8x7b-32768:
-    #       name: "Mixtral 8x7B"
-    #       tier: "standard"
-    #       public: false
-    #     llama3-8b-8192:
-    #       name: "Llama 3 8B"
-    #       tier: "standard"
-    #       public: false
-    #     llama3-70b-8192:
-    #       name: "Llama 3 70B"
-    #       tier: "advanced"
-    #       public: false
-    # deepgram:
-    #   name: "Deepgram"
-    #   models:
-    #     llama-3-1-8b-instruct:
-    #       name: "Llama 3.1 8B Instruct"
-    #       tier: "standard"
-    #       public: false
+    groq:
+      name: "Groq"
+      models:
+        mixtral-8x7b-32768:
+          name: "Mixtral 8x7B"
+          tier: "standard"
+          public: false
+        llama3-8b-8192:
+          name: "Llama 3 8B"
+          tier: "standard"
+          public: false
+        llama3-70b-8192:
+          name: "Llama 3 70B"
+          tier: "advanced"
+          public: false
+    deepgram:
+      name: "Deepgram"
+      models:
+        llama-3-1-8b-instruct:
+          name: "Llama 3.1 8B Instruct"
+          tier: "standard"
+          public: false
+    x_ai:
+      name: "xAI"
+        models:
+          grok-2-latest:
+            name: "Grok 2 Latest"
+            tier: "standard"
+            public: false
 
 api:
   affinity:

@@ -70,6 +70,10 @@ spec:
         - secretRef:
             name: {{ .Values.global.cartesiaSecretRef }}
         {{- end }}
+        {{- if .Values.global.xaiSecretRef }}
+        - secretRef:
+            name: {{ .Values.global.xaiSecretRef }}
+        {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
@@ -91,6 +95,10 @@ spec:
         {{- end }}
         {{- if not .Values.global.cartesiaSecretRef }}
         - name: CARTESIA_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.xaiSecretRef }}
+        - name: XAI_API_KEY
           value: ""
         {{- end }}
         command: [ "stem" ]

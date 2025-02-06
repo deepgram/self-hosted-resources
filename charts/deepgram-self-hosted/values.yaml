@@ -112,7 +112,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: 1.133.0-rc.0
+    tag: 1.135.0-rc.0
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
