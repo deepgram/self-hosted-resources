@@ -28,13 +28,14 @@ global:
   # ```
   deepgramSecretRef: "dg-self-hosted-api-key"
 
-  # Third-party providers for voice agent
-  openAiSecretRef: "openai-api-key"
-  anthropicSecretRef: "anthropic-api-key"
-  groqSecretRef: "groq-api-key"
-  elevenLabsSecretRef: "elevenlabs-api-key"
-  cartesiaSecretRef: "cartesia-api-key"
-  xaiSecretRef: "xai-secret-ref"
+  # Third-party providers for voice agent.
+  # For each provider, if not using, set secret to null (e.g. `exampleSecretRef: null`)
+  openAiSecretRef: "openai-api-key" # null
+  anthropicSecretRef: "anthropic-api-key" # null
+  groqSecretRef: "groq-api-key" # null
+  elevenLabsSecretRef: "elevenlabs-api-key" # null
+  cartesiaSecretRef: "cartesia-api-key" # null
+  xaiSecretRef: "xai-secret-ref" # null
 
 scaling:
   replicas:
@@ -124,11 +125,11 @@ agent:
           public: false
     x_ai:
       name: "xAI"
-        models:
-          grok-2-latest:
-            name: "Grok 2 Latest"
-            tier: "standard"
-            public: false
+      models:
+        grok-2-latest:
+          name: "Grok 2 Latest"
+          tier: "standard"
+          public: false
 
 api:
   affinity:
@@ -181,10 +182,14 @@ engine:
           fileSystemId: fs-xxxxxxxxxxxxxxxx # Replace with your EFS ID
     models:
       add:
-        - https://link-to-model-1.dg # Replace these links with those provided to you
-        - https://link-to-model-2.dg #   by your Deepgram Account Representative.
-        - https://link-to-model-3.dg
-        - ...
+        # Recommended Voice Agent models:
+        # - Nova-3 non-formatted (nova-3-general.en.non-formatted.streaming.bf05427e.dg)
+        # - EOT (end-of-turn.4e9dbd96.dg)
+        # - Phonemizer for TTS (phonemizer.en.d6b10ae6.dg)
+        # - Aura-2 TTS voice model(s) (e.g. aura-asteria-en.ecb76e9d.dg)
+        # - Any other streaming STT models of choice (e.g. Nova-2 instead of Nova-3)
+        # - https://link-to-model-1.dg
+        # ...
       remove:
         # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
         # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
