@@ -529,7 +529,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-241226
+    tag: 1.8.0
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
