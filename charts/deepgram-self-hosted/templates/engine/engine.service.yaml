@@ -1,8 +1,8 @@
 {{- $engineTypes := list }}
 {{- if .Values.agent.enabled }}
-  {{- $engineTypes = list "stt" "tts" "eot" }}
+{{- $engineTypes = list "agent-speech-to-text" "agent-text-to-speech" "agent-end-of-turn" }}
 {{- else }}
-  {{- $engineTypes = list "" }}
+{{- $engineTypes = list "" }}
 {{- end }}
 {{- range $type := $engineTypes }}
 ---

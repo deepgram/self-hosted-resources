@@ -1,6 +1,6 @@
 {{- $engineTypes := list }}
 {{- if .Values.agent.enabled }}
-{{- $engineTypes = list "stt" "tts" "eot" }}
+{{- $engineTypes = list "agent-speech-to-text" "agent-text-to-speech" "agent-end-of-turn" }}
 {{- else }}
 {{- $engineTypes = list "" }}
 {{- end }}
@@ -31,7 +31,20 @@ spec:
       engine-type: {{ $type }}
       {{- end }}
       {{ include "deepgram-self-hosted.selectorLabels" $ }}
-  replicas: {{ $.Values.scaling.replicas.engine }}
+  replicas: {{ if $.Values.agent.enabled }}
+    {{- if kindIs "map" $.Values.scaling.replicas.engine }}
+    {{- $replicaCount := index $.Values.scaling.replicas.engine (printf "agent-%s" $type) | default 1 }}
+    {{ $replicaCount }}
+    {{- else }}
+    {{- required (printf "Expected map for Voice Agent Engine replicas, got %s" (kindOf $.Values.scaling.replicas.engine)) nil }}
+    {{- end }}
+  {{- else }}
+    {{- if kindIs "map" .Values.scaling.replicas.engine }}
+    {{- required "Expected integer for Engine replicas, got a map" nil }}
+    {{- else }}
+    {{- .Values.scaling.replicas.engine }}
+    {{- end }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:

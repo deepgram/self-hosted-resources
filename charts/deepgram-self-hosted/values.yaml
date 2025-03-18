@@ -31,7 +31,14 @@ scaling:
   # @default -- ``
   replicas:
     api: 1
+    {{- if .Values.agent.enabled }}
+    engine:
+      agent-speech-to-text: 1
+      agent-text-to-speech: 1
+      agent-end-of-turn: 1
+    {{- else }}
     engine: 1
+    {{- end }}
 
   # -- Enable pod autoscaling based on system load/traffic.
   # @default -- ``
