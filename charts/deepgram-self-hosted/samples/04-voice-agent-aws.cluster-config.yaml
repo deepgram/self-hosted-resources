@@ -2,7 +2,7 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: deepgram-self-hosted-cluster-va
+  name: deepgram-self-hosted-voice-agent-cluster
   region: us-west-2
   version: "1.30"
 

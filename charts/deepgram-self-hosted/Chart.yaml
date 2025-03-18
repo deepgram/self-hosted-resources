@@ -1,8 +1,8 @@
 apiVersion: v2
 name: deepgram-self-hosted
 type: application
-version: 0.11.0
-appVersion: "release-250307"
+version: 0.12.0
+appVersion: "release-250307-voice-agent"
 description: A Helm chart for running Deepgram services in a self-hosted environment
 home: "https://developers.deepgram.com/docs/self-hosted-introduction"
 sources: ["https://github.com/deepgram/self-hosted-resources"]
