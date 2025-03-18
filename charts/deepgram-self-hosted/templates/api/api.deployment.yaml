@@ -50,29 +50,11 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {{- if .Values.global.openAiSecretRef }}
+        {- range $key, $value := .Values.global.thirdPartyCredentials }}
+        {{- if $value }}
         - secretRef:
-            name: {{ .Values.global.openAiSecretRef }}
+            name: {{ $value }}
         {{- end }}
-        {{- if .Values.global.anthropicSecretRef }}
-        - secretRef:
-            name: {{ .Values.global.anthropicSecretRef }}
-        {{- end }}
-        {{- if .Values.global.groqSecretRef }}
-        - secretRef:
-            name: {{ .Values.global.groqSecretRef }}
-        {{- end }}
-        {{- if .Values.global.elevenLabsSecretRef }}
-        - secretRef:
-            name: {{ .Values.global.elevenLabsSecretRef }}
-        {{- end }}
-        {{- if .Values.global.cartesiaSecretRef }}
-        - secretRef:
-            name: {{ .Values.global.cartesiaSecretRef }}
-        {{- end }}
-        {{- if .Values.global.xaiSecretRef }}
-        - secretRef:
-            name: {{ .Values.global.xaiSecretRef }}
         {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR

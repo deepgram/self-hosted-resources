@@ -28,14 +28,16 @@ global:
   # ```
   deepgramSecretRef: "dg-self-hosted-api-key"
 
-  # Third-party providers for voice agent.
-  # For each provider, if not using, set secret to null (e.g. `exampleSecretRef: null`)
-  openAiSecretRef: "openai-api-key" # null
-  anthropicSecretRef: "anthropic-api-key" # null
-  groqSecretRef: "groq-api-key" # null
-  elevenLabsSecretRef: "elevenlabs-api-key" # null
-  cartesiaSecretRef: "cartesia-api-key" # null
-  xaiSecretRef: "xai-secret-ref" # null
+  # Third-party providers for Voice Agent.
+  # For each provider you'd like to configure, uncomment its line and insert your API key.
+  # Make sure to preserve the indentation under the `thirdPartyCredentials` header.
+  thirdPartyCredentials:
+    # openAiSecretRef: "openai-api-key"
+    # anthropicSecretRef: "anthropic-api-key"
+    # groqSecretRef: "groq-api-key"
+    # elevenLabsSecretRef: "elevenlabs-api-key"
+    # cartesiaSecretRef: "cartesia-api-key"
+    # xaiSecretRef: "xai-secret-ref"
 
 scaling:
   replicas:
