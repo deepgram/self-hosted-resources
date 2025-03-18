@@ -217,16 +217,7 @@ licenseProxy:
       cpu: "2000m"
 
 cluster-autoscaler:
-  enabled: false # Autoscaling is not yet supported for voice agent as of January 2025
-  rbac:
-    serviceAccount:
-      name: "cluster-autoscaler-sa"
-      annotations:
-        # Replace with the AWS Role ARN configured for the Cluster Autoscaler
-        eks.amazonaws.com/role-arn: "arn:aws:iam::000000000000:role/MyRoleName"
-  autoDiscovery:
-    clusterName: "deepgram-self-hosted-cluster-va"
-  awsRegion: "us-west-2"
+  enabled: false # Autoscaling is not yet supported for Voice Agent
 
 gpu-operator:
   enabled: true

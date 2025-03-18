@@ -9,7 +9,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
+  name: {{ $.Values.engine.namePrefix }}{{ default "" (printf "-%s" $type) }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" $ | indent 4}}
     app: deepgram-engine
