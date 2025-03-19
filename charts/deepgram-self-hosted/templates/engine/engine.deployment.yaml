@@ -9,7 +9,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ $.Values.engine.namePrefix }}{{ default "" (printf "-%s" $type) }}
+  name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" $ | indent 4}}
     app: deepgram-engine
@@ -31,13 +31,13 @@ spec:
       engine-type: {{ $type }}
       {{- end }}
       {{ include "deepgram-self-hosted.selectorLabels" $ }}
-  {{- if .Values.agent.enabled }}
+  {{- if $.Values.agent.enabled }}
   replicas:
     {{- range $type := $engineTypes }}
     {{ $type }}: {{ index $.Values.scaling.replicas.engine $type | default 1 }}
     {{- end }}
   {{- else }}
-  replicas: {{ .Values.scaling.replicas.engine }}
+  replicas: {{ $.Values.scaling.replicas.engine }}
   {{- end }}
   strategy:
     type: RollingUpdate

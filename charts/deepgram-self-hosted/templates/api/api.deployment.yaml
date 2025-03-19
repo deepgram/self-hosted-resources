@@ -50,7 +50,7 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {- range $key, $value := .Values.global.thirdPartyCredentials }}
+        {{- range $key, $value := .Values.global.thirdPartyCredentials }}
         {{- if $value }}
         - secretRef:
             name: {{ $value }}
