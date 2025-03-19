@@ -112,7 +112,7 @@ engine:
       remove:
         # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
         # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
-        # - name-of-old-model-3.dg #   this will likely be empty.
+        # - name-of-old-model-3.dg          #   this will likely be empty.
         # - ...
 
 licenseProxy:
