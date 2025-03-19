@@ -177,7 +177,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
-| agent.enabled | bool | `false` | Disable voice agent by default |
+| agent.enabled | bool | `false` | Whether to enable voice agent. Disabled by default |
 | agent.eotTimeoutMs | int | `3500` | Timeout in milliseconds for end-of-turn detection |
 | agent.llmProviders | object | `` | Configuration for LLM providers and their available models |
 | agent.llmProviders.anthropic | object | `` | Anthropic provider configuration |
