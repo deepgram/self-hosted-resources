@@ -31,14 +31,9 @@ scaling:
   # @default -- ``
   replicas:
     api: 1
-    {{- if .Values.agent.enabled }}
-    engine:
-      agent-speech-to-text: 1
-      agent-text-to-speech: 1
-      agent-end-of-turn: 1
-    {{- else }}
+    # -- Engine replicas can be specified either as a single number for one engine type,
+    # or as individual counts for each engine type when Voice Agent is enabled.
     engine: 1
-    {{- end }}
 
   # -- Enable pod autoscaling based on system load/traffic.
   # @default -- ``

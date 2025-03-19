@@ -31,19 +31,13 @@ spec:
       engine-type: {{ $type }}
       {{- end }}
       {{ include "deepgram-self-hosted.selectorLabels" $ }}
-  replicas: {{ if $.Values.agent.enabled }}
-    {{- if kindIs "map" $.Values.scaling.replicas.engine }}
-    {{- $replicaCount := index $.Values.scaling.replicas.engine $type | default 1 }}
-    {{ $replicaCount }}
-    {{- else }}
-    {{- required (printf "Expected map for Voice Agent Engine replicas, got %s" (kindOf $.Values.scaling.replicas.engine)) nil }}
+  {{- if .Values.agent.enabled }}
+  replicas:
+    {{- range $type := $engineTypes }}
+    {{ $type }}: {{ index $.Values.scaling.replicas.engine $type | default 1 }}
     {{- end }}
   {{- else }}
-    {{- if kindIs "map" $.Values.scaling.replicas.engine }}
-    {{- required "Expected integer for Engine replicas, got a map" nil }}
-    {{- else }}
-    {{- $.Values.scaling.replicas.engine }}
-    {{- end }}
+  replicas: {{ .Values.scaling.replicas.engine }}
   {{- end }}
   strategy:
     type: RollingUpdate
