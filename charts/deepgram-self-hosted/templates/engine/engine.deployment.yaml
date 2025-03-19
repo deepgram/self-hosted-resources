@@ -33,16 +33,16 @@ spec:
       {{ include "deepgram-self-hosted.selectorLabels" $ }}
   replicas: {{ if $.Values.agent.enabled }}
     {{- if kindIs "map" $.Values.scaling.replicas.engine }}
-    {{- $replicaCount := index $.Values.scaling.replicas.engine (printf "agent-%s" $type) | default 1 }}
+    {{- $replicaCount := index $.Values.scaling.replicas.engine $type | default 1 }}
     {{ $replicaCount }}
     {{- else }}
     {{- required (printf "Expected map for Voice Agent Engine replicas, got %s" (kindOf $.Values.scaling.replicas.engine)) nil }}
     {{- end }}
   {{- else }}
-    {{- if kindIs "map" .Values.scaling.replicas.engine }}
+    {{- if kindIs "map" $.Values.scaling.replicas.engine }}
     {{- required "Expected integer for Engine replicas, got a map" nil }}
     {{- else }}
-    {{- .Values.scaling.replicas.engine }}
+    {{- $.Values.scaling.replicas.engine }}
     {{- end }}
   {{- end }}
   strategy:
@@ -66,7 +66,7 @@ spec:
       tolerations:
         {{- toYaml $.Values.engine.tolerations | nindent 8 }}
       securityContext:
-        {{- toYaml $.Values.licenseProxy.securityContext | nindent 8 }}
+        {{- toYaml $.Values.engine.securityContext | nindent 8 }}
       {{- if or $.Values.engine.serviceAccount.create $.Values.engine.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
