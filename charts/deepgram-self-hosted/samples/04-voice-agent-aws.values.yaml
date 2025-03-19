@@ -32,7 +32,7 @@ global:
   # For each provider you'd like to configure, uncomment its line and insert your API key.
   # Make sure to preserve the indentation under the `thirdPartyCredentials` header.
   thirdPartyCredentials:
-    openAiSecretRef: "openai-api-key"
+    # openAiSecretRef: "openai-api-key"
     # anthropicSecretRef: "anthropic-api-key"
     # groqSecretRef: "groq-api-key"
     # elevenLabsSecretRef: "elevenlabs-api-key"
