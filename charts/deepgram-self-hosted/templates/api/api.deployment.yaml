@@ -50,9 +50,39 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        {{- range $key, $value := .Values.global.thirdPartyCredentials }}
+        {{- if $value }}
+        - secretRef:
+            name: {{ $value }}
+        {{- end }}
+        {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        {{- if not .Values.global.openAiSecretRef }}
+        - name: OPENAI_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.anthropicSecretRef }}
+        - name: ANTHROPIC_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.groqSecretRef }}
+        - name: GROQ_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.elevenLabsSecretRef }}
+        - name: ELEVENLABS_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.cartesiaSecretRef }}
+        - name: CARTESIA_API_KEY
+          value: ""
+        {{- end }}
+        {{- if not .Values.global.xaiSecretRef }}
+        - name: XAI_API_KEY
+          value: ""
+        {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
