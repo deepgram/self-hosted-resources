@@ -28,6 +28,9 @@ spec:
       labels: *labels
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api/api.config.yaml") . | sha256sum }}
+        {{- with .Values.api.additionalAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
     spec:
       terminationGracePeriodSeconds: {{ .Values.global.outstandingRequestGracePeriod }}
       {{- if .Values.global.pullSecretRef }}
