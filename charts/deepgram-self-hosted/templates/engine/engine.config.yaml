@@ -45,6 +45,7 @@ data:
     [features]
       multichannel = true
       language_detection = true
+      streaming_ner = {{ .Values.engine.features.streamingNer }}
 
     [chunking.batch]
       {{- if .Values.engine.chunking.speechToText.batch.minDuration }}

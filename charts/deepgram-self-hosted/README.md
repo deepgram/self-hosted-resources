@@ -188,8 +188,9 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.driverPool.standard.timeoutBackoff | float | `1.2` | timeoutBackoff is the factor to increase the timeout by for each additional retry (for exponential backoff). |
 | api.features | object | `` | Enable ancillary features |
 | api.features.diskBufferPath | string | `nil` | If API is receiving requests faster than Engine can process them, a request queue will form. By default, this queue is stored in memory. Under high load, the queue may grow too large and cause Out-Of-Memory errors. To avoid this, set a diskBufferPath to buffer the overflow on the request queue to disk.  WARN: This is only to temporarily buffer requests during high load. If there is not enough Engine capacity to process the queued requests over time, the queue (and response time) will grow indefinitely. |
-| api.features.entityDetection | bool | `false` | Enables entity detection on pre-recorded audio *if* a valid entity detection model is available. *WARNING*: Beta functionality. |
-| api.features.entityRedaction | bool | `false` | Enables entity-based redaction on pre-recorded audio *if* a valid entity detection model is available. *WARNING*: Beta functionality. |
+| api.features.entityDetection | bool | `false` | Enables entity detection on pre-recorded audio *if* a valid entity detection model is available. |
+| api.features.entityRedaction | bool | `false` | Enables entity-based redaction on pre-recorded audio *if* a valid entity detection model is available. |
+| api.features.formatEntityTags | bool | `false` | Enables entity formatting on pre-recorded audio *if* a valid NER model is available. |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
 | api.image.tag | string | `"release-250307"` | tag defines which Deepgram release to use for API containers |
@@ -221,6 +222,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.additionalAnnotations | object | `nil` | Additional annotations to add to the Engine deployment |
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
 | engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
+| engine.features.streamingNer | bool | `false` | Enables entity formatting on streaming audio *if* a valid NER model is available. |
 | engine.chunking | object | `` | chunking defines the size of audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
 | engine.chunking.speechToText.batch.maxDuration | float | `nil` | minDuration is the maximum audio duration for a STT chunk size for a batch request |
 | engine.chunking.speechToText.batch.minDuration | float | `nil` | minDuration is the minimum audio duration for a STT chunk size for a batch request |

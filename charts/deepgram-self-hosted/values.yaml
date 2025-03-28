@@ -224,13 +224,15 @@ api:
   features:
     # -- Enables entity detection on pre-recorded audio
     # *if* a valid entity detection model is available.
-    # *WARNING*: Beta functionality.
     entityDetection: false
 
     # -- Enables entity-based redaction on pre-recorded audio
     # *if* a valid entity detection model is available.
-    # *WARNING*: Beta functionality.
     entityRedaction: false
+
+    # -- Enables format entity tags on pre-recorded audio
+    # *if* a valid NER model is available.
+    formatEntityTags: false
 
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,
@@ -467,6 +469,11 @@ engine:
       # for removal.
       # **Automatic model management is currently supported for AWS EFS volumes only.**
       remove: []
+
+  features:
+    # -- Enables format entity tags on streaming audio
+    # *if* a valid NER model is available.
+    streamingNer: false
 
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
