@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.13.0] - 2025-06-10
+
+### Added
+
+- Updated default container tags to June 2025 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-june-2025-release-250610) for additional details.
+
 ## [0.12.0] - 2025-03-31
 
 ### Added
@@ -178,7 +184,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.12.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.13.0...HEAD
+[0.13.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.12.0...0.13.0
 [0.12.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.1...0.12.0
 [0.11.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.0...0.11.1
 [0.11.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.10.0...deepgram-self-hosted-0.11.0
