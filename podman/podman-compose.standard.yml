@@ -3,7 +3,7 @@
 services:
   # The speech API service.
   api:
-    image: quay.io/deepgram/self-hosted-api:release-250307
+    image: quay.io/deepgram/self-hosted-api:release-250626
 
     # Here we expose the API port to the host machine. The container port
     # (right-hand side) must match the port that the API service is listening
@@ -27,7 +27,7 @@ services:
 
   # The speech engine service.
   engine:
-    image: quay.io/deepgram/self-hosted-engine:release-250307
+    image: quay.io/deepgram/self-hosted-engine:release-250626
 
     # Utilize a GPU, if available.
     devices:
