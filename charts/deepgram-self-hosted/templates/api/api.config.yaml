@@ -47,6 +47,7 @@ data:
       summarization = true
       entity_detection = {{ .Values.api.features.entityDetection }}
       entity_redaction = {{ .Values.api.features.entityRedaction }}
+      format_entity_tags = {{ .Values.api.features.formatEntityTags }}
       speak_streaming = true
 
       {{- if .Values.api.features.diskBufferPath }}

@@ -6,11 +6,34 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
-## [0.12.0] - 2025-03-18
+### Added
+
+- Added built-in support for Voice Agent.
+- Apply additional annotations to the template section of Deployment resources.
+
+## [0.14.0] - 2025-06-26
 
 ### Added
 
-- Added built-in support for Voice Agent on the March 2025 release.
+- Updated default container tags to June 2025 release (`release-250626`). Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-june-2025-release-250626) for additional details.
+
+## [0.13.0] - 2025-06-10
+
+### Added
+
+- Updated default container tags to June 2025 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-june-2025-release-250610) for additional details.
+
+## [0.12.0] - 2025-03-31
+
+### Added
+
+- Updated default container tags to March 2025 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-march-2025-release-250331) for additional details.
+
+## [0.11.1] - 2025-03-28
+
+### Added
+
+- Exposed configuration values to enable named-entity recognition models. See the [March 2025 Deepgram Self-Hosted Changelog](https://deepgram.com/changelog/deepgram-self-hosted-march-2025-release-250307) for more details on features powered by these models.
 
 ## [0.11.0] - 2025-03-07
 
@@ -171,8 +194,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.12.0...HEAD
-[0.12.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.0...deepgram-self-hosted-0.12.0
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.14.0...HEAD
+[0.14.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.13.0...0.14.0
+[0.13.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.12.0...0.13.0
+[0.12.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.1...0.12.0
+[0.11.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.0...0.11.1
 [0.11.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.10.0...deepgram-self-hosted-0.11.0
 [0.10.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.9.0...deepgram-self-hosted-0.10.0
 [0.9.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.8.1...deepgram-self-hosted-0.9.0
