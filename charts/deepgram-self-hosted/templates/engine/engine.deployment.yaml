@@ -48,7 +48,7 @@ spec:
     metadata:
       labels: *labels
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/engine/engine.config.yaml") . | sha256sum }}
+        checksum/config: {{ include (print $.Template.BasePath "/engine/engine.config.yaml") $ | sha256sum }}
         {{- with $.Values.engine.additionalAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
