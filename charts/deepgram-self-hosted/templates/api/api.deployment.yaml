@@ -62,15 +62,21 @@ spec:
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
-        {{- if not .Values.global.openAiSecretRef }}
+        {{- if .Values.global.thirdPartyCredentials.openAiSecretRef }}
         - name: OPENAI_API_KEY
           valueFrom:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.openAiSecretRef }}
               key: OPENAI_API_KEY
+        {{- else if .Values.global.openAiSecretRef }}
+        - name: OPENAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.openAiSecretRef }}
+              key: OPENAI_API_KEY
         {{- else }}
         - name: OPENAI_API_KEY
-          value: ""
+          value: "placeholder-openai-key"
         {{- end }}
         {{- if .Values.global.thirdPartyCredentials.anthropicSecretRef }}
         - name: ANTHROPIC_API_KEY
@@ -78,9 +84,15 @@ spec:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.anthropicSecretRef }}
               key: ANTHROPIC_API_KEY
+        {{- else if .Values.global.anthropicSecretRef }}
+        - name: ANTHROPIC_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.anthropicSecretRef }}
+              key: ANTHROPIC_API_KEY
         {{- else }}
         - name: ANTHROPIC_API_KEY
-          value: ""
+          value: "placeholder-anthropic-key"
         {{- end }}
         {{- if .Values.global.thirdPartyCredentials.groqSecretRef }}
         - name: GROQ_API_KEY
@@ -88,9 +100,15 @@ spec:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.groqSecretRef }}
               key: GROQ_API_KEY
+        {{- else if .Values.global.groqSecretRef }}
+        - name: GROQ_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.groqSecretRef }}
+              key: GROQ_API_KEY
         {{- else }}
         - name: GROQ_API_KEY
-          value: ""
+          value: "placeholder-groq-key"
         {{- end }}
         {{- if .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
         - name: ELEVENLABS_API_KEY
@@ -98,9 +116,15 @@ spec:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
               key: ELEVENLABS_API_KEY
+        {{- else if .Values.global.elevenLabsSecretRef }}
+        - name: ELEVENLABS_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.elevenLabsSecretRef }}
+              key: ELEVENLABS_API_KEY
         {{- else }}
         - name: ELEVENLABS_API_KEY
-          value: ""
+          value: "placeholder-elevenlabs-key"
         {{- end }}
         {{- if .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
         - name: CARTESIA_API_KEY
@@ -108,9 +132,15 @@ spec:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
               key: CARTESIA_API_KEY
+        {{- else if .Values.global.cartesiaSecretRef }}
+        - name: CARTESIA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.cartesiaSecretRef }}
+              key: CARTESIA_API_KEY
         {{- else }}
         - name: CARTESIA_API_KEY
-          value: ""
+          value: "placeholder-cartesia-key"
         {{- end }}
         {{- if .Values.global.thirdPartyCredentials.xaiSecretRef }}
         - name: XAI_API_KEY
@@ -118,9 +148,15 @@ spec:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.xaiSecretRef }}
               key: XAI_API_KEY
+        {{- else if .Values.global.xaiSecretRef }}
+        - name: XAI_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.xaiSecretRef }}
+              key: XAI_API_KEY
         {{- else }}
         - name: XAI_API_KEY
-          value: ""
+          value: "placeholder-xai-key"
         {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
