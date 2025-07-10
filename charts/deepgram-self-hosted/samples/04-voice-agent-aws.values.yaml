@@ -102,6 +102,7 @@ engine:
         efs:
           enabled: true
           fileSystemId: fs-xxxxxxxxxxxxxxxx # Replace with your EFS ID
+          namePrefix: dg-models
     models:
       add:
         # Recommended Voice Agent models:

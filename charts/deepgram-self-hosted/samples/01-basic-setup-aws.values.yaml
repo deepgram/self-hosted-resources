@@ -101,6 +101,7 @@ engine:
         efs:
           enabled: true
           fileSystemId: fs-xxxxxxxxxxxxxxxx # Replace with your EFS ID
+          namePrefix: dg-models
     models:
       add:
         - https://link-to-model-1.dg # Replace these links with those provided to you

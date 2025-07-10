@@ -32,10 +32,7 @@ spec:
       {{- end }}
       {{ include "deepgram-self-hosted.selectorLabels" $ }}
   {{- if $.Values.agent.enabled }}
-  replicas:
-    {{- range $type := $engineTypes }}
-    {{ $type }}: {{ index $.Values.scaling.replicas.engine $type | default 1 }}
-    {{- end }}
+  replicas: {{ index $.Values.scaling.replicas.engine $type | default 1 }}
   {{- else }}
   replicas: {{ $.Values.scaling.replicas.engine }}
   {{- end }}

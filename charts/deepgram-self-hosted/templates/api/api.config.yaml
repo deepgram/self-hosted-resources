@@ -56,7 +56,7 @@ data:
 
     {{- if .Values.agent.enabled }}
     [[driver_pool.standard]]
-      url = "https://{{ .Values.engine.namePrefix }}-stt-internal:{{ .Values.engine.server.port}}/v2"
+      url = "https://{{ .Values.engine.namePrefix }}-agent-speech-to-text-internal:{{ .Values.engine.server.port}}/v2"
       streaming_stt = true
       tts = false
       eot = false
@@ -66,7 +66,7 @@ data:
       max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
 
     [[driver_pool.standard]]
-      url = "https://{{ .Values.engine.namePrefix }}-tts-internal:{{ .Values.engine.server.port}}/v2"
+      url = "https://{{ .Values.engine.namePrefix }}-agent-text-to-speech-internal:{{ .Values.engine.server.port}}/v2"
       streaming_stt = false
       tts = true
       eot = false
@@ -76,7 +76,7 @@ data:
       max_response_size = {{ int .Values.api.driverPool.standard.maxResponseSize }}
 
     [[driver_pool.standard]]
-      url = "https://{{ .Values.engine.namePrefix }}-eot-internal:{{ .Values.engine.server.port}}/v2"
+      url = "https://{{ .Values.engine.namePrefix }}-agent-end-of-turn-internal:{{ .Values.engine.server.port}}/v2"
       streaming_stt = false
       tts = false
       eot = true
