@@ -62,102 +62,18 @@ spec:
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
-        {{- if .Values.global.thirdPartyCredentials.openAiSecretRef }}
         - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.thirdPartyCredentials.openAiSecretRef }}
-              key: OPENAI_API_KEY
-        {{- else if .Values.global.openAiSecretRef }}
-        - name: OPENAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.openAiSecretRef }}
-              key: OPENAI_API_KEY
-        {{- else }}
-        - name: OPENAI_API_KEY
-          value: "placeholder-openai-key"
-        {{- end }}
-        {{- if .Values.global.thirdPartyCredentials.anthropicSecretRef }}
+          value: {{ .Values.global.openAiSecretRef | default "placeholder-openai-key" | quote }}
         - name: ANTHROPIC_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.thirdPartyCredentials.anthropicSecretRef }}
-              key: ANTHROPIC_API_KEY
-        {{- else if .Values.global.anthropicSecretRef }}
-        - name: ANTHROPIC_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.anthropicSecretRef }}
-              key: ANTHROPIC_API_KEY
-        {{- else }}
-        - name: ANTHROPIC_API_KEY
-          value: "placeholder-anthropic-key"
-        {{- end }}
-        {{- if .Values.global.thirdPartyCredentials.groqSecretRef }}
+          value: {{ .Values.global.anthropicSecretRef | default "" | quote }}
         - name: GROQ_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.thirdPartyCredentials.groqSecretRef }}
-              key: GROQ_API_KEY
-        {{- else if .Values.global.groqSecretRef }}
-        - name: GROQ_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.groqSecretRef }}
-              key: GROQ_API_KEY
-        {{- else }}
-        - name: GROQ_API_KEY
-          value: "placeholder-groq-key"
-        {{- end }}
-        {{- if .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
+          value: {{ .Values.global.groqSecretRef | default "" | quote }}
         - name: ELEVENLABS_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
-              key: ELEVENLABS_API_KEY
-        {{- else if .Values.global.elevenLabsSecretRef }}
-        - name: ELEVENLABS_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.elevenLabsSecretRef }}
-              key: ELEVENLABS_API_KEY
-        {{- else }}
-        - name: ELEVENLABS_API_KEY
-          value: "placeholder-elevenlabs-key"
-        {{- end }}
-        {{- if .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
+          value: {{ .Values.global.elevenLabsSecretRef | default "" | quote }}
         - name: CARTESIA_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
-              key: CARTESIA_API_KEY
-        {{- else if .Values.global.cartesiaSecretRef }}
-        - name: CARTESIA_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.cartesiaSecretRef }}
-              key: CARTESIA_API_KEY
-        {{- else }}
-        - name: CARTESIA_API_KEY
-          value: "placeholder-cartesia-key"
-        {{- end }}
-        {{- if .Values.global.thirdPartyCredentials.xaiSecretRef }}
+          value: {{ .Values.global.cartesiaSecretRef | default "" | quote }}
         - name: XAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.thirdPartyCredentials.xaiSecretRef }}
-              key: XAI_API_KEY
-        {{- else if .Values.global.xaiSecretRef }}
-        - name: XAI_API_KEY
-          valueFrom:
-            secretKeyRef:
-              name: {{ .Values.global.xaiSecretRef }}
-              key: XAI_API_KEY
-        {{- else }}
-        - name: XAI_API_KEY
-          value: "placeholder-xai-key"
-        {{- end }}
+          value: {{ .Values.global.xaiSecretRef | default "" | quote }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
