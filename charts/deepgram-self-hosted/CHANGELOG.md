@@ -6,9 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
-
 ### Added
 
+- Added built-in support for Voice Agent.
 - Apply additional annotations to the template section of Deployment resources.
 
 ## [0.14.0] - 2025-06-26
@@ -28,7 +28,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Updated default container tags to March 2025 release. Refer to the [main Deepgram changelog](https://deepgram.com/changelog/deepgram-self-hosted-march-2025-release-250331) for additional details.
-
 
 ## [0.11.1] - 2025-03-28
 

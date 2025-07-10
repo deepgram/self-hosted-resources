@@ -29,7 +29,7 @@ spec:
       labels: *labels
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/license-proxy/license-proxy.config.yaml") . | sha256sum }}
-        {{- with .Values.licenseProxy.additionalAnnotations }}
+        {{- with $.Values.licenseProxy.additionalAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:

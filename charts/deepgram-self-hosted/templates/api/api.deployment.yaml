@@ -28,7 +28,7 @@ spec:
       labels: *labels
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api/api.config.yaml") . | sha256sum }}
-        {{- with .Values.api.additionalAnnotations }}
+        {{- with $.Values.api.additionalAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -53,9 +53,27 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        {{- range $key, $value := .Values.global.thirdPartyCredentials }}
+        {{- if $value }}
+        - secretRef:
+            name: {{ $value }}
+        {{- end }}
+        {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        - name: OPENAI_API_KEY
+          value: {{ .Values.global.openAiSecretRef | default "placeholder-openai-key" | quote }}
+        - name: ANTHROPIC_API_KEY
+          value: {{ .Values.global.anthropicSecretRef | default "" | quote }}
+        - name: GROQ_API_KEY
+          value: {{ .Values.global.groqSecretRef | default "" | quote }}
+        - name: ELEVENLABS_API_KEY
+          value: {{ .Values.global.elevenLabsSecretRef | default "" | quote }}
+        - name: CARTESIA_API_KEY
+          value: {{ .Values.global.cartesiaSecretRef | default "" | quote }}
+        - name: XAI_API_KEY
+          value: {{ .Values.global.xaiSecretRef | default "" | quote }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
