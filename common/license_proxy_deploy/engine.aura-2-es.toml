@@ -1,0 +1,79 @@
+### Keep in mind that all paths are in-container paths and do not need to exist
+### on the host machine.
+
+### Limit the number of active requests handled by a single Engine container.
+### Engine will reject additional requests from API beyond this limit, and the
+### API container will continue with the retry logic configured in `api.toml`.
+###
+### The default is no limit.
+# max_active_requests =
+
+
+### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
+### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
+[license]
+### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
+### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
+server_url = ["https://license-proxy:8443", "https://license.deepgram.com"]
+
+
+### Configure the server to listen for requests from the API.
+[server]
+### The IP address to listen on. Since this is likely running in a Docker
+### container, you will probably want to listen on all interfaces.
+host = "0.0.0.0"
+### The port to listen on
+port = 8080
+
+
+### To support metrics we need to expose an Engine endpoint.
+### See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine
+[metrics_server]
+host = "0.0.0.0"
+port = 9992
+
+
+[model_manager]
+### The number of models to have concurrently loaded in system memory.
+### If managing a deployment with dozens of models this setting will
+### help prevent instances where models consume too much memory and
+### offload the models to disk as needed on a least-recently-used basis.
+###
+### The default is no limit.
+# max_concurrently_loaded_models = 20
+
+### Inference models. You can place these in one or multiple directories.
+search_paths = ["/models"]
+
+
+### Enable ancillary features
+[features]
+### Allow multichannel requests by setting this to true, set to false to disable
+multichannel = true # or false
+### Enables language detection *if* a valid language detection model is available
+language_detection = true # or false
+### Enables streaming entity formatting *if* a valid NER model is available
+streaming_ner = false # or true
+
+### Size of audio chunks to process in seconds.
+[chunking.batch]
+# min_duration =
+# max_duration =
+[chunking.streaming]
+# min_duration =
+# max_duration =
+
+### How often to return interim results, in seconds. Default is 1.0s.
+###
+### This value may be lowered to increase the frequency of interim results.
+### However, this may cause a signficant decrease in number of concurrent
+### streams supported by a single GPU. Please contact your Deepgram Account
+### representative for more details.
+# step = 1.0
+
+
+### Engine will automatically enable half precision operations if your GPU supports
+### them. You can explicitly enable or disable this behavior with the state parameter
+### which supports enabled, disabled, and auto (the default).
+[half_precision]
+# state = "disabled" # or "enabled" or "auto"
