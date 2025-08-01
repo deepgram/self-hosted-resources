@@ -1,0 +1,148 @@
+# Make sure to replace placeholder paths to config files and model directories
+
+x-env-vars: &env
+  # Make sure you `export` your self-hosted API key secret in your local environment
+  # Be sure to use the &env anchor inside an 'environment' mapping for a given service
+  DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+  DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "docker-compose"
+
+services:
+  # The speech API service.
+  # English Language Aura-2
+  api-en:
+    image: quay.io/deepgram/self-hosted-api:release-250731
+
+    # Here we expose the API port to the host machine. The container port
+    # (right-hand side) must match the port that the API service is listening
+    # on (from its configuration file).
+    ports:
+      - "8080:8080"
+
+    environment:
+      <<: *env
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path. It must match the path
+    #     specified in the `command` header below.
+    volumes:
+      - "./api.aura-2-en.toml:/api.toml:ro,Z"
+
+    # Invoke the API server
+    command: -v serve /api.toml
+
+    # Make sure the License Proxy is available for licensing
+    depends_on:
+      - license-proxy
+
+  # Spanish Language Aura-2
+  api-es:
+    image: quay.io/deepgram/self-hosted-api:release-250731
+
+    # Here we expose the API port to the host machine. The container port
+    # (right-hand side) must match the port that the API service is listening
+    # on (from its configuration file).
+    ports:
+      - "8081:8080"
+
+    environment:
+      <<: *env
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path. It must match the path
+    #     specified in the `command` header below.
+    volumes:
+      - "./api.aura-2-es.toml:/api.toml:ro,Z"
+
+    # Invoke the API server
+    command: -v serve /api.toml
+
+    # Make sure the License Proxy is available for licensing
+    depends_on:
+      - license-proxy
+
+  # The speech engine service.
+  # English Language Aura-2 Driver
+  engine-en:
+    image: quay.io/deepgram/self-hosted-engine:release-250731
+
+    # Utilize a GPU, if available.
+    runtime: nvidia
+
+    ports:
+      - "9991:9991"
+
+    environment:
+      <<: *env
+      IMPELLER_AURA2_MAX_BATCH_SIZE: 8
+      IMPELLER_AURA2_T2C_UUID: "15ef8614-52cb-4cd3-a641-d68249c15d53"
+      IMPELLER_AURA2_C2A_UUID: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
+      CUDA_VISIBLE_DEVICES: 0,1
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path.
+    volumes:
+      # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
+      - "../models:/models:ro,Z"
+      # In-container config path below must match the path specified in the `command` header below.
+      - "./engine.aura-2-en.toml:/engine.toml:ro,Z"
+
+    # Invoke the Engine service
+    command: -v serve /engine.toml
+
+    # Make sure the License Proxy is available for licensing
+    depends_on:
+      - license-proxy
+
+  # Spanish Language Aura-2 Driver
+  engine-es:
+    image: quay.io/deepgram/self-hosted-engine:release-250731
+
+    # Utilize a GPU, if available.
+    runtime: nvidia
+
+    ports:
+      - "9992:9992"
+
+    environment:
+      <<: *env
+      IMPELLER_AURA2_MAX_BATCH_SIZE: 8
+      IMPELLER_AURA2_T2C_UUID: "5d53d105-c6a4-47f5-b670-61adb6e8a880"
+      IMPELLER_AURA2_C2A_UUID: "4d5c93ad-9e20-4ebf-a1f0-0fb88ac73ef5"
+      CUDA_VISIBLE_DEVICES: 2,3
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path.
+    volumes:
+      # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
+      - "../models:/models:ro,Z"
+      # In-container config path below must match the path specified in the `command` header below.
+      - "./engine.aura-2-es.toml:/engine.toml:ro,Z"
+
+    # Invoke the Engine service
+    command: -v serve /engine.toml
+
+    # Make sure the License Proxy is available for licensing
+    depends_on:
+      - license-proxy
+
+  # The service to validate your Deepgram license
+  license-proxy:
+    image: quay.io/deepgram/self-hosted-license-proxy:release-250731
+
+    # Here we expose the License Proxy status port to the host machine. The container port
+    # (right-hand side) must match the port that the License Proxy service is listening
+    # on (from its configuration file).
+    ports:
+      - "8089:8080"
+
+    environment:
+      <<: *env
+
+    # The path on the left of the colon ':' should point to files/directories on the host machine.
+    # The path on the right of the colon ':' is an in-container path. It must match the path
+    #     specified in the `command` header below.
+    volumes:
+      - "./license-proxy.toml:/license-proxy.toml:ro,Z"
+
+    # Invoke the License Proxy service
+    command: -v serve /license-proxy.toml

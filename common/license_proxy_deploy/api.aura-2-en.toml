@@ -5,7 +5,9 @@
 ### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
 ### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
 [license]
-server_url = ["https://license.deepgram.com"]
+### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
+### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
+server_url = ["https://license-proxy:8443", "https://license.deepgram.com"]
 
 
 ### Configure how the API will listen for your requests
@@ -109,7 +111,7 @@ speak_streaming = true # or false
 ###
 ### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
 ### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
-url = "https://engine:8080/v2"
+url = "https://engine-en:8080/v2"
 ### Factor to increase the timeout by for each additional retry (for
 ### exponential backoff).
 timeout_backoff = 1.2
