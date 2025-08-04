@@ -1,0 +1,162 @@
+# Sample Helm values for Aura-2 deployment with English and Spanish language support
+# This configuration supports both English and Spanish Aura-2 models
+# 
+# Usage:
+#   helm install deepgram ./charts/deepgram-self-hosted -f samples/04-aura-2-setup.yaml
+
+global:
+  # Set your Deepgram secret containing API key
+  deepgramSecretRef: "deepgram-secret"
+  
+  # Set your image pull secret if using private registry
+  # pullSecretRef: "quay-secret"
+
+# Configure scaling for multi-language deployment
+scaling:
+  replicas:
+    # Deploy separate API instances for each language
+    api: 2
+    # Deploy separate Engine instances for each language  
+    engine: 2
+
+# API configuration for English Aura-2
+api:
+  image:
+    tag: release-250731
+  
+  # Enable Aura-2 specific features
+  features:
+    # Enable topic detection and summarization for Aura-2
+    # These features are commonly used with Aura-2 models
+    entityDetection: false
+    entityRedaction: false
+    formatEntityTags: false
+
+  # Configure driver pool to connect to both language engines
+  driverPool:
+    standard:
+      timeoutBackoff: 1.2
+      retrySleep: "2s"
+      retryBackoff: 1.6
+      maxResponseSize: "1073741824"
+
+# Engine configuration for Aura-2
+engine:
+  image:
+    tag: release-250731
+  
+  # Aura-2 requires more resources than standard models
+  resources:
+    requests:
+      memory: "32Gi"
+      cpu: "4000m"
+      gpu: 1
+    limits:
+      memory: "48Gi"
+      cpu: "8000m"
+      gpu: 1
+
+  # Aura-2 specific features
+  features:
+    streamingNer: false
+
+  # Enable automatic model management for Aura-2 models
+  modelManager:
+    models:
+      # Add your Aura-2 model links here
+      # Replace with actual model links provided by Deepgram
+      add: []
+        # Example (replace with your actual model links):
+        # - "https://path.to/aura-2-en-model"
+        # - "https://path.to/aura-2-es-model"
+
+    # Configure volume storage for models
+    volumes:
+      # For AWS EKS deployments
+      aws:
+        efs:
+          enabled: false
+          # fileSystemId: "fs-xxxxxxxxx"
+          forceDownload: false
+          
+      # For GCP GKE deployments  
+      gcp:
+        gpd:
+          enabled: false
+          # storageCapacity: "100G"
+          # volumeHandle: "projects/PROJECT/zones/ZONE/disks/DISK"
+
+      # Or use custom PVC
+      customVolumeClaim:
+        enabled: false
+        # name: "deepgram-models-pvc"
+        modelsDirectory: "/"
+
+# Enable License Proxy for production Aura-2 deployments
+licenseProxy:
+  enabled: true
+  deploySecondReplica: false
+  keepUpstreamServerAsBackup: true
+  
+  image:
+    tag: release-250731
+
+# Monitoring configuration for Aura-2
+# Enable Prometheus stack for metrics collection
+kube-prometheus-stack:
+  enabled: true
+  fullnameOverride: "dg-prometheus-stack"
+
+prometheus-adapter:
+  enabled: true
+
+# GPU Operator for NVIDIA GPU support (required for Aura-2)
+gpu-operator:
+  enabled: true
+  driver:
+    enabled: true
+    version: "550.54.15"
+  toolkit:
+    enabled: true
+    version: v1.15.0-ubi8
+
+# Auto-scaling configuration for Aura-2 workloads
+scaling:
+  auto:
+    enabled: false  # Set to true to enable autoscaling
+    
+    engine:
+      minReplicas: 1
+      maxReplicas: 4
+      metrics:
+        requestCapacityRatio: 0.8
+        speechToText:
+          batch:
+            requestsPerPod: 10
+          streaming:
+            requestsPerPod: 20
+        textToSpeech:
+          batch:
+            requestsPerPod: 15
+
+# Additional environment variables for Aura-2 Engine containers
+# These will be added via configmap in the templates
+aura2:
+  # Aura-2 specific configuration
+  enabled: true
+  
+  # English language configuration
+  english:
+    enabled: true
+    maxBatchSize: 8
+    t2cUuid: "15ef8614-52cb-4cd3-a641-d68249c15d53"
+    c2aUuid: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
+    cudaVisibleDevices: "0,1"
+    
+  # Spanish language configuration  
+  spanish:
+    enabled: true
+    maxBatchSize: 8
+    t2cUuid: "5d53d105-c6a4-47f5-b670-61adb6e8a880"
+    c2aUuid: "4d5c93ad-9e20-4ebf-a1f0-0fb88ac73ef5"
+    cudaVisibleDevices: "2,3"
