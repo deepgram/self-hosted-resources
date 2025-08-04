@@ -11,6 +11,7 @@ services:
   # English Language Aura-2
   api-en:
     image: quay.io/deepgram/self-hosted-api:release-250731
+    restart: always
 
     # Here we expose the API port to the host machine. The container port
     # (right-hand side) must match the port that the API service is listening
@@ -37,6 +38,7 @@ services:
   # Spanish Language Aura-2
   api-es:
     image: quay.io/deepgram/self-hosted-api:release-250731
+    restart: always
 
     # Here we expose the API port to the host machine. The container port
     # (right-hand side) must match the port that the API service is listening
@@ -64,6 +66,7 @@ services:
   # English Language Aura-2 Driver
   engine-en:
     image: quay.io/deepgram/self-hosted-engine:release-250731
+    restart: always
 
     # Utilize a GPU, if available.
     runtime: nvidia
@@ -96,6 +99,7 @@ services:
   # Spanish Language Aura-2 Driver
   engine-es:
     image: quay.io/deepgram/self-hosted-engine:release-250731
+    restart: always
 
     # Utilize a GPU, if available.
     runtime: nvidia
@@ -128,6 +132,7 @@ services:
   # The service to validate your Deepgram license
   license-proxy:
     image: quay.io/deepgram/self-hosted-license-proxy:release-250731
+    restart: always
 
     # Here we expose the License Proxy status port to the host machine. The container port
     # (right-hand side) must match the port that the License Proxy service is listening
