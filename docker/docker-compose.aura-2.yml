@@ -85,7 +85,7 @@ services:
     # The path on the right of the colon ':' is an in-container path.
     volumes:
       # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
-      - "../models:/models:ro,Z"
+      - "/path/to/models:/models:ro,Z"
       # In-container config path below must match the path specified in the `command` header below.
       - "./engine.aura-2-en.toml:/engine.toml:ro,Z"
 
@@ -118,7 +118,7 @@ services:
     # The path on the right of the colon ':' is an in-container path.
     volumes:
       # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
-      - "../models:/models:ro,Z"
+      - "/path/to/models:/models:ro,Z"
       # In-container config path below must match the path specified in the `command` header below.
       - "./engine.aura-2-es.toml:/engine.toml:ro,Z"
 
