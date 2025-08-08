@@ -26,11 +26,6 @@ api:
   
   # Enable Aura-2 specific features
   features:
-    # Enable topic detection and summarization for Aura-2
-    # These features are commonly used with Aura-2 models
-    entityDetection: false
-    entityRedaction: false
-    formatEntityTags: false
 
   # Configure driver pool to connect to both language engines
   driverPool:
@@ -50,15 +45,10 @@ engine:
     requests:
       memory: "32Gi"
       cpu: "4000m"
-      gpu: 1
-    limits:
-      memory: "48Gi"
-      cpu: "8000m"
-      gpu: 1
+      gpu: 2
 
   # Aura-2 specific features
   features:
-    streamingNer: false
 
   # Enable automatic model management for Aura-2 models
   modelManager:
@@ -115,7 +105,7 @@ gpu-operator:
   enabled: true
   driver:
     enabled: true
-    version: "550.54.15"
+    version: "570.172.08"
   toolkit:
     enabled: true
     version: v1.15.0-ubi8
