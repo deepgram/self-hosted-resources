@@ -41,6 +41,8 @@ spec:
         {{- toYaml .Values.licenseProxy.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.licenseProxy.nodeSelector | nindent 8 }}
       securityContext:
         {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
       {{- if or .Values.licenseProxy.serviceAccount.create .Values.licenseProxy.serviceAccount.name }}
