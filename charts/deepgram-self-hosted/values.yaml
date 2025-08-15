@@ -796,3 +796,27 @@ prometheus-adapter:
           overrides:
             namespace: { resource: "namespace" }
             pod: { resource: "pod" }
+
+# -- Aura-2 specific configuration options
+# @default -- ``
+aura2:
+  # -- Enable Aura-2 features and configuration
+  enabled: false
+  
+  # -- English language configuration for Aura-2
+  # @default -- ``
+  english:
+    enabled: false
+    maxBatchSize: 8
+    t2cUuid: ""
+    c2aUuid: ""
+    cudaVisibleDevices: "0,1"
+    
+  # -- Spanish language configuration for Aura-2
+  # @default -- ``
+  spanish:
+    enabled: false
+    maxBatchSize: 8
+    t2cUuid: ""
+    c2aUuid: ""
+    cudaVisibleDevices: "2,3"
