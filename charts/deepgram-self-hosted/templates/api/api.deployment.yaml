@@ -42,7 +42,7 @@ spec:
       tolerations:
         {{- toYaml .Values.api.tolerations | nindent 8 }}
       securityContext:
-        {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+        {{- toYaml .Values.api.securityContext | nindent 8 }}
       {{- if or .Values.api.serviceAccount.create .Values.api.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.api.namePrefix) .Values.api.serviceAccount.name }}
       {{- end }}
