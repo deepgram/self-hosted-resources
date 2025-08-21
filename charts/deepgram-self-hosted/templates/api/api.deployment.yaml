@@ -41,6 +41,7 @@ spec:
         {{- toYaml .Values.api.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.api.tolerations | nindent 8 }}
+      {{- with .Values.api.securityContext }}
       securityContext:
         {{- toYaml .Values.api.securityContext | nindent 8 }}
       {{- if or .Values.api.serviceAccount.create .Values.api.serviceAccount.name }}
@@ -48,6 +49,10 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Values.api.namePrefix }}
+        {{- with .Values.api.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         image: {{ .Values.api.image.path }}:{{ .Values.api.image.tag }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         envFrom:

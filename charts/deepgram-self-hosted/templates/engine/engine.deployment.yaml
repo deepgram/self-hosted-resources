@@ -41,6 +41,7 @@ spec:
         {{- toYaml .Values.engine.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.engine.tolerations | nindent 8 }}
+      {{- with .Values.engine.securityContext }}
       securityContext:
         {{- toYaml .Values.engine.securityContext | nindent 8 }}
       {{- if or .Values.engine.serviceAccount.create .Values.engine.serviceAccount.name }}
@@ -48,6 +49,10 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Values.engine.namePrefix }}
+        {{- with .Values.engine.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         image: {{ .Values.engine.image.path }}:{{ .Values.engine.image.tag }}
         imagePullPolicy: {{ .Values.engine.image.pullPolicy }}
         envFrom:
@@ -153,4 +158,3 @@ spec:
           {{- else if $gcpGpdEnabled }}
           claimName: {{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
           {{- end }}
-

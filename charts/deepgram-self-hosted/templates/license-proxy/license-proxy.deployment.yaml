@@ -41,13 +41,19 @@ spec:
         {{- toYaml .Values.licenseProxy.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
+      {{- with .Values.licenseProxy.securityContext }}
       securityContext:
-        {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       {{- if or .Values.licenseProxy.serviceAccount.create .Values.licenseProxy.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.licenseProxy.namePrefix) .Values.licenseProxy.serviceAccount.name }}
       {{- end }}
       containers:
       - name: {{ .Values.licenseProxy.namePrefix }}
+        {{- with .Values.licenseProxy.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         image: {{ .Values.licenseProxy.image.path }}:{{ .Values.licenseProxy.image.tag }}
         imagePullPolicy: {{ .Values.licenseProxy.image.pullPolicy }}
         envFrom:
