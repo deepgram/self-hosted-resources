@@ -165,8 +165,11 @@ api:
   # to apply to API pods.
   tolerations: []
 
-  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for API pods.
   securityContext: {}
+
+  # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for API containers.
+  containerSecurityContext: {}
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram API Deployment.
@@ -354,8 +357,11 @@ engine:
   # to apply to Engine pods.
   tolerations: []
 
-  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods.
   securityContext: {}
+
+  # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers.
+  containerSecurityContext: {}
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
@@ -591,8 +597,11 @@ licenseProxy:
   # to apply to License Proxy pods.
   tolerations: []
 
-  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods.
   securityContext: {}
+
+  # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for License Proxy containers.
+  containerSecurityContext: {}
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram License Proxy Deployment.
