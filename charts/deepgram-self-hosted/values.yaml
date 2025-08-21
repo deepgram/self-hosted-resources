@@ -167,22 +167,9 @@ api:
 
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for API pods.
   securityContext: {}
-    # runAsNonRoot: true
-    # runAsUser: 1000
-    # runAsGroup: 3000
-    # fsGroup: 2000
-    # seccompProfile:
-    #   type: RuntimeDefault
 
   # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for API containers.
   containerSecurityContext: {}
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram API Deployment.
@@ -372,22 +359,9 @@ engine:
 
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods.
   securityContext: {}
-    # runAsNonRoot: true
-    # runAsUser: 1000
-    # runAsGroup: 3000
-    # fsGroup: 2000
-    # seccompProfile:
-    #   type: RuntimeDefault
 
   # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers.
   containerSecurityContext: {}
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
@@ -625,22 +599,9 @@ licenseProxy:
 
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods.
   securityContext: {}
-    # runAsNonRoot: true
-    # runAsUser: 1000
-    # runAsGroup: 3000
-    # fsGroup: 2000
-    # seccompProfile:
-    #   type: RuntimeDefault
 
   # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for License Proxy containers.
   containerSecurityContext: {}
-    # allowPrivilegeEscalation: false
-    # capabilities:
-    #   drop:
-    #   - ALL
-    # readOnlyRootFilesystem: true
-    # runAsNonRoot: true
-    # runAsUser: 1000
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram License Proxy Deployment.
