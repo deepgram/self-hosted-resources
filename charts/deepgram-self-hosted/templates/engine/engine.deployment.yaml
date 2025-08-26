@@ -78,7 +78,7 @@ spec:
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
         {{- end }}
-        {{- if .Values.aura2.enabled }}
+        {{- if $.Values.aura2.enabled }}
         {{- if .Values.aura2.english.enabled }}
         - name: IMPELLER_AURA2_MAX_BATCH_SIZE
           value: "{{ .Values.aura2.english.maxBatchSize }}"
