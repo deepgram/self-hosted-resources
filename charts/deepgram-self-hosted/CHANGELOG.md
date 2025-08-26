@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `nodeSelector` support for all components (API, Engine, License Proxy) to allow scheduling pods on specific nodes.
+
 ## [0.17.0] - 2025-08-14
 
 ### Added
