@@ -53,27 +53,63 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {{- range $key, $value := .Values.global.thirdPartyCredentials }}
-        {{- if $value }}
-        - secretRef:
-            name: {{ $value }}
-        {{- end }}
-        {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
         - name: OPENAI_API_KEY
-          value: {{ .Values.global.openAiSecretRef | default "placeholder-openai-key" | quote }}
-        - name: ANTHROPIC_API_KEY
-          value: {{ .Values.global.anthropicSecretRef | default "" | quote }}
-        - name: GROQ_API_KEY
-          value: {{ .Values.global.groqSecretRef | default "" | quote }}
-        - name: ELEVENLABS_API_KEY
-          value: {{ .Values.global.elevenLabsSecretRef | default "" | quote }}
-        - name: CARTESIA_API_KEY
-          value: {{ .Values.global.cartesiaSecretRef | default "" | quote }}
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.openAiSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.openAiSecretRef }}
+              key: OPENAI_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
         - name: XAI_API_KEY
-          value: {{ .Values.global.xaiSecretRef | default "" | quote }}
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.xaiSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.xaiSecretRef }}
+              key: XAI_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: ANTHROPIC_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.anthropicSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.anthropicSecretRef }}
+              key: ANTHROPIC_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: GROQ_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.groqSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.groqSecretRef }}
+              key: GROQ_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: ELEVENLABS_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
+              key: ELEVENLABS_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: CARTESIA_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
+              key: CARTESIA_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
