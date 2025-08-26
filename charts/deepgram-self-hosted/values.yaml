@@ -216,7 +216,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-250626
+    tag: release-250814
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -384,7 +384,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-250626
+    tag: release-250814
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -640,7 +640,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-250626
+    tag: release-250814
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -900,3 +900,27 @@ prometheus-adapter:
           overrides:
             namespace: { resource: "namespace" }
             pod: { resource: "pod" }
+
+# -- Aura-2 specific configuration options
+# @default -- ``
+aura2:
+  # -- Enable Aura-2 features and configuration
+  enabled: false
+  
+  # -- English language configuration for Aura-2
+  # @default -- ``
+  english:
+    enabled: false
+    maxBatchSize: 8
+    t2cUuid: ""
+    c2aUuid: ""
+    cudaVisibleDevices: "0,1"
+    
+  # -- Spanish language configuration for Aura-2
+  # @default -- ``
+  spanish:
+    enabled: false
+    maxBatchSize: 8
+    t2cUuid: ""
+    c2aUuid: ""
+    cudaVisibleDevices: "2,3"
