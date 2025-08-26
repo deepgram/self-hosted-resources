@@ -180,6 +180,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.additionalAnnotations | object | `nil` | Additional annotations to add to the API deployment |
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
 | api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
+| api.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for API containers. |
 | api.driverPool | object | `` | driverPool configures the backend pool of speech engines (generically referred to as "drivers" here). The API will load-balance among drivers in the standard pool; if one standard driver fails, the next one will be tried. |
 | api.driverPool.standard | object | `` | standard is the main driver pool to use. |
 | api.driverPool.standard.maxResponseSize | string | `"1073741824"` | Maximum response to deserialize from Driver (in bytes). Default is 1GB, expressed in bytes. |
@@ -201,7 +202,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.resolver.maxTTL | int | `nil` | maxTTL sets the DNS TTL value if specifying a custom DNS nameserver. |
 | api.resolver.nameservers | list | `[]` | nameservers allows for specifying custom domain name server(s). A valid list item's format is "{IP} {PORT} {PROTOCOL (tcp or udp)}", e.g. `"127.0.0.1 53 udp"`. |
 | api.resources | object | `` | Configure resource limits per API container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#api) for more details. |
-| api.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
+| api.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for API pods. |
 | api.server | object | `` | Configure how the API will listen for your requests |
 | api.server.callbackConnTimeout | string | `"1s"` | callbackConnTimeout configures how long to wait for a connection to a callback URL. See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback) for more details. The value should be a humantime duration. |
 | api.server.callbackTimeout | string | `"10s"` | callbackTimeout configures how long to wait for a response from a callback URL. See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback) for more details. The value should be a humantime duration. |
@@ -233,6 +234,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.chunking.speechToText.streaming.minDuration | float | `nil` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
 | engine.chunking.speechToText.streaming.step | float | `1` | step defines how often to return interim results, in seconds. This value may be lowered to increase the frequency of interim results. However, this also causes a significant decrease in the number of concurrent streams supported by a single GPU. Please contact your Deepgram Account representative for more details. |
 | engine.concurrencyLimit.activeRequests | int | `nil` | activeRequests limits the number of active requests handled by a single Engine container. If additional requests beyond the limit are sent, the API container forming the request will try a different Engine pod. If no Engine pods are able to accept the request, the API will return a 429 HTTP response to the client. The `nil` default means no limit will be set. |
+| engine.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers. |
 | engine.features.streamingNer | bool | `false` | Enables format entity tags on streaming audio *if* a valid NER model is available. |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
@@ -263,7 +265,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
 | engine.resources.requests.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
-| engine.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
+| engine.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods. |
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.server.port | int | `8080` | port to listen on for inference requests |
@@ -291,6 +293,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.additionalAnnotations | object | `nil` | Additional annotations to add to the LicenseProxy deployment |
 | licenseProxy.additionalLabels | object | `{}` | Additional labels to add to License Proxy resources |
 | licenseProxy.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for License Proxy pods. |
+| licenseProxy.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for License Proxy containers. |
 | licenseProxy.deploySecondReplica | bool | `false` | If the License Proxy is deployed, one replica should be sufficient to support many API/Engine pods. Highly available environments may wish to deploy a second replica to ensure uptime, which can be toggled with this option. |
 | licenseProxy.enabled | bool | `false` | The License Proxy is optional, but highly recommended to be deployed in production to enable highly available environments. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
@@ -301,7 +304,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
 | licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
-| licenseProxy.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
+| licenseProxy.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods. |
 | licenseProxy.server | object | `` | Configure how the license proxy will listen for licensing requests. |
 | licenseProxy.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
 | licenseProxy.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
