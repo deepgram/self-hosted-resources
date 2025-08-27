@@ -177,6 +177,24 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| agent.enabled | bool | `false` | Whether to enable voice agent. Disabled by default |
+| agent.eotTimeoutMs | int | `3500` | Timeout in milliseconds for end-of-turn detection |
+| agent.llmProviders | object | `` | Configuration for LLM providers and their available models |
+| agent.llmProviders.anthropic | object | `` | Anthropic provider configuration |
+| agent.llmProviders.anthropic.models | object | `` | Available Anthropic models and their configurations |
+| agent.llmProviders.deepgram | object | `` | Deepgram provider configuration |
+| agent.llmProviders.deepgram.models | object | `` | Available Deepgram models and their configurations |
+| agent.llmProviders.groq | object | `` | Groq provider configuration |
+| agent.llmProviders.groq.models | object | `` | Available Groq models and their configurations |
+| agent.llmProviders.open_ai | object | `` | OpenAI provider configuration |
+| agent.llmProviders.open_ai.models | object | `` | Available OpenAI models and their configurations |
+| agent.llmProviders.open_ai.models.gpt-4o-mini.name | string | `"GPT-4o mini"` | Display name for the GPT-4o mini model |
+| agent.llmProviders.open_ai.models.gpt-4o-mini.public | bool | `true` | Whether this model is publicly available |
+| agent.llmProviders.open_ai.models.gpt-4o-mini.tier | string | `"standard"` | Service tier for this model (standard or advanced) |
+| agent.llmProviders.open_ai.name | string | `"OpenAI"` | Display name for the OpenAI provider |
+| agent.llmProviders.x_ai | object | `` | xAI provider configuration |
+| agent.llmProviders.x_ai.models | object | `` | Available xAI models and their configurations |
+| agent.maxConversationChars | int | `15000` | Maximum number of characters allowed in a conversation history |
 | api.additionalAnnotations | object | `nil` | Additional annotations to add to the API deployment |
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
 | api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
@@ -327,6 +345,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | scaling.auto.engine.metrics.textToSpeech.batch.requestsPerPod | int | `nil` | Scale the Engine pods based on a static desired number of text-to-speech batch requests per pod |
 | scaling.auto.engine.minReplicas | int | `1` | Minimum number of Engine replicas. |
 | scaling.replicas | object | `` | Number of replicas to set during initial installation. |
+| scaling.replicas.engine | int | `1` | Engine replicas can be specified either as a single number for one engine type, or as individual counts for each engine type when Voice Agent is enabled. |
 
 ## Maintainers
 
