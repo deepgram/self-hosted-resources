@@ -281,7 +281,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
 | engine.resources.requests.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
-| engine.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
+| engine.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Engine pods. |
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.server.port | int | `8080` | port to listen on for inference requests |
@@ -319,7 +319,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
 | licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
-| licenseProxy.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
+| licenseProxy.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for License Proxy pods. |
 | licenseProxy.server | object | `` | Configure how the license proxy will listen for licensing requests. |
 | licenseProxy.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
 | licenseProxy.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |

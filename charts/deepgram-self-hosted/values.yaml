@@ -458,7 +458,7 @@ engine:
   # to apply to Engine pods.
   tolerations: []
 
-  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Engine pods.
   securityContext: {}
 
   serviceAccount:
@@ -695,7 +695,7 @@ licenseProxy:
   # to apply to License Proxy pods.
   tolerations: []
 
-  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
+  # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for License Proxy pods.
   securityContext: {}
 
   serviceAccount:

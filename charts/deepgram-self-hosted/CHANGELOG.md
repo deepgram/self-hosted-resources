@@ -10,6 +10,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added built-in support for Voice Agent.
 
+### Fixed
+
+- Fixed securityContext template references for API and Engine deployments
+- Fixed securityContext documentation comments
+
 ## [0.17.0] - 2025-08-14
 
 ### Added
