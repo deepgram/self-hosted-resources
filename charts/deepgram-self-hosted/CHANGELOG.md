@@ -6,9 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.18.0] - 2025-08-28
+
 ### Added
 
 - Added built-in support for Voice Agent.
+- Updated default container tags to August 2025 release (`release-250828`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-august-2025-release-250828) for additional details.
 
 ### Fixed
 
@@ -217,7 +220,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.17.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.0...HEAD
+[0.18.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.17.0...0.18.0
 [0.17.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.16.0...0.17.0
 [0.16.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.15.0...0.16.0
 [0.15.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.14.0...0.15.0
