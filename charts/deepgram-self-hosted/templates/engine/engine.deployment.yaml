@@ -31,10 +31,12 @@ spec:
       engine-type: {{ $type }}
       {{- end }}
       {{ include "deepgram-self-hosted.selectorLabels" $ }}
+  {{- if not $.Values.scaling.auto.enabled }}
   {{- if $.Values.agent.enabled }}
   replicas: {{ index $.Values.scaling.replicas.engine $type | default 1 }}
   {{- else }}
   replicas: {{ $.Values.scaling.replicas.engine }}
+  {{- end }}
   {{- end }}
   strategy:
     type: RollingUpdate
