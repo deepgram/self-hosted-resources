@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.18.1] - 2025-09-03
+
+### Added
+
+- Defined `allowNonpublicEndpoints` Voice Agent flag for use with custom LLM endpoints
+
 ### Fixed
 
 - Fixed HPA replica conflicts in API and Engine deployments by conditionally removing hardcoded replicas when autoscaling is enabled
