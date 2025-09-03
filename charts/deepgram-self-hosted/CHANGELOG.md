@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Fixed
+
+- Fixed HPA replica conflicts in API and Engine deployments by conditionally removing hardcoded replicas when autoscaling is enabled
+
 ## [0.18.0] - 2025-08-28
 
 ### Added
