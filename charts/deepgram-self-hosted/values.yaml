@@ -108,7 +108,7 @@ agent:
   eotTimeoutMs: 3500
   # -- (int) Maximum number of characters allowed in a conversation history
   maxConversationChars: 15000
-  # -- (bool) Whether to allow non-public endpoints. Disabled by default
+  # -- (bool) Whether to allow non-public URLs (such as `localhost`) in custom endpoints. Disabled by default
   allowNonpublicEndpoints: false
   # -- Configuration for LLM providers and their available models
   # @default -- ``
