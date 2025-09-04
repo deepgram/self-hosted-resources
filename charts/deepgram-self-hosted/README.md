@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.18.0](https://img.shields.io/badge/Version-0.18.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-250828](https://img.shields.io/badge/AppVersion-release--250828-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.18.1](https://img.shields.io/badge/Version-0.18.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-250828](https://img.shields.io/badge/AppVersion-release--250828-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -177,6 +177,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| agent.allowNonpublicEndpoints | bool | `false` | Whether to allow non-public URLs (such as `localhost`) in custom endpoints. Disabled by default |
 | agent.enabled | bool | `false` | Whether to enable voice agent. Disabled by default |
 | agent.eotTimeoutMs | int | `3500` | Timeout in milliseconds for end-of-turn detection |
 | agent.llmProviders | object | `` | Configuration for LLM providers and their available models |
