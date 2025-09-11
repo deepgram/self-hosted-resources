@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Exposed the ability to add custom TOML sections in engine.toml via `customToml`
+
 ## [0.18.1] - 2025-09-03
 
 ### Added
