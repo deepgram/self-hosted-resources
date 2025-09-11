@@ -96,7 +96,6 @@ engine:
     activeRequests:
 
   # -- Custom TOML sections can be added here to extend engine.toml
-
   # customToml: |
   #   # Preload models on engine startup for faster initial requests
   #   # See https://deepgram.gitbook.io/help-center/how-can-i-pre-load-models-to-reduce-cold-start-latency
