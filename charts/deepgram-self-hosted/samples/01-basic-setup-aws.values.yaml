@@ -70,6 +70,10 @@ api:
       memory: "8Gi"
       cpu: "4000m"
 
+  # -- Custom TOML sections can be added here to extend api.toml
+  # customToml: |
+  #   [custom_section]
+
 engine:
   affinity:
     nodeAffinity:
