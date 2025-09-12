@@ -51,7 +51,7 @@ multichannel = true # or false
 ### Enables language detection *if* a valid language detection model is available
 language_detection = true # or false
 ### Enables streaming entity formatting *if* a valid NER model is available
-streaming_ner = false # or true
+streaming_ner = true # or false
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]
