@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Changes the defaults of `.Values.api.features.formatEntityTags` and `.Values.engine.features.streamingNer` to `true`, so that NER formatting is enabled by default. This formatting is required with Nova-3 models. See our [self-hosted NER guide](https://deepgram.gitbook.io/help-center/self-hosted/how-can-i-enable-ner-formatting-in-my-self-hosted-deployment) for further details.
 - Updated default container tags to September 2025 release (`release-250912`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-september-2025-release-250912) for additional details.
 
 ## [0.18.1] - 2025-09-03
