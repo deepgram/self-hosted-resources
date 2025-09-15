@@ -113,10 +113,10 @@ spec:
             nvidia.com/gpu: {{ $.Values.engine.resources.requests.gpu }}
             {{- end }}
           limits:
-            {{- if .Values.engine.resources.limits.memory }}
+            {{- if $.Values.engine.resources.limits.memory }}
             memory: "{{ $.Values.engine.resources.limits.memory }}"
             {{- end }}
-            {{- if .Values.engine.resources.limits.cpu }}
+            {{- if $.Values.engine.resources.limits.cpu }}
             cpu: "{{ $.Values.engine.resources.limits.cpu }}"
             {{- end }}
             {{- if gt (int $.Values.engine.resources.limits.gpu) 0 }}
@@ -161,13 +161,13 @@ spec:
           {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
 
           {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) }}
- 
+
           {{- if eq $enabledCount 0 }}
           {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled must be set to true." }}
           {{- else if gt $enabledCount 1 }}
           {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled can be set to true." }}
           {{- end }}
- 
+
           {{- if $customClaimEnabled }}
             {{- if not $customClaimName }}
             {{- fail "Error: customVolumeClaim.name must be set when customVolumeClaim.enabled is true." }}
