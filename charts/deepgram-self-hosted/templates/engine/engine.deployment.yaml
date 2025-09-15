@@ -61,6 +61,8 @@ spec:
         {{- toYaml $.Values.engine.affinity | nindent 8 }}
       tolerations:
         {{- toYaml $.Values.engine.tolerations | nindent 8 }}
+      nodeSelector:
+        {{- toYaml $.Values.engine.nodeSelector | nindent 8 }}
       {{- with $.Values.engine.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}
@@ -69,7 +71,7 @@ spec:
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
       containers:
-      - name: {{ $.Values.engine.namePrefix }}
+      - name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
         {{- with $.Values.engine.containerSecurityContext }}
         securityContext:
           {{- toYaml . | nindent 10 }}

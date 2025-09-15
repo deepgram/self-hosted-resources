@@ -1,0 +1,155 @@
+# See the Chart [README](https://github.com/deepgram/self-hosted-resources/blob/main/charts/deepgram-self-hosted#values)
+#   for documentation on all available options.
+
+global:
+  # pullSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
+  # ```bash
+  # docker login quay.io
+  # kubectl create secret docker-registry dg-regcred \
+  #   --docker-server=quay.io \
+  #   --docker-username='QUAY_DG_USER' \
+  #   --docker-password='QUAY_DG_PASSWORD'
+  # ```
+  pullSecretRef: "dg-regcred"
+
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key"
+
+  # Third-party providers for Voice Agent.
+  # For each provider you'd like to configure, uncomment its line and insert your API key.
+  # Make sure to preserve the indentation under the `thirdPartyCredentials` header.
+  thirdPartyCredentials:
+    # openAiSecretRef: "openai-api-key"
+    # anthropicSecretRef: "anthropic-api-key"
+    # groqSecretRef: "groq-api-key"
+    # elevenLabsSecretRef: "elevenlabs-api-key"
+    # cartesiaSecretRef: "cartesia-api-key"
+    # xaiSecretRef: "xai-secret-ref"
+
+scaling:
+  replicas:
+    api: 1
+    engine:
+      agent-speech-to-text: 1
+      agent-text-to-speech: 1
+      agent-end-of-turn: 1
+  auto:
+    # Autoscaling is not yet supported for the Voice Agent.
+    enabled: false
+
+agent:
+  enabled: true
+
+api:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: k8s.deepgram.com/node-type
+                operator: In
+                values:
+                  - api
+  resources:
+    requests:
+      memory: "4Gi"
+      cpu: "2000m"
+    limits:
+      memory: "8Gi"
+      cpu: "4000m"
+
+engine:
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: k8s.deepgram.com/node-type
+                operator: In
+                values:
+                  - engine
+  resources:
+    requests:
+      memory: "28Gi"
+      cpu: "6000m"
+      gpu: 1
+    limits:
+      memory: "40Gi"
+      cpu: "8000m"
+      gpu: 1
+  # Discuss a reasonable value with your Deepgram Account Representative
+  # If not using autoscaling, can be left empty, but must be set if using
+  # autoscaling with scaling.auto.engine.metrics.requestCapacityRatio
+  concurrencyLimit:
+    activeRequests:
+
+  modelManager:
+    volumes:
+      aws:
+        efs:
+          enabled: true
+          fileSystemId: fs-xxxxxxxxxxxxxxxx # Replace with your EFS ID
+          namePrefix: dg-models
+    models:
+      add:
+        # Recommended Voice Agent models:
+        # - Nova-3 non-formatted (nova-3-general.en.non-formatted.streaming.*.dg)
+        # - EOT (end-of-turn.*.dg)
+        # - Phonemizer for TTS (phonemizer.en.*.dg)
+        # - Aura TTS voice model(s) (e.g. aura-asteria-en.*.dg)
+        # - Any other streaming STT models of choice (e.g. Nova-2 instead of Nova-3)
+        # - https://link-to-model-1.dg
+        # ...
+      remove:
+        # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
+        # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
+        # - name-of-old-model-3.dg          #   this will likely be empty.
+        # - ...
+
+licenseProxy:
+  enabled: true
+
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: k8s.deepgram.com/node-type
+                operator: In
+                values:
+                  - license-proxy
+  resources:
+    requests:
+      memory: "6Gi"
+      cpu: "1500m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+
+cluster-autoscaler:
+  enabled: false # Autoscaling is not yet supported for Voice Agent
+
+gpu-operator:
+  enabled: true
+
+  # If using EKS accelerated AMIs based on Amazon Linux 2023 (default with Deepgram guides as of Oct 2024),
+  # driver and toolkit come bundled with the AMI.
+  #
+  # If using other AMIs, such as Ubuntu, you should re-enable the driver and toolkit below.
+  driver:
+    enabled: false
+  toolkit:
+    enabled: false
