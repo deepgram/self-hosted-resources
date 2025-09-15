@@ -216,6 +216,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.image.tag | string | `"release-250912"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
+| api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
 | api.readinessProbe | object | `` | Readiness probe customization for API pods. |
 | api.resolver | object | `` | Specify custom DNS resolution options. |
 | api.resolver.maxTTL | int | `nil` | maxTTL sets the DNS TTL value if specifying a custom DNS nameserver. |
@@ -280,6 +281,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.modelManager.volumes.gcp.gpd.storageClassName | string | `"standard-rwo"` | The storageClassName of the existing persistent disk. |
 | engine.modelManager.volumes.gcp.gpd.volumeHandle | string | `""` | The identifier of your pre-existing persistent disk. The format is projects/{project_id}/zones/{zone_name}/disks/{disk_name} for Zonal persistent disks, or projects/{project_id}/regions/{region_name}/disks/{disk_name} for Regional persistent disks. |
 | engine.namePrefix | string | `"deepgram-engine"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Engine containers. |
+| engine.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to Engine pods. |
 | engine.readinessProbe | object | `` | Readiness probe customization for Engine pods. |
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
@@ -320,6 +322,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
+| licenseProxy.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to License Proxy pods. |
 | licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
 | licenseProxy.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for License Proxy pods. |

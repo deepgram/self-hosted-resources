@@ -61,6 +61,8 @@ spec:
         {{- toYaml $.Values.engine.affinity | nindent 8 }}
       tolerations:
         {{- toYaml $.Values.engine.tolerations | nindent 8 }}
+      nodeSelector:
+        {{- toYaml $.Values.engine.nodeSelector | nindent 8 }}
       securityContext:
         {{- toYaml $.Values.engine.securityContext | nindent 8 }}
       {{- if or $.Values.engine.serviceAccount.create $.Values.engine.serviceAccount.name }}

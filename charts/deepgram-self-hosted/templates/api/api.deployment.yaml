@@ -43,6 +43,8 @@ spec:
         {{- toYaml .Values.api.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.api.tolerations | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.api.nodeSelector | nindent 8 }}
       securityContext:
         {{- toYaml .Values.api.securityContext | nindent 8 }}
       {{- if or .Values.api.serviceAccount.create .Values.api.serviceAccount.name }}

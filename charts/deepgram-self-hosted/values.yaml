@@ -271,6 +271,10 @@ api:
   # to apply to API pods.
   tolerations: []
 
+  # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  # to apply to API pods.
+  nodeSelector: {}
+
   # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods.
   securityContext: {}
 
@@ -462,6 +466,10 @@ engine:
   # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   # to apply to Engine pods.
   tolerations: []
+
+  # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  # to apply to Engine pods.
+  nodeSelector: {}
 
   # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Engine pods.
   securityContext: {}
@@ -702,6 +710,10 @@ licenseProxy:
   # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   # to apply to License Proxy pods.
   tolerations: []
+
+  # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  # to apply to License Proxy pods.
+  nodeSelector: {}
 
   # -- [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for License Proxy pods.
   securityContext: {}

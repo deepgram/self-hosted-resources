@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Exposed the ability to add custom TOML sections in api.toml and engine.toml via `customToml`
+- Added `nodeSelector` support for all components (API, Engine, License Proxy) to allow scheduling pods on specific nodes.
 
 ## [0.19.0] - 2025-09-12
 
