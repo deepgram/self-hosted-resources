@@ -373,6 +373,9 @@ api:
       # Default is 1GB, expressed in bytes.
       maxResponseSize: "1073741824"
 
+  # -- Custom TOML sections can be added to extend api.toml
+  customToml:
+
 engine:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram Engine containers.
@@ -481,6 +484,9 @@ engine:
     # are able to accept the request, the API will return a 429 HTTP response
     # to the client. The `nil` default means no limit will be set.
     activeRequests:
+
+  # -- Custom TOML sections can be added to extend engine.toml
+  customToml:
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``

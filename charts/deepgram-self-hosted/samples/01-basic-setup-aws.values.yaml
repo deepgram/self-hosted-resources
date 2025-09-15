@@ -70,6 +70,10 @@ api:
       memory: "8Gi"
       cpu: "4000m"
 
+  # -- Custom TOML sections can be added here to extend api.toml
+  # customToml: |
+  #   [custom_section]
+
 engine:
   affinity:
     nodeAffinity:
@@ -94,6 +98,16 @@ engine:
   # autoscaling with scaling.auto.engine.metrics.requestCapacityRatio
   concurrencyLimit:
     activeRequests:
+
+  # -- Custom TOML sections can be added here to extend engine.toml
+  # customToml: |
+  #   # Preload models on engine startup for faster initial requests
+  #   # See https://deepgram.gitbook.io/help-center/how-can-i-pre-load-models-to-reduce-cold-start-latency
+  #   [preload_models]
+  #   models = [
+  #     # Example model preload configuration:
+  #     # { model = "general-nova-3", version = "2025-09-05.12808", language = "multi", format = false }
+  #   ]
 
   modelManager:
     volumes:

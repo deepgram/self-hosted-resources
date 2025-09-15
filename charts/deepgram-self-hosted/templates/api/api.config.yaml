@@ -108,3 +108,7 @@ data:
       {{- end }}
     {{- end }}
     {{- end }}
+
+    {{- if .Values.api.customToml }}
+    {{ .Values.api.customToml | nindent 4 }}
+    {{- end }}

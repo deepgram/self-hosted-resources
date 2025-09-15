@@ -199,6 +199,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.additionalAnnotations | object | `nil` | Additional annotations to add to the API deployment |
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
 | api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
+| api.customToml | string | `nil` | Custom TOML sections can be added to extend api.toml |
 | api.driverPool | object | `` | driverPool configures the backend pool of speech engines (generically referred to as "drivers" here). The API will load-balance among drivers in the standard pool; if one standard driver fails, the next one will be tried. |
 | api.driverPool.standard | object | `` | standard is the main driver pool to use. |
 | api.driverPool.standard.maxResponseSize | string | `"1073741824"` | Maximum response to deserialize from Driver (in bytes). Default is 1GB, expressed in bytes. |
@@ -252,6 +253,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.chunking.speechToText.streaming.minDuration | float | `nil` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
 | engine.chunking.speechToText.streaming.step | float | `1` | step defines how often to return interim results, in seconds. This value may be lowered to increase the frequency of interim results. However, this also causes a significant decrease in the number of concurrent streams supported by a single GPU. Please contact your Deepgram Account representative for more details. |
 | engine.concurrencyLimit.activeRequests | int | `nil` | activeRequests limits the number of active requests handled by a single Engine container. If additional requests beyond the limit are sent, the API container forming the request will try a different Engine pod. If no Engine pods are able to accept the request, the API will return a 429 HTTP response to the client. The `nil` default means no limit will be set. |
+| engine.customToml | string | `nil` | Custom TOML sections can be added to extend engine.toml |
 | engine.features.streamingNer | bool | `true` | Enables format entity tags on streaming audio *if* a valid NER model is available. |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
