@@ -71,7 +71,7 @@ entity_detection = false # or true
 entity_redaction = false # or true
 
 ### Enables pre-recorded entity formatting *if* a valid NER model is available
-format_entity_tags = false # or true
+format_entity_tags = true # or false
 
 ### If API is receiving requests faster than Engine can process them, a request
 ### queue will form. By default, this queue is stored in memory. Under high load,

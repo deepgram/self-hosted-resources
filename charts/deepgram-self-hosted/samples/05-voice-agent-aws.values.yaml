@@ -28,29 +28,30 @@ global:
   # ```
   deepgramSecretRef: "dg-self-hosted-api-key"
 
+  # Third-party providers for Voice Agent.
+  # For each provider you'd like to configure, uncomment its line and insert your API key.
+  # Make sure to preserve the indentation under the `thirdPartyCredentials` header.
+  thirdPartyCredentials:
+    # openAiSecretRef: "openai-api-key"
+    # anthropicSecretRef: "anthropic-api-key"
+    # groqSecretRef: "groq-api-key"
+    # elevenLabsSecretRef: "elevenlabs-api-key"
+    # cartesiaSecretRef: "cartesia-api-key"
+    # xaiSecretRef: "xai-secret-ref"
+
 scaling:
   replicas:
     api: 1
-    engine: 1
-  auto:
-    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
-    enabled: false
     engine:
-      metrics:
-        speechToText:
-          batch:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-          streaming:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-        textToSpeech:
-          batch:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-        # Discuss a reasoanble value with your Deepgram Account Representative
-        # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
-        requestCapacityRatio:
+      agent-speech-to-text: 1
+      agent-text-to-speech: 1
+      agent-end-of-turn: 1
+  auto:
+    # Autoscaling is not yet supported for the Voice Agent.
+    enabled: false
 
 agent:
-  enabled: false
+  enabled: true
 
 api:
   affinity:
@@ -69,10 +70,6 @@ api:
     limits:
       memory: "8Gi"
       cpu: "4000m"
-
-  # -- Custom TOML sections can be added here to extend api.toml
-  # customToml: |
-  #   [custom_section]
 
 engine:
   affinity:
@@ -99,16 +96,6 @@ engine:
   concurrencyLimit:
     activeRequests:
 
-  # -- Custom TOML sections can be added here to extend engine.toml
-  # customToml: |
-  #   # Preload models on engine startup for faster initial requests
-  #   # See https://deepgram.gitbook.io/help-center/how-can-i-pre-load-models-to-reduce-cold-start-latency
-  #   [preload_models]
-  #   models = [
-  #     # Example model preload configuration:
-  #     # { model = "general-nova-3", version = "2025-09-05.12808", language = "multi", format = false }
-  #   ]
-
   modelManager:
     volumes:
       aws:
@@ -118,14 +105,18 @@ engine:
           namePrefix: dg-models
     models:
       add:
-        - https://link-to-model-1.dg # Replace these links with those provided to you
-        - https://link-to-model-2.dg #   by your Deepgram Account Representative.
-        - https://link-to-model-3.dg
-        - ...
+        # Recommended Voice Agent models:
+        # - Nova-3 non-formatted (nova-3-general.en.non-formatted.streaming.*.dg)
+        # - EOT (end-of-turn.*.dg)
+        # - Phonemizer for TTS (phonemizer.en.*.dg)
+        # - Aura TTS voice model(s) (e.g. aura-asteria-en.*.dg)
+        # - Any other streaming STT models of choice (e.g. Nova-2 instead of Nova-3)
+        # - https://link-to-model-1.dg
+        # ...
       remove:
         # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
         # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
-        # - name-of-old-model-3.dg #   this will likely be empty.
+        # - name-of-old-model-3.dg          #   this will likely be empty.
         # - ...
 
 licenseProxy:
@@ -149,16 +140,7 @@ licenseProxy:
       cpu: "2000m"
 
 cluster-autoscaler:
-  enabled: true
-  rbac:
-    serviceAccount:
-      name: "cluster-autoscaler-sa"
-      annotations:
-        # Replace with the AWS Role ARN configured for the Cluster Autoscaler
-        eks.amazonaws.com/role-arn: "arn:aws:iam::000000000000:role/MyRoleName"
-  autoDiscovery:
-    clusterName: "deepgram-self-hosted-cluster"
-  awsRegion: "us-west-2"
+  enabled: false # Autoscaling is not yet supported for Voice Agent
 
 gpu-operator:
   enabled: true

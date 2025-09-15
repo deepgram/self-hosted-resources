@@ -53,7 +53,7 @@ multichannel = true # or false
 ### Enables language detection *if* a valid language detection model is available
 language_detection = true # or false
 ### Enables streaming entity formatting *if* a valid NER model is available
-streaming_ner = false # or true
+streaming_ner = true # or false
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]
@@ -77,3 +77,12 @@ streaming_ner = false # or true
 ### which supports enabled, disabled, and auto (the default).
 [half_precision]
 # state = "disabled" # or "enabled" or "auto"
+
+[health]
+### Controls whether Engine fails on startup if no GPU is detected
+### Default: false
+###
+### While Engine can run without a GPU, production deployments require one for
+### acceptable performance. Set to true to fail fast if no GPU is available,
+### rather than running with severely degraded performance.
+# gpu_required = true # or false
