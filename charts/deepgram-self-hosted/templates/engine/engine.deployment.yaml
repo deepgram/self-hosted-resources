@@ -108,7 +108,7 @@ spec:
         resources:
           requests:
             memory: "{{ $.Values.engine.resources.requests.memory }}"
-            cpu: "{{ .Values.engine.resources.requests.cpu }}"
+            cpu: "{{ $.Values.engine.resources.requests.cpu }}"
             {{- if gt (int $.Values.engine.resources.requests.gpu) 0 }}
             nvidia.com/gpu: {{ $.Values.engine.resources.requests.gpu }}
             {{- end }}
