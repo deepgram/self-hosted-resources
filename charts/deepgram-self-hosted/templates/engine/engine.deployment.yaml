@@ -60,7 +60,7 @@ spec:
       affinity:
         {{- toYaml $.Values.engine.affinity | nindent 8 }}
       tolerations:
-        {{- toYaml .Values.engine.tolerations | nindent 8 }}
+        {{- toYaml $Values.engine.tolerations | nindent 8 }}
       nodeSelector:
         {{- toYaml .Values.engine.nodeSelector | nindent 8 }}
       securityContext:
