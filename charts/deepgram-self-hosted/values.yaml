@@ -218,7 +218,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-250828
+    tag: release-250912
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -338,7 +338,7 @@ api:
 
     # -- Enables format entity tags on pre-recorded audio
     # *if* a valid NER model is available.
-    formatEntityTags: false
+    formatEntityTags: true
 
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,
@@ -373,6 +373,9 @@ api:
       # Default is 1GB, expressed in bytes.
       maxResponseSize: "1073741824"
 
+  # -- Custom TOML sections can be added to extend api.toml
+  customToml:
+
 engine:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram Engine containers.
@@ -386,7 +389,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-250828
+    tag: release-250912
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -481,6 +484,9 @@ engine:
     # are able to accept the request, the API will return a 429 HTTP response
     # to the client. The `nil` default means no limit will be set.
     activeRequests:
+
+  # -- Custom TOML sections can be added to extend engine.toml
+  customToml:
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``
@@ -579,7 +585,7 @@ engine:
   features:
     # -- Enables format entity tags on streaming audio
     # *if* a valid NER model is available.
-    streamingNer: false
+    streamingNer: true
 
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
@@ -642,7 +648,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-250828
+    tag: release-250912
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
