@@ -29,7 +29,7 @@ spec:
       labels: *labels
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/license-proxy/license-proxy.config.yaml") . | sha256sum }}
-        {{- with .Values.licenseProxy.additionalAnnotations }}
+        {{- with $.Values.licenseProxy.additionalAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -41,10 +41,10 @@ spec:
         {{- toYaml .Values.licenseProxy.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
-      {{- with .Values.licenseProxy.securityContext }}
+      nodeSelector:
+        {{- toYaml .Values.licenseProxy.nodeSelector | nindent 8 }}
       securityContext:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
       {{- if or .Values.licenseProxy.serviceAccount.create .Values.licenseProxy.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.licenseProxy.namePrefix) .Values.licenseProxy.serviceAccount.name }}
       {{- end }}

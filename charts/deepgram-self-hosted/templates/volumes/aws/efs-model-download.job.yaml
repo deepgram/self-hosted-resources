@@ -20,6 +20,8 @@ spec:
       securityContext:
         {{- toYaml . | nindent 8 }}
       {{- end }}
+      nodeSelector:
+        {{- toYaml .Values.engine.nodeSelector | nindent 8 }}
       containers:
       - name: model-management
         {{- with .Values.engine.containerSecurityContext }}

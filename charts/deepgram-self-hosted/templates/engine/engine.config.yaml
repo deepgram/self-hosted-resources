@@ -67,3 +67,6 @@ data:
     [half_precision]
       state = "{{ .Values.engine.halfPrecision.state }}"
 
+    {{- if .Values.engine.customToml }}
+    {{ .Values.engine.customToml | nindent 4 }}
+    {{- end }}

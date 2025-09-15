@@ -8,6 +8,7 @@ This directory contains examples of how to use the Deepgram Helm chart in variou
 - **02-basic-setup-gcp.yaml** - Basic GCP GKE deployment configuration  
 - **03-basic-setup-onprem.yaml** - On-premises deployment configuration
 - **04-aura-2-setup.yaml** - Aura-2 model deployment with English and Spanish language support
+- **05-voice-agent-aws.values.yaml** - AWS EKS Voice Agent deployment configuration
 
 ## AWS EKS Samples
 See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in AWS.

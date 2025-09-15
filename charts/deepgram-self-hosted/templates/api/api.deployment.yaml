@@ -17,7 +17,9 @@ spec:
     matchLabels:
       app: deepgram-api
       {{ include "deepgram-self-hosted.selectorLabels" . }}
+  {{- if not .Values.scaling.auto.enabled }}
   replicas: {{ .Values.scaling.replicas.api }}
+  {{- end }}
   strategy:
     type: RollingUpdate
     rollingUpdate:
@@ -28,7 +30,7 @@ spec:
       labels: *labels
       annotations:
         checksum/config: {{ include (print $.Template.BasePath "/api/api.config.yaml") . | sha256sum }}
-        {{- with .Values.api.additionalAnnotations }}
+        {{- with $.Values.api.additionalAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
@@ -41,7 +43,8 @@ spec:
         {{- toYaml .Values.api.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.api.tolerations | nindent 8 }}
-      {{- with .Values.api.securityContext }}
+      nodeSelector:
+        {{- toYaml .Values.api.nodeSelector | nindent 8 }}
       securityContext:
         {{- toYaml .Values.api.securityContext | nindent 8 }}
       {{- if or .Values.api.serviceAccount.create .Values.api.serviceAccount.name }}
@@ -61,6 +64,60 @@ spec:
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        - name: OPENAI_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.openAiSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.openAiSecretRef }}
+              key: OPENAI_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: XAI_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.xaiSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.xaiSecretRef }}
+              key: XAI_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: ANTHROPIC_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.anthropicSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.anthropicSecretRef }}
+              key: ANTHROPIC_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: GROQ_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.groqSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.groqSecretRef }}
+              key: GROQ_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: ELEVENLABS_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
+              key: ELEVENLABS_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
+        - name: CARTESIA_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.cartesiaSecretRef }}
+              key: CARTESIA_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
