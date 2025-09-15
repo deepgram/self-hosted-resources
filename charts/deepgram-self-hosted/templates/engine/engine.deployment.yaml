@@ -108,13 +108,17 @@ spec:
         resources:
           requests:
             memory: "{{ $.Values.engine.resources.requests.memory }}"
-            cpu: "{{ $.Values.engine.resources.requests.cpu }}"
+            cpu: "{{ .Values.engine.resources.requests.cpu }}"
             {{- if gt (int $.Values.engine.resources.requests.gpu) 0 }}
             nvidia.com/gpu: {{ $.Values.engine.resources.requests.gpu }}
             {{- end }}
           limits:
+            {{- if .Values.engine.resources.limits.memory }}
             memory: "{{ $.Values.engine.resources.limits.memory }}"
+            {{- end }}
+            {{- if .Values.engine.resources.limits.cpu }}
             cpu: "{{ $.Values.engine.resources.limits.cpu }}"
+            {{- end }}
             {{- if gt (int $.Values.engine.resources.limits.gpu) 0 }}
             nvidia.com/gpu: {{ $.Values.engine.resources.limits.gpu }}
             {{- end }}
