@@ -257,7 +257,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 
 [unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.20.0...HEAD
-[0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...0.20.0
+[0.20.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...0.20.0
 [0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.1...0.19.0
 [0.18.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.0...0.18.1
 [0.18.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.17.0...0.18.0
