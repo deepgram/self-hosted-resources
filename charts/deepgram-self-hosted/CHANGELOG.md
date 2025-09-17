@@ -10,6 +10,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Exposed the ability to add custom TOML sections in api.toml and engine.toml via `customToml`
 - Added `nodeSelector` support for all components (API, Engine, License Proxy) to allow scheduling pods on specific nodes.
+- Added configurable service types for API, Engine, and License Proxy services with ClusterIP as the default
+- Added support for service annotations when using LoadBalancer service type
+- Added `loadBalancerSourceRanges` configuration for LoadBalancer services to restrict access to specific IP CIDR ranges
+- Added `externalTrafficPolicy` configuration for LoadBalancer services to control traffic routing behavior
+- Updated sample configurations to demonstrate service configuration options including LoadBalancer security settings
+
+### Changed
+
+- Changed default service type from NodePort to ClusterIP for all services (API external, Engine metrics, License Proxy status)
+- Updated service templates to support configurable service types and annotations
 
 ## [0.19.0] - 2025-09-12
 

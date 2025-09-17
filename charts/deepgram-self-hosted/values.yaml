@@ -226,6 +226,24 @@ api:
   # -- (object) Additional annotations to add to the API deployment
   additionalAnnotations:
 
+  # -- Service configuration for the API external service
+  # @default -- ``
+  service:
+    # -- Service type for the API external service. Options: ClusterIP, NodePort, LoadBalancer
+    # @default -- `ClusterIP`
+    type: ClusterIP
+    # -- Additional annotations to add to the service when type is LoadBalancer
+    # @default -- ``
+    annotations: {}
+    # -- List of IP CIDR ranges allowed to access the LoadBalancer service
+    # Only applies when service type is LoadBalancer
+    # @default -- ``
+    loadBalancerSourceRanges: []
+    # -- External traffic policy for LoadBalancer service. Options: Cluster, Local
+    # Only applies when service type is LoadBalancer
+    # @default -- ``
+    externalTrafficPolicy: ""
+
   updateStrategy:
     rollingUpdate:
       # -- The maximum number of API pods, relative to the number of replicas,
@@ -400,6 +418,24 @@ engine:
 
   # -- (object) Additional annotations to add to the Engine deployment
   additionalAnnotations:
+
+  # -- Service configuration for the Engine metrics service
+  # @default -- ``
+  service:
+    # -- Service type for the Engine metrics service. Options: ClusterIP, NodePort, LoadBalancer
+    # @default -- `ClusterIP`
+    type: ClusterIP
+    # -- Additional annotations to add to the service when type is LoadBalancer
+    # @default -- ``
+    annotations: {}
+    # -- List of IP CIDR ranges allowed to access the LoadBalancer service
+    # Only applies when service type is LoadBalancer
+    # @default -- ``
+    loadBalancerSourceRanges: []
+    # -- External traffic policy for LoadBalancer service. Options: Cluster, Local
+    # Only applies when service type is LoadBalancer
+    # @default -- ``
+    externalTrafficPolicy: ""
 
   updateStrategy:
     rollingUpdate:
@@ -666,6 +702,24 @@ licenseProxy:
 
   # -- (object) Additional annotations to add to the LicenseProxy deployment
   additionalAnnotations:
+
+  # -- Service configuration for the License Proxy status service
+  # @default -- ``
+  service:
+    # -- Service type for the License Proxy status service. Options: ClusterIP, NodePort, LoadBalancer
+    # @default -- `ClusterIP`
+    type: ClusterIP
+    # -- Additional annotations to add to the service when type is LoadBalancer
+    # @default -- ``
+    annotations: {}
+    # -- List of IP CIDR ranges allowed to access the LoadBalancer service
+    # Only applies when service type is LoadBalancer
+    # @default -- ``
+    loadBalancerSourceRanges: []
+    # -- External traffic policy for LoadBalancer service. Options: Cluster, Local
+    # Only applies when service type is LoadBalancer
+    # @default -- ``
+    externalTrafficPolicy: ""
 
   updateStrategy:
     # -- For the LicenseProxy, we only expose maxSurge and not maxUnavailable.
