@@ -63,13 +63,19 @@ spec:
         {{- toYaml $.Values.engine.tolerations | nindent 8 }}
       nodeSelector:
         {{- toYaml $.Values.engine.nodeSelector | nindent 8 }}
+      {{- with $.Values.engine.securityContext }}
       securityContext:
-        {{- toYaml $.Values.engine.securityContext | nindent 8 }}
+        {{- toYaml . | nindent 8 }}
+      {{- end}}
       {{- if or $.Values.engine.serviceAccount.create $.Values.engine.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
       containers:
       - name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
+        {{- with $.Values.engine.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         image: {{ $.Values.engine.image.path }}:{{ $.Values.engine.image.tag }}
         imagePullPolicy: {{ $.Values.engine.image.pullPolicy }}
         envFrom:
@@ -83,24 +89,24 @@ spec:
           value: "void"
         {{- end }}
         {{- if $.Values.aura2.enabled }}
-        {{- if .Values.aura2.english.enabled }}
+        {{- if $.Values.aura2.english.enabled }}
         - name: IMPELLER_AURA2_MAX_BATCH_SIZE
-          value: "{{ .Values.aura2.english.maxBatchSize }}"
+          value: "{{ $.Values.aura2.english.maxBatchSize }}"
         - name: IMPELLER_AURA2_T2C_UUID
-          value: "{{ .Values.aura2.english.t2cUuid }}"
+          value: "{{ $.Values.aura2.english.t2cUuid }}"
         - name: IMPELLER_AURA2_C2A_UUID
-          value: "{{ .Values.aura2.english.c2aUuid }}"
+          value: "{{ $.Values.aura2.english.c2aUuid }}"
         - name: CUDA_VISIBLE_DEVICES
-          value: "{{ .Values.aura2.english.cudaVisibleDevices }}"
-        {{- else if .Values.aura2.spanish.enabled }}
+          value: "{{ $.Values.aura2.english.cudaVisibleDevices }}"
+        {{- else if $.Values.aura2.spanish.enabled }}
         - name: IMPELLER_AURA2_MAX_BATCH_SIZE
-          value: "{{ .Values.aura2.spanish.maxBatchSize }}"
+          value: "{{ $.Values.aura2.spanish.maxBatchSize }}"
         - name: IMPELLER_AURA2_T2C_UUID
-          value: "{{ .Values.aura2.spanish.t2cUuid }}"
+          value: "{{ $.Values.aura2.spanish.t2cUuid }}"
         - name: IMPELLER_AURA2_C2A_UUID
-          value: "{{ .Values.aura2.spanish.c2aUuid }}"
+          value: "{{ $.Values.aura2.spanish.c2aUuid }}"
         - name: CUDA_VISIBLE_DEVICES
-          value: "{{ .Values.aura2.spanish.cudaVisibleDevices }}"
+          value: "{{ $.Values.aura2.spanish.cudaVisibleDevices }}"
         {{- end }}
         {{- end }}
         command: [ "impeller" ]

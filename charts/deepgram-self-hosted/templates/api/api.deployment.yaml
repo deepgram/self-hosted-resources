@@ -52,6 +52,10 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Values.api.namePrefix }}
+        {{- with .Values.api.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         image: {{ .Values.api.image.path }}:{{ .Values.api.image.tag }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         envFrom:

@@ -69,6 +69,22 @@ api:
     limits:
       memory: "8Gi"
       cpu: "4000m"
+  
+  # -- Service configuration for the API external service
+  # Uncomment and modify the service type as needed for your deployment
+  # service:
+  #   # Options: ClusterIP (default), NodePort, LoadBalancer
+  #   type: LoadBalancer
+  #   # Add annotations when using LoadBalancer type (e.g., for AWS ELB configuration)
+  #   annotations:
+  #     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+  #     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+  #   # Restrict access to specific IP ranges (optional)
+  #   loadBalancerSourceRanges:
+  #     - "10.0.0.0/8"      # Allow access from private networks
+  #     - "192.168.1.0/24"  # Allow access from specific subnet
+  #   # External traffic policy: Cluster (default) or Local
+  #   externalTrafficPolicy: "Local"  # Preserve source IP and reduce hops
 
   # -- Custom TOML sections can be added here to extend api.toml
   # customToml: |

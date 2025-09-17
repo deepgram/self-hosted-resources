@@ -7,11 +7,26 @@ metadata:
     {{- range $key, $val := .Values.engine.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
+  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.annotations }}
+  annotations:
+    {{- range $key, $val := .Values.api.service.annotations }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end}}
+  {{- end }}
 spec:
   selector:
     app: deepgram-api
     {{ include "deepgram-self-hosted.selectorLabels" . }}
-  type: NodePort
+  type: {{ .Values.api.service.type | default "ClusterIP" }}
+  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- range .Values.api.service.loadBalancerSourceRanges }}
+    - {{ . }}
+    {{- end }}
+  {{- end }}
+  {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.externalTrafficPolicy }}
+  externalTrafficPolicy: {{ .Values.api.service.externalTrafficPolicy }}
+  {{- end }}
   ports:
     - name: "primary"
       port: {{ .Values.api.server.port }}

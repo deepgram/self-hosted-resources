@@ -92,6 +92,60 @@ To configure a specific storage option, see the `engine.modelManager.volumes` [c
 
 For detailed instructions on setting up and configuring each storage option, refer to the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes) and the respective cloud provider's documentation.
 
+### Service Configuration
+
+The Deepgram Helm chart provides flexible service configuration options for exposing the API, Engine, and License Proxy services. By default, all services use `ClusterIP` type, which provides internal cluster access only.
+
+#### Service Types
+
+- **ClusterIP** (default): Exposes the service on a cluster-internal IP. This is the default and recommended option for most deployments.
+- **NodePort**: Exposes the service on each Node's IP at a static port. Useful for development or when you need direct node access.
+- **LoadBalancer**: Exposes the service externally using a cloud provider's load balancer. Recommended for production deployments requiring external access.
+
+#### Configuration Examples
+
+**API Service with LoadBalancer (with security restrictions):**
+```yaml
+api:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+      service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+    loadBalancerSourceRanges:
+      - "10.0.0.0/8"      # Allow access from private networks
+      - "192.168.1.0/24"  # Allow access from specific subnet
+    externalTrafficPolicy: "Local"  # Preserve source IP and reduce hops
+```
+
+**Engine Metrics Service with NodePort:**
+```yaml
+engine:
+  service:
+    type: NodePort
+```
+
+**License Proxy Service with LoadBalancer (restricted access):**
+```yaml
+licenseProxy:
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+    loadBalancerSourceRanges:
+      - "10.0.0.0/8"  # Only allow internal network access
+    externalTrafficPolicy: "Cluster"  # Allow traffic from any node
+```
+
+#### LoadBalancer Security Options
+
+When using `LoadBalancer` service type, you can configure additional security and performance options:
+
+- **`loadBalancerSourceRanges`**: Restrict access to specific IP CIDR ranges. This provides network-level security by only allowing traffic from specified IP ranges.
+- **`externalTrafficPolicy`**: Controls how external traffic is routed:
+  - `Cluster` (default): Traffic can be routed to any node in the cluster, then forwarded to the target pod
+  - `Local`: Traffic is only routed to nodes that have the target pod running, preserving source IP addresses
+
 ### Autoscaling
 
 Autoscaling your cluster's capacity to meet incoming traffic demands involves both node autoscaling and pod autoscaling. Node autoscaling for supported cloud providers is setup by default when using this Helm chart and creating your cluster with the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes). Pod autoscaling can be enabled via the `scaling.auto.enabled` configuration option in this chart.
@@ -199,6 +253,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.additionalAnnotations | object | `nil` | Additional annotations to add to the API deployment |
 | api.additionalLabels | object | `{}` | Additional labels to add to API resources |
 | api.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for API pods. |
+| api.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for API containers. |
 | api.customToml | string | `nil` | Custom TOML sections can be added to extend api.toml |
 | api.driverPool | object | `` | driverPool configures the backend pool of speech engines (generically referred to as "drivers" here). The API will load-balance among drivers in the standard pool; if one standard driver fails, the next one will be tried. |
 | api.driverPool.standard | object | `` | standard is the main driver pool to use. |
@@ -222,7 +277,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.resolver.maxTTL | int | `nil` | maxTTL sets the DNS TTL value if specifying a custom DNS nameserver. |
 | api.resolver.nameservers | list | `[]` | nameservers allows for specifying custom domain name server(s). A valid list item's format is "{IP} {PORT} {PROTOCOL (tcp or udp)}", e.g. `"127.0.0.1 53 udp"`. |
 | api.resources | object | `` | Configure resource limits per API container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#api) for more details. |
-| api.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for API pods. |
+| api.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for API pods. |
 | api.server | object | `` | Configure how the API will listen for your requests |
 | api.server.callbackConnTimeout | string | `"1s"` | callbackConnTimeout configures how long to wait for a connection to a callback URL. See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback) for more details. The value should be a humantime duration. |
 | api.server.callbackTimeout | string | `"10s"` | callbackTimeout configures how long to wait for a response from a callback URL. See [Deepgram's callback documentation](https://developers.deepgram.com/docs/callback) for more details. The value should be a humantime duration. |
@@ -230,6 +285,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.server.fetchTimeout | string | `"60s"` | fetchTimeout configures how long to wait for a response from a fetch URL. The value should be a humantime duration. A fetch URL is a URL passed in an inference request from which a payload should be downloaded. |
 | api.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | api.server.port | int | `8080` | port to listen on. |
+| api.service | object | `` | Service configuration for the API external service |
+| api.service.annotations | object | `` | Additional annotations to add to the service when type is LoadBalancer |
+| api.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
+| api.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
+| api.service.type | string | `ClusterIP` | Service type for the API external service. Options: ClusterIP, NodePort, LoadBalancer |
 | api.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram API Deployment. |
 | api.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the API component. If left empty, the default service account name will be used. If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the API deployment. |
 | api.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to API pods. |
@@ -254,6 +314,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.chunking.speechToText.streaming.minDuration | float | `nil` | minDuration is the minimum audio duration for a STT chunk size for a streaming request |
 | engine.chunking.speechToText.streaming.step | float | `1` | step defines how often to return interim results, in seconds. This value may be lowered to increase the frequency of interim results. However, this also causes a significant decrease in the number of concurrent streams supported by a single GPU. Please contact your Deepgram Account representative for more details. |
 | engine.concurrencyLimit.activeRequests | int | `nil` | activeRequests limits the number of active requests handled by a single Engine container. If additional requests beyond the limit are sent, the API container forming the request will try a different Engine pod. If no Engine pods are able to accept the request, the API will return a 429 HTTP response to the client. The `nil` default means no limit will be set. |
+| engine.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers. |
 | engine.customToml | string | `nil` | Custom TOML sections can be added to extend engine.toml |
 | engine.features.streamingNer | bool | `true` | Enables format entity tags on streaming audio *if* a valid NER model is available. |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
@@ -286,10 +347,15 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
 | engine.resources.requests.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
-| engine.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for Engine pods. |
+| engine.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods. |
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.server.port | int | `8080` | port to listen on for inference requests |
+| engine.service | object | `` | Service configuration for the Engine metrics service |
+| engine.service.annotations | object | `` | Additional annotations to add to the service when type is LoadBalancer |
+| engine.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
+| engine.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
+| engine.service.type | string | `ClusterIP` | Service type for the Engine metrics service. Options: ClusterIP, NodePort, LoadBalancer |
 | engine.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Engine Deployment. |
 | engine.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the Engine component. If left empty, the default service account name will be used. If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the Engine deployment. |
 | engine.startupProbe | object | `` | The startupProbe combination of `periodSeconds` and `failureThreshold` allows time for the container to load all models and start listening for incoming requests.  Model load time can be affected by hardware I/O speeds, as well as network speeds if you are using a network volume mount for the models.  If you are hitting the failure threshold before models are finished loading, you may want to extend the startup probe. However, this will also extend the time it takes to detect a pod that can't establish a network connection to validate its license. |
@@ -314,6 +380,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.additionalAnnotations | object | `nil` | Additional annotations to add to the LicenseProxy deployment |
 | licenseProxy.additionalLabels | object | `{}` | Additional labels to add to License Proxy resources |
 | licenseProxy.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for License Proxy pods. |
+| licenseProxy.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for License Proxy containers. |
 | licenseProxy.deploySecondReplica | bool | `false` | If the License Proxy is deployed, one replica should be sufficient to support many API/Engine pods. Highly available environments may wish to deploy a second replica to ensure uptime, which can be toggled with this option. |
 | licenseProxy.enabled | bool | `false` | The License Proxy is optional, but highly recommended to be deployed in production to enable highly available environments. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
@@ -325,12 +392,17 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to License Proxy pods. |
 | licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
-| licenseProxy.securityContext | object | `{}` | [Security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/) for License Proxy pods. |
+| licenseProxy.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods. |
 | licenseProxy.server | object | `` | Configure how the license proxy will listen for licensing requests. |
 | licenseProxy.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
 | licenseProxy.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | licenseProxy.server.port | int | `8443` | port to listen on. |
 | licenseProxy.server.statusPort | int | `8080` | statusPort is the port to listen on for the status/health endpoint. |
+| licenseProxy.service | object | `` | Service configuration for the License Proxy status service |
+| licenseProxy.service.annotations | object | `` | Additional annotations to add to the service when type is LoadBalancer |
+| licenseProxy.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
+| licenseProxy.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
+| licenseProxy.service.type | string | `ClusterIP` | Service type for the License Proxy status service. Options: ClusterIP, NodePort, LoadBalancer |
 | licenseProxy.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram License Proxy Deployment. |
 | licenseProxy.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the LicenseProxy component. If left empty, the default service account name will be used. If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the License Proxy deployment. |
 | licenseProxy.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to License Proxy pods. |
