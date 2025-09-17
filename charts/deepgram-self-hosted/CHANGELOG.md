@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.20.0] - 2025-09-17
+
 ### Added
 
 - Exposed the ability to add custom TOML sections in api.toml and engine.toml via `customToml`
@@ -254,7 +256,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.20.0...HEAD
+[0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...0.20.0
 [0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.1...0.19.0
 [0.18.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.0...0.18.1
 [0.18.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.17.0...0.18.0
