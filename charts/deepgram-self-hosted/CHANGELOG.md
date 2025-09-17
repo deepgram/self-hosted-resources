@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added `externalTrafficPolicy` configuration for LoadBalancer services to control traffic routing behavior
 - Updated sample configurations to demonstrate service configuration options including LoadBalancer security settings
 - Container-level security context support to Helm templates
+- Supported removing resource limits on Engine pods
 
 ### Changed
 
