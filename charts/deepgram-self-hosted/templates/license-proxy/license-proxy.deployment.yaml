@@ -50,6 +50,10 @@ spec:
       {{- end }}
       containers:
       - name: {{ .Values.licenseProxy.namePrefix }}
+        {{- with .Values.licenseProxy.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
         image: {{ .Values.licenseProxy.image.path }}:{{ .Values.licenseProxy.image.tag }}
         imagePullPolicy: {{ .Values.licenseProxy.image.pullPolicy }}
         envFrom:

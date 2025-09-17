@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added `loadBalancerSourceRanges` configuration for LoadBalancer services to restrict access to specific IP CIDR ranges
 - Added `externalTrafficPolicy` configuration for LoadBalancer services to control traffic routing behavior
 - Updated sample configurations to demonstrate service configuration options including LoadBalancer security settings
+- Container-level security context support to Helm templates
 
 ### Changed
 
