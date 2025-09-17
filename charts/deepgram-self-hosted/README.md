@@ -284,12 +284,13 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.server.fetchTimeout | string | `"60s"` | fetchTimeout configures how long to wait for a response from a fetch URL. The value should be a humantime duration. A fetch URL is a URL passed in an inference request from which a payload should be downloaded. |
 | api.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | api.server.port | int | `8080` | port to listen on. |
+| api.service | object | `` | Service configuration for the API external service |
+| api.service.annotations | object | `` | Additional annotations to add to the service when type is LoadBalancer |
+| api.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
+| api.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
+| api.service.type | string | `ClusterIP` | Service type for the API external service. Options: ClusterIP, NodePort, LoadBalancer |
 | api.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram API Deployment. |
 | api.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the API component. If left empty, the default service account name will be used. If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the API deployment. |
-| api.service.annotations | object | `{}` | Additional annotations to add to the service when type is LoadBalancer |
-| api.service.externalTrafficPolicy | string | `""` | External traffic policy for LoadBalancer service. Options: Cluster, Local |
-| api.service.loadBalancerSourceRanges | list | `[]` | List of IP CIDR ranges allowed to access the LoadBalancer service |
-| api.service.type | string | `"ClusterIP"` | Service type for the API external service. Options: ClusterIP, NodePort, LoadBalancer |
 | api.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to API pods. |
 | api.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra API pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | api.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of API pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
@@ -348,12 +349,13 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.server.port | int | `8080` | port to listen on for inference requests |
+| engine.service | object | `` | Service configuration for the Engine metrics service |
+| engine.service.annotations | object | `` | Additional annotations to add to the service when type is LoadBalancer |
+| engine.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
+| engine.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
+| engine.service.type | string | `ClusterIP` | Service type for the Engine metrics service. Options: ClusterIP, NodePort, LoadBalancer |
 | engine.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Engine Deployment. |
 | engine.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the Engine component. If left empty, the default service account name will be used. If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the Engine deployment. |
-| engine.service.annotations | object | `{}` | Additional annotations to add to the service when type is LoadBalancer |
-| engine.service.externalTrafficPolicy | string | `""` | External traffic policy for LoadBalancer service. Options: Cluster, Local |
-| engine.service.loadBalancerSourceRanges | list | `[]` | List of IP CIDR ranges allowed to access the LoadBalancer service |
-| engine.service.type | string | `"ClusterIP"` | Service type for the Engine metrics service. Options: ClusterIP, NodePort, LoadBalancer |
 | engine.startupProbe | object | `` | The startupProbe combination of `periodSeconds` and `failureThreshold` allows time for the container to load all models and start listening for incoming requests.  Model load time can be affected by hardware I/O speeds, as well as network speeds if you are using a network volume mount for the models.  If you are hitting the failure threshold before models are finished loading, you may want to extend the startup probe. However, this will also extend the time it takes to detect a pod that can't establish a network connection to validate its license. |
 | engine.startupProbe.failureThreshold | int | `60` | failureThreshold defines how many unsuccessful startup probe attempts are allowed before the container will be marked as Failed |
 | engine.startupProbe.periodSeconds | int | `10` | periodSeconds defines how often to execute the probe. |
@@ -393,12 +395,13 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | licenseProxy.server.port | int | `8443` | port to listen on. |
 | licenseProxy.server.statusPort | int | `8080` | statusPort is the port to listen on for the status/health endpoint. |
+| licenseProxy.service | object | `` | Service configuration for the License Proxy status service |
+| licenseProxy.service.annotations | object | `` | Additional annotations to add to the service when type is LoadBalancer |
+| licenseProxy.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
+| licenseProxy.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
+| licenseProxy.service.type | string | `ClusterIP` | Service type for the License Proxy status service. Options: ClusterIP, NodePort, LoadBalancer |
 | licenseProxy.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram License Proxy Deployment. |
 | licenseProxy.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the LicenseProxy component. If left empty, the default service account name will be used. If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the License Proxy deployment. |
-| licenseProxy.service.annotations | object | `{}` | Additional annotations to add to the service when type is LoadBalancer |
-| licenseProxy.service.externalTrafficPolicy | string | `""` | External traffic policy for LoadBalancer service. Options: Cluster, Local |
-| licenseProxy.service.loadBalancerSourceRanges | list | `[]` | List of IP CIDR ranges allowed to access the LoadBalancer service |
-| licenseProxy.service.type | string | `"ClusterIP"` | Service type for the License Proxy status service. Options: ClusterIP, NodePort, LoadBalancer |
 | licenseProxy.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to License Proxy pods. |
 | licenseProxy.updateStrategy.rollingUpdate | object | `` | For the LicenseProxy, we only expose maxSurge and not maxUnavailable. This is to avoid accidentally having all LicenseProxy nodes go offline during upgrades, which could impact the entire cluster's connection to the Deepgram License Server. |
 | licenseProxy.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra License Proxy pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
