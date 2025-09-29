@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Updated default container tags to September 2025 release (`release-250929`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog) for additional details.
+- Updated default container tags to September 2025 release (`release-250929`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-september-2025-release-250929) for additional details.
 
 ## [0.20.0] - 2025-09-17
 
