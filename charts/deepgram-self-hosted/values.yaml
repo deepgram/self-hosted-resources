@@ -293,6 +293,10 @@ api:
   # to apply to API pods.
   nodeSelector: {}
 
+  # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+  # to apply to API pods.
+  topologySpreadConstraints: []
+
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for API pods.
   securityContext: {}
 
@@ -505,6 +509,9 @@ engine:
   # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   # to apply to Engine pods.
   tolerations: []
+  # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+  # to apply to Engine pods.
+  topologySpreadConstraints: []
 
   # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   # to apply to Engine pods.
@@ -770,6 +777,9 @@ licenseProxy:
   # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
   # to apply to License Proxy pods.
   tolerations: []
+  # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+  # to apply to License Proxy pods.
+  topologySpreadConstraints: []
 
   # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   # to apply to License Proxy pods.
