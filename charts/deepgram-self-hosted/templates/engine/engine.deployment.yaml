@@ -61,6 +61,8 @@ spec:
         {{- toYaml $.Values.engine.affinity | nindent 8 }}
       tolerations:
         {{- toYaml $.Values.engine.tolerations | nindent 8 }}
+      topologySpreadConstraints:
+        {{- toYaml $.Values.engine.topologySpreadConstraints | nindent 8 }}
       nodeSelector:
         {{- toYaml $.Values.engine.nodeSelector | nindent 8 }}
       {{- with $.Values.engine.securityContext }}

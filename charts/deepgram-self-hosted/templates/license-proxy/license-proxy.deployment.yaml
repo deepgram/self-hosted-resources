@@ -41,6 +41,8 @@ spec:
         {{- toYaml .Values.licenseProxy.affinity | nindent 8 }}
       tolerations:
         {{- toYaml .Values.licenseProxy.tolerations | nindent 8 }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.licenseProxy.topologySpreadConstraints | nindent 8 }}
       nodeSelector:
         {{- toYaml .Values.licenseProxy.nodeSelector | nindent 8 }}
       securityContext:
