@@ -369,7 +369,7 @@ api:
     # *if* a valid NER model is available.
     formatEntityTags: true
     
-    # -- Toggles usage data redaction; set to false to disable redaction of usage data
+    # -- Enables usage metadata redaction; set to false to disable redaction of usage metadata
     redactUsage: true
 
     # -- If API is receiving requests faster than Engine can process them, a request
