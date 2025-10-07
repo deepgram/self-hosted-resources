@@ -49,6 +49,7 @@ data:
       entity_redaction = {{ .Values.api.features.entityRedaction }}
       format_entity_tags = {{ .Values.api.features.formatEntityTags }}
       speak_streaming = true
+      redact_usage = {{ .Values.api.features.redactUsage }}
 
       {{- if .Values.api.features.diskBufferPath }}
       disk_buffer_path = "{{ .Values.api.features.diskBufferPath }}"
