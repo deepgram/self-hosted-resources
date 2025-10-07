@@ -204,6 +204,25 @@ agent:
           name: "Grok 2 Latest"
           tier: "standard"
           public: false
+    # -- Google provider configuration
+    # @default -- `
+    google:
+      name: "Google"
+      # -- Available Google models and their configurations
+      # @default -- ``
+      models:
+        gemini-2.5-flash:
+          name: "Gemini 2.5 Flash"
+          tier: "standard"
+          public: false
+        gemini-2.0-flash:
+          name: "Gemini 2.0 Flash"
+          tier: "standard"
+          public: false
+        gemini-2.0-flash-lite:
+          name: "Gemini 2.0 Flash Lite"
+          tier: "standard"
+          public: false
 
 api:
   # -- namePrefix is the prefix to apply to the name of all K8s objects

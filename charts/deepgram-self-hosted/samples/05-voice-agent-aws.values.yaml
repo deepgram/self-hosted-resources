@@ -38,6 +38,7 @@ global:
     # elevenLabsSecretRef: "elevenlabs-api-key"
     # cartesiaSecretRef: "cartesia-api-key"
     # xaiSecretRef: "xai-secret-ref"
+    # googleSecretRef: "google-api-key"
 
 scaling:
   replicas:

@@ -120,6 +120,15 @@ spec:
           {{- else }}
           value: ""
           {{- end }}
+        - name: GOOGLE_API_KEY
+          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.googleSecretRef }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.googleSecretRef }}
+              key: GOOGLE_API_KEY
+          {{- else }}
+          value: ""
+          {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:
