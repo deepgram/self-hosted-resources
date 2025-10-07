@@ -239,6 +239,8 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | agent.llmProviders.anthropic.models | object | `` | Available Anthropic models and their configurations |
 | agent.llmProviders.deepgram | object | `` | Deepgram provider configuration |
 | agent.llmProviders.deepgram.models | object | `` | Available Deepgram models and their configurations |
+| agent.llmProviders.google | object | ` | Google provider configuration |
+| agent.llmProviders.google.models | object | `` | Available Google models and their configurations |
 | agent.llmProviders.groq | object | `` | Groq provider configuration |
 | agent.llmProviders.groq.models | object | `` | Available Groq models and their configurations |
 | agent.llmProviders.open_ai | object | `` | OpenAI provider configuration |
