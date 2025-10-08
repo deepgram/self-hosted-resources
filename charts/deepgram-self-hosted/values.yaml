@@ -368,6 +368,9 @@ api:
     # -- Enables format entity tags on pre-recorded audio
     # *if* a valid NER model is available.
     formatEntityTags: true
+    
+    # -- Enables usage metadata redaction; set to false to disable redaction of usage metadata
+    redactUsage: true
 
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,

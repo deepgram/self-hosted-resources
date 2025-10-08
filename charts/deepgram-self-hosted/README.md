@@ -266,6 +266,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.entityDetection | bool | `false` | Enables entity detection on pre-recorded audio *if* a valid entity detection model is available. |
 | api.features.entityRedaction | bool | `false` | Enables entity-based redaction on pre-recorded audio *if* a valid entity detection model is available. |
 | api.features.formatEntityTags | bool | `true` | Enables format entity tags on pre-recorded audio *if* a valid NER model is available. |
+| api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
 | api.image.tag | string | `"release-250929"` | tag defines which Deepgram release to use for API containers |

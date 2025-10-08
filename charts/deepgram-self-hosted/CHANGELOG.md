@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added `topologySpreadConstraints`, which allows even distribution of pods from the same deployment across availability zones, among other criteria
+- Added `redactUsage` under api features which enables redaction of usage metadata
 
 ## [0.21.0] - 2025-09-29
 
