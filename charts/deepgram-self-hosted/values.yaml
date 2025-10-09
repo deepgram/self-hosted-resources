@@ -205,7 +205,7 @@ agent:
           tier: "standard"
           public: false
     # -- Google provider configuration
-    # @default -- `
+    # @default -- ``
     google:
       name: "Google"
       # -- Available Google models and their configurations
