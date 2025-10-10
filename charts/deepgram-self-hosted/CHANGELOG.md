@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added Google as a 3rd party provider for Voice Agent helm chart
 - Added `topologySpreadConstraints`, which allows even distribution of pods from the same deployment across availability zones, among other criteria
 - Added `redactUsage` under api features which enables redaction of usage metadata
 
