@@ -382,7 +382,7 @@ api:
 
     # -- Enables entity-based redaction on pre-recorded audio
     # *if* a valid entity detection model is available.
-    entityRedaction: false
+    entityRedaction: true
 
     # -- Enables format entity tags on pre-recorded audio
     # *if* a valid NER model is available.

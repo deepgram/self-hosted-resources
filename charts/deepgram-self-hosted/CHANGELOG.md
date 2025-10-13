@@ -12,6 +12,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added `topologySpreadConstraints`, which allows even distribution of pods from the same deployment across availability zones, among other criteria
 - Added `redactUsage` under api features which enables redaction of usage metadata
 
+### Changed
+
+- Set `entity_redaction` to `true` by default, so redaction is automatically enabled if a valid NER model is available
+
 ## [0.21.0] - 2025-09-29
 
 ### Changed

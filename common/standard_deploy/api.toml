@@ -68,7 +68,7 @@ summarization = true # or false
 entity_detection = false # or true
 
 ### Enables pre-recorded entity-based redaction *if* a valid entity detection model is available
-entity_redaction = false # or true
+entity_redaction = true # or false
 
 ### Enables pre-recorded entity formatting *if* a valid NER model is available
 format_entity_tags = true # or false
