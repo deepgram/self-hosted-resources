@@ -266,7 +266,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features | object | `` | Enable ancillary features |
 | api.features.diskBufferPath | string | `nil` | If API is receiving requests faster than Engine can process them, a request queue will form. By default, this queue is stored in memory. Under high load, the queue may grow too large and cause Out-Of-Memory errors. To avoid this, set a diskBufferPath to buffer the overflow on the request queue to disk.  WARN: This is only to temporarily buffer requests during high load. If there is not enough Engine capacity to process the queued requests over time, the queue (and response time) will grow indefinitely. |
 | api.features.entityDetection | bool | `false` | Enables entity detection on pre-recorded audio *if* a valid entity detection model is available. |
-| api.features.entityRedaction | bool | `false` | Enables entity-based redaction on pre-recorded audio *if* a valid entity detection model is available. |
+| api.features.entityRedaction | bool | `true` | Enables entity-based redaction on pre-recorded audio *if* a valid entity detection model is available. |
 | api.features.formatEntityTags | bool | `true` | Enables format entity tags on pre-recorded audio *if* a valid NER model is available. |
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
