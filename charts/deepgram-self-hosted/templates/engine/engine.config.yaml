@@ -47,6 +47,9 @@ data:
       language_detection = true
       streaming_ner = {{ .Values.engine.features.streamingNer }}
 
+    [flux]
+      enabled = {{ .Values.engine.flux.enabled }}
+
     [chunking.batch]
       {{- if .Values.engine.chunking.speechToText.batch.minDuration }}
       min_duration = {{ .Values.engine.chunking.speechToText.batch.minDuration }}

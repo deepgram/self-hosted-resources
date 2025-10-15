@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.22.0] - 2025-10-15
+
 ### Added
 
 - Added Google as a 3rd party provider for Voice Agent helm chart
@@ -14,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Updated default container tags to October 2025 release (`release-251015`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-october-2025-release-251015) for additional details.
 - Set `entity_redaction` to `true` by default, so redaction is automatically enabled if a valid NER model is available
 
 ## [0.21.0] - 2025-09-29
@@ -272,7 +275,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.21.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.22.0...HEAD
+[0.22.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.21.0...deepgram-self-hosted-0.22.0
 [0.21.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.20.0...deepgram-self-hosted-0.21.0
 [0.20.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...0.20.0
 [0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.1...0.19.0
