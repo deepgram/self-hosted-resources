@@ -669,8 +669,9 @@ engine:
     # *if* a valid NER model is available.
     streamingNer: true
 
+  flux:
     # -- Enables Flux turn-based streaming STT
-    flux: false
+    enabled: false
 
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
