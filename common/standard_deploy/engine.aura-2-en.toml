@@ -57,7 +57,7 @@ streaming_ner = true # or false
 
 ### Enable Flux turn-based streaming STT
 [flux]
-enabled = false
+enabled = false # or true
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]
