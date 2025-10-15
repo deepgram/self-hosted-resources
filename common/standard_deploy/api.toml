@@ -89,6 +89,9 @@ speak_streaming = true # or false
 ### Toggles usage data redaction; set to false to disable redaction of usage data; defaults to true if not present
 # redact_usage = true # or false
 
+### Enables Flux turn-based streaming STT
+listen_v2 = false
+
 ### Configure the backend pool of speech engines (generically referred to as
 ### "drivers" here). The API will load-balance among drivers in the standard
 ### pool; if one standard driver fails, the next one will be tried.

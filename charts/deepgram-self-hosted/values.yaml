@@ -237,7 +237,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-250929
+    tag: release-251015
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -391,6 +391,9 @@ api:
     # -- Enables usage metadata redaction; set to false to disable redaction of usage metadata
     redactUsage: true
 
+    # -- Enables Flux turn-based streaming STT
+    listenV2: false
+
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,
     # the queue may grow too large and cause Out-Of-Memory errors. To avoid this,
@@ -440,7 +443,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-250929
+    tag: release-251015
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -666,6 +669,9 @@ engine:
     # *if* a valid NER model is available.
     streamingNer: true
 
+    # -- Enables Flux turn-based streaming STT
+    flux: false
+
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
   # of results. Please contact your Deepgram Account Representative if you
@@ -727,7 +733,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-250929
+    tag: release-251015
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent

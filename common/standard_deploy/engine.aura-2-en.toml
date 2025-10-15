@@ -55,6 +55,10 @@ language_detection = true # or false
 ### Enables streaming entity formatting *if* a valid NER model is available
 streaming_ner = true # or false
 
+### Enable Flux turn-based streaming STT
+[flux]
+enabled = false
+
 ### Size of audio chunks to process in seconds.
 [chunking.batch]
 # min_duration =
