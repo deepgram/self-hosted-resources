@@ -118,7 +118,7 @@ spec:
             memory: "{{ $.Values.engine.resources.requests.memory }}"
             cpu: "{{ $.Values.engine.resources.requests.cpu }}"
             {{- if gt (int $.Values.engine.resources.requests.gpu) 0 }}
-            nvidia.com/gpu: {{ $.Values.engine.resources.requests.gpu }}
+            {{ $.Values.engine.resources.gpuResourceName }}: {{ $.Values.engine.resources.requests.gpu }}
             {{- end }}
           limits:
             {{- if $.Values.engine.resources.limits.memory }}
@@ -128,7 +128,7 @@ spec:
             cpu: "{{ $.Values.engine.resources.limits.cpu }}"
             {{- end }}
             {{- if gt (int $.Values.engine.resources.limits.gpu) 0 }}
-            nvidia.com/gpu: {{ $.Values.engine.resources.limits.gpu }}
+            {{ $.Values.engine.resources.gpuResourceName }}: {{ $.Values.engine.resources.limits.gpu }}
             {{- end }}
         volumeMounts:
         - name: engine-config-volume
