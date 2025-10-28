@@ -4,7 +4,8 @@ metadata:
   name: {{ .Values.api.namePrefix }}-external
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    {{- range $key, $val := .Values.engine.additionalLabels }}
+    app: deepgram-api
+    {{- range $key, $val := .Values.api.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
   {{- if and (eq .Values.api.service.type "LoadBalancer") .Values.api.service.annotations }}
