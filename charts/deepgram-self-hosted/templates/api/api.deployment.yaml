@@ -5,7 +5,7 @@ metadata:
   labels: &labels
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
     app: deepgram-api
-    {{- range $key, $val := .Values.engine.additionalLabels }}
+    {{- range $key, $val := .Values.api.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
   {{- with .Values.api.additionalAnnotations }}
