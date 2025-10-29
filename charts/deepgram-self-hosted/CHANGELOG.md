@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.23.0] - 2025-10-29
+
+### Changed
+
+- Updated default container tags to October 2025 release (`release-251029`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-october-2025-release-251029) for additional details.
+
 ### Fixed
 
 - Fixed API templates to use correct `additionalLabels` reference
@@ -279,20 +285,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.22.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.0...HEAD
+[0.23.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.22.0...deepgram-self-hosted-0.23.0
 [0.22.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.21.0...deepgram-self-hosted-0.22.0
 [0.21.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.20.0...deepgram-self-hosted-0.21.0
-[0.20.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...0.20.0
-[0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.1...0.19.0
-[0.18.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.0...0.18.1
-[0.18.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.17.0...0.18.0
-[0.17.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.16.0...0.17.0
-[0.16.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.15.0...0.16.0
-[0.15.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.14.0...0.15.0
-[0.14.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.13.0...0.14.0
-[0.13.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.12.0...0.13.0
-[0.12.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.1...0.12.0
-[0.11.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.0...0.11.1
+[0.20.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.19.0...deepgram-self-hosted-0.20.0
+[0.19.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.1...deepgram-self-hosted-0.19.0
+[0.18.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.18.0...deepgram-self-hosted-0.18.1
+[0.18.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.17.0...deepgram-self-hosted-0.18.0
+[0.17.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.16.0...deepgram-self-hosted-0.17.0
+[0.16.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.15.0...deepgram-self-hosted-0.16.0
+[0.15.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.14.0...deepgram-self-hosted-0.15.0
+[0.14.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.13.0...deepgram-self-hosted-0.14.0
+[0.13.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.12.0...deepgram-self-hosted-0.13.0
+[0.12.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.1...deepgram-self-hosted-0.12.0
+[0.11.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.11.0...deepgram-self-hosted-0.11.1
 [0.11.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.10.0...deepgram-self-hosted-0.11.0
 [0.10.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.9.0...deepgram-self-hosted-0.10.0
 [0.9.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.8.1...deepgram-self-hosted-0.9.0
