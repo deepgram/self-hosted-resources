@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated default container tags to October 2025 release (`release-251029`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-october-2025-release-251029) for additional details.
+- Updated sample cluster configuration files to use Kubernetes 1.33 (previously 1.30)
+- Updated Helm chart dependencies: cluster-autoscaler 9.52.1 (previously 9.46.3), prometheus-adapter 4.14.2 (previously 4.13.0)
 
 ### Fixed
 
