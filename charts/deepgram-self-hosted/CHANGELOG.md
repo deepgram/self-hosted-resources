@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Fixed
+
+- Quoted Voice Agent LLM model names to fix periods breaking the TOML parser
+
 ## [0.23.0] - 2025-10-29
 
 ### Changed
