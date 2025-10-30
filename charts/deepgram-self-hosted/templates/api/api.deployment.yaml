@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.api.namePrefix }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    app: deepgram-api
+    app: {{ .Values.api.namePrefix }}
     {{- range $key, $val := .Values.api.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
@@ -15,7 +15,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: deepgram-api
+      app: {{ .Values.api.namePrefix }}
       {{ include "deepgram-self-hosted.selectorLabels" . }}
   {{- if not .Values.scaling.auto.enabled }}
   replicas: {{ .Values.scaling.replicas.api }}

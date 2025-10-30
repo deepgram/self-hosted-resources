@@ -5,7 +5,7 @@ metadata:
   name: {{ .Values.licenseProxy.namePrefix }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    app: deepgram-license-proxy
+    app: {{ .Values.licenseProxy.namePrefix }}
     {{- range $key, $val := .Values.licenseProxy.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end }}
@@ -16,7 +16,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-       app: deepgram-license-proxy
+       app: {{ .Values.licenseProxy.namePrefix }}
        {{ include "deepgram-self-hosted.selectorLabels" . }}
   replicas: {{ if .Values.licenseProxy.deploySecondReplica }}2{{ else }}1{{ end }}
   strategy:
