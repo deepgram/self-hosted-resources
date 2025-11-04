@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.23.0](https://img.shields.io/badge/Version-0.23.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-251029](https://img.shields.io/badge/AppVersion-release--251029-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.23.1](https://img.shields.io/badge/Version-0.23.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-251029](https://img.shields.io/badge/AppVersion-release--251029-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
