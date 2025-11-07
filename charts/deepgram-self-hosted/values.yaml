@@ -9,6 +9,11 @@ global:
   # self-hosted API key. See chart docs for more details.
   deepgramSecretRef:
 
+  # -- (string) Name of the pre-configured K8s Secret containing your Deepgram
+  # license key for airgapped deployments with billing container.
+  # Only required when billing.enabled is true.
+  deepgramLicenseSecretRef:
+
   # -- Additional labels to add to all Deepgram resources
   additionalLabels: {}
 
@@ -724,6 +729,15 @@ licenseProxy:
   # and only the License Proxy should send egress traffic to the upstream license server.
   keepUpstreamServerAsBackup: true
 
+  # -- Configuration for license-proxy to use billing container as upstream
+  # in airgapped deployments. Only applies when both licenseProxy.enabled
+  # and billing.enabled are true.
+  # @default -- ``
+  upstream:
+    # -- Set to true to configure license-proxy to use the billing container
+    # as its upstream server instead of license.deepgram.com.
+    useBilling: false
+
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram License Proxy containers.
   namePrefix: "deepgram-license-proxy"
@@ -844,6 +858,134 @@ licenseProxy:
 
     # -- statusPort is the port to listen on for the status/health endpoint.
     statusPort: 8080
+
+# -- Configuration options for the Deepgram Billing container.
+# The Billing container is used for airgapped deployments where API and Engine
+# cannot reach license.deepgram.com. It validates licenses locally using a
+# license file and maintains a usage journal.
+# @default -- ``
+billing:
+  # -- Enable the Billing container for airgapped deployments.
+  # When enabled, API and Engine will connect to the billing container instead of
+  # license.deepgram.com or license-proxy.
+  enabled: false
+
+  # -- Number of billing replicas. Default is 1 (singleton).
+  # Can be increased for high availability. Each replica maintains its own journal file.
+  replicas: 1
+
+  # -- namePrefix is the prefix to apply to the name of all K8s objects
+  # associated with the Deepgram Billing containers.
+  namePrefix: "deepgram-billing"
+
+  image:
+    # -- path configures the image path to use for creating Billing containers.
+    # You may change this from the public Quay image path if you have imported
+    # Deepgram images into a private container registry.
+    path: quay.io/deepgram/self-hosted-billing
+    # -- tag defines which Deepgram release to use for Billing containers
+    tag: release-251029
+    # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
+    # Billing image
+    pullPolicy: IfNotPresent
+
+  # -- Additional labels to add to Billing resources
+  additionalLabels: {}
+
+  # -- (object) Additional annotations to add to the Billing deployment
+  additionalAnnotations:
+
+  # -- Configuration for the Deepgram license file.
+  # The license file is a 1-line JSON file provided by Deepgram for airgapped deployments.
+  # You must create a Kubernetes Secret containing this file before installing the chart.
+  # @default -- ``
+  licenseFile:
+    # -- (string) Name of the pre-configured K8s Secret containing your Deepgram license file
+    secretRef:
+    # -- Key within the Secret that contains the license file content
+    secretKey: "license.dg"
+
+  # -- Configuration for the usage journal volume.
+  # The journal tracks usage for billing purposes and must be persisted.
+  # WARNING: Do not delete or lose this volume as it contains critical billing data.
+  # @default -- ``
+  journal:
+    # -- (string) Storage class to use for the journal PVC. If empty, uses cluster default.
+    storageClass: ""
+    # -- Size of the journal volume. The journal is plain text and typically only needs 1Gi.
+    size: "1Gi"
+
+  updateStrategy:
+    # -- For StatefulSets, we use maxUnavailable: 0 to ensure at least one billing pod
+    # is always available during updates.
+    # @default -- ``
+    rollingUpdate:
+      # -- The maximum number of extra Billing pods that can be created during a rollingUpdate.
+      maxUnavailable: 0
+
+  # -- Configure resource limits per Billing container.
+  # @default -- ``
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+
+  # -- Readiness probe customization for Billing pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Billing pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for Billing pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to Billing pods.
+  tolerations: []
+  # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+  # to apply to Billing pods.
+  topologySpreadConstraints: []
+
+  # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  # to apply to Billing pods.
+  nodeSelector: {}
+
+  # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods.
+  securityContext: {}
+
+  # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Billing containers.
+  containerSecurityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram Billing Deployment.
+    create: true
+    # -- (string) Allows providing a custom service account name for the Billing component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `billing.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `billing.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the Billing deployment.
+    name:
+
+  # -- Configure how the billing container will listen for licensing requests.
+  # @default -- ``
+  server:
+    # -- host is the IP address to listen on. You will want to listen
+    # on all interfaces to interact with other pods in the cluster.
+    host: "0.0.0.0"
+    # -- port to listen on.
+    port: 8443
+    # -- baseUrl is the prefix for incoming license verification requests.
+    baseUrl: "/"
 
 # -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
 # You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.

@@ -63,6 +63,10 @@ spec:
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        {{- if .Values.billing.enabled }}
+        - secretRef:
+            name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
+        {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
