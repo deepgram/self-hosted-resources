@@ -72,6 +72,57 @@ spec:
       {{- if or $.Values.engine.serviceAccount.create $.Values.engine.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
+
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
+        - name: working-config
+          emptyDir: {}
+        - name: models-volume
+          persistentVolumeClaim:
+            {{- $customClaimEnabled := $.Values.engine.modelManager.volumes.customVolumeClaim.enabled }}
+            {{- $customClaimName := $.Values.engine.modelManager.volumes.customVolumeClaim.name }}
+            {{- $awsEfsEnabled := $.Values.engine.modelManager.volumes.aws.efs.enabled }}
+            {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
+            {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) }}
+            {{- if eq $enabledCount 0 }}
+            {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled must be set to true." }}
+            {{- else if gt $enabledCount 1 }}
+            {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled can be set to true." }}
+            {{- end }}
+            {{- if $customClaimEnabled }}
+              {{- if not $customClaimName }}
+              {{- fail "Error: customVolumeClaim.name must be set when customVolumeClaim.enabled is true." }}
+              {{- else }}
+            claimName: {{ $customClaimName }}
+              {{- end }}
+            {{- else if $awsEfsEnabled }}
+            claimName: {{ $.Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
+            {{- else if $gcpGpdEnabled }}
+            claimName: {{ $.Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
+            {{- end }}
+
+      initContainers:
+        - name: config-render
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - apk add --no-cache gettext-envsubst && envsubst < /config/engine.toml > /work/engine.toml
+          envFrom:
+            - secretRef:
+                name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" $.Values.global.deepgramSecretRef }}
+            {{- if $.Values.billing.enabled }}
+            - secretRef:
+                name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" $.Values.global.deepgramLicenseSecretRef }}
+            {{- end }}
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /config
+            - name: working-config
+              mountPath: /work
+
       containers:
       - name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
         {{- with $.Values.engine.containerSecurityContext }}
@@ -82,10 +133,10 @@ spec:
         imagePullPolicy: {{ $.Values.engine.image.pullPolicy }}
         envFrom:
         - secretRef:
-            name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {{- if .Values.billing.enabled }}
+            name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" $.Values.global.deepgramSecretRef }}
+        {{- if $.Values.billing.enabled }}
         - secretRef:
-            name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
+            name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" $.Values.global.deepgramLicenseSecretRef }}
         {{- end }}
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
@@ -135,7 +186,7 @@ spec:
             nvidia.com/gpu: {{ $.Values.engine.resources.limits.gpu }}
             {{- end }}
         volumeMounts:
-        - name: engine-config-volume
+        - name: working-config
           mountPath: /etc/config
         - name: models-volume
           mountPath: /models
@@ -161,34 +212,4 @@ spec:
           initialDelaySeconds: {{ $.Values.engine.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.engine.readinessProbe.periodSeconds }}
           failureThreshold: {{ $.Values.engine.readinessProbe.failureThreshold }}
-      volumes:
-      - name: engine-config-volume
-        configMap:
-          name: {{ $.Values.engine.namePrefix }}-config
-      - name: models-volume
-        persistentVolumeClaim:
-          {{- $customClaimEnabled := $.Values.engine.modelManager.volumes.customVolumeClaim.enabled }}
-          {{- $customClaimName := $.Values.engine.modelManager.volumes.customVolumeClaim.name }}
-          {{- $awsEfsEnabled := $.Values.engine.modelManager.volumes.aws.efs.enabled }}
-          {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
-
-          {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) }}
-
-          {{- if eq $enabledCount 0 }}
-          {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled must be set to true." }}
-          {{- else if gt $enabledCount 1 }}
-          {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled can be set to true." }}
-          {{- end }}
-
-          {{- if $customClaimEnabled }}
-            {{- if not $customClaimName }}
-            {{- fail "Error: customVolumeClaim.name must be set when customVolumeClaim.enabled is true." }}
-            {{- else }}
-          claimName: {{ $customClaimName }}
-            {{- end }}
-          {{- else if $awsEfsEnabled }}
-          claimName: {{ $.Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
-          {{- else if $gcpGpdEnabled }}
-          claimName: {{ $.Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
-          {{- end }}
 {{- end }}

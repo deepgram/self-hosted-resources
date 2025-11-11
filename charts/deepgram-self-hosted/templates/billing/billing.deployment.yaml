@@ -51,6 +51,39 @@ spec:
       {{- if or .Values.billing.serviceAccount.create .Values.billing.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.billing.namePrefix) .Values.billing.serviceAccount.name }}
       {{- end }}
+
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: {{ .Values.billing.namePrefix }}-config
+        - name: working-config
+          emptyDir: {}
+        - name: license-file
+          secret:
+            secretName: {{ required "Missing Deepgram license file secret - see `billing.licenseFile.secretRef`" .Values.billing.licenseFile.secretRef }}
+            items:
+            - key: {{ .Values.billing.licenseFile.secretKey }}
+              path: license.dg
+        - name: journal
+          persistentVolumeClaim:
+            claimName: journal
+
+      initContainers:
+        - name: config-render
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - apk add --no-cache gettext-envsubst && envsubst < /config/billing.toml > /work/billing.toml
+          envFrom:
+            - secretRef:
+                name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /config
+            - name: working-config
+              mountPath: /work
+
       containers:
       - name: {{ .Values.billing.namePrefix }}
         {{- with .Values.billing.containerSecurityContext }}
@@ -62,8 +95,7 @@ spec:
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
-        command: ["serve"]
-        args: ["--config", "/etc/config/billing.toml"]
+        args: ["serve", "--config", "/etc/config/billing.toml"]
         resources:
           requests:
             memory: "{{ .Values.billing.resources.requests.memory }}"
@@ -72,7 +104,7 @@ spec:
             memory: "{{ .Values.billing.resources.limits.memory }}"
             cpu: "{{ .Values.billing.resources.limits.cpu }}"
         volumeMounts:
-        - name: billing-config-volume
+        - name: working-config
           mountPath: /etc/config
         - name: license-file
           mountPath: /license
@@ -94,16 +126,6 @@ spec:
           initialDelaySeconds: {{ .Values.billing.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.billing.readinessProbe.periodSeconds }}
           failureThreshold: {{ .Values.billing.readinessProbe.failureThreshold }}
-      volumes:
-      - name: billing-config-volume
-        configMap:
-          name: {{ .Values.billing.namePrefix }}-config
-      - name: license-file
-        secret:
-          secretName: {{ required "Missing Deepgram license file secret - see `billing.licenseFile.secretRef`" .Values.billing.licenseFile.secretRef }}
-          items:
-          - key: {{ .Values.billing.licenseFile.secretKey }}
-            path: license.dg
   volumeClaimTemplates:
   - metadata:
       name: journal

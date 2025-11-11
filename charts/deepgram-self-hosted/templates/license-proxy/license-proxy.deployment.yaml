@@ -50,6 +50,34 @@ spec:
       {{- if or .Values.licenseProxy.serviceAccount.create .Values.licenseProxy.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.licenseProxy.namePrefix) .Values.licenseProxy.serviceAccount.name }}
       {{- end }}
+
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: {{ .Values.licenseProxy.namePrefix }}-config
+        - name: working-config
+          emptyDir: {}
+
+      initContainers:
+        - name: config-render
+          image: alpine:latest
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - apk add --no-cache gettext-envsubst && envsubst < /config/license-proxy.toml > /work/license-proxy.toml
+          envFrom:
+            - secretRef:
+                name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+            {{- if .Values.licenseProxy.upstream.useBilling }}
+            - secretRef:
+                name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
+            {{- end }}
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /config
+            - name: working-config
+              mountPath: /work
+
       containers:
       - name: {{ .Values.licenseProxy.namePrefix }}
         {{- with .Values.licenseProxy.containerSecurityContext }}
@@ -78,7 +106,7 @@ spec:
             memory: "{{ .Values.licenseProxy.resources.limits.memory }}"
             cpu: "{{ .Values.licenseProxy.resources.limits.cpu }}"
         volumeMounts:
-        - name: license-proxy-config-volume
+        - name: working-config
           mountPath: /etc/config
         ports:
         - name: primary
@@ -100,8 +128,4 @@ spec:
           initialDelaySeconds: {{ .Values.licenseProxy.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.licenseProxy.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.licenseProxy.readinessProbe.timeoutSeconds }}
-      volumes:
-      - name: license-proxy-config-volume
-        configMap:
-          name: {{ .Values.licenseProxy.namePrefix }}-config
 {{- end -}}

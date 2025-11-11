@@ -19,6 +19,17 @@ global:
   # ```
   pullSecretRef: "dg-regcred"
 
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key"
+
   # deepgramLicenseSecretRef should refer to a K8s secret that
   # must be created prior to installing this Chart for airgapped deployments.
   # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
@@ -163,7 +174,7 @@ billing:
   
   journal:
     size: "1Gi"
-    storageClass: ""  # Leave empty to use cluster default, or specify (e.g., "gp3" for AWS)
+    storageClass: gp2
 
   affinity:
     nodeAffinity:
