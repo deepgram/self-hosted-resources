@@ -4,6 +4,14 @@ All notable changes to this Helm chart will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## [0.24.0] - 2025-11-13
+
+### Changed
+
+- Updated default container tags to November 2025 release (`release-2511113`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-november-2025-release-251113) for additional details.
+
 ## [0.23.1] - 2025-11-04
 
 ### Fixed
