@@ -51,7 +51,7 @@ search_paths = ["/models"]
 ### Allow multichannel requests by setting this to true, set to false to disable
 multichannel = true # or false
 ### Enables language detection *if* a valid language detection model is available
-language_detection = true # or false
+use_v2_language_detection = true
 ### Enables streaming entity formatting *if* a valid NER model is available
 streaming_ner = true # or false
 
