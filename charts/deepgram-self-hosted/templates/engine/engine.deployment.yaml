@@ -84,7 +84,7 @@ spec:
         lifecycle:
           postStart:
             exec:
-              command: {{ $.Values.engine.lifecycle.postStart.command }}
+              command: {{ toJson $.Values.engine.lifecycle.postStart.command }}
         {{- end }}
         envFrom:
         - secretRef:
