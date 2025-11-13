@@ -5,11 +5,31 @@
 #   helm install deepgram ./charts/deepgram-self-hosted -f samples/04-aura-2-setup.yaml
 
 global:
-  # Set your Deepgram secret containing API key
-  deepgramSecretRef: "deepgram-secret"
-  
-  # Set your image pull secret if using private registry
-  # pullSecretRef: "quay-secret"
+  # pullSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
+  # ```bash
+  # docker login quay.io
+  # kubectl create secret docker-registry dg-regcred \
+  #   --docker-server=quay.io \
+  #   --docker-username='QUAY_DG_USER' \
+  #   --docker-password='QUAY_DG_PASSWORD'
+  # ```
+  pullSecretRef: "dg-regcred"
+
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key" 
 
 # Configure scaling for multi-language deployment
 scaling:
@@ -26,6 +46,7 @@ api:
   
   # Enable Aura-2 specific features
   features:
+    entityDetection: false
 
   # Configure driver pool to connect to both language engines
   driverPool:
@@ -46,6 +67,10 @@ engine:
       memory: "32Gi"
       cpu: "4000m"
       gpu: 2
+    limits:
+      memory: "40Gi"
+      cpu: "8000m"
+      gpu: 2
 
   # Aura-2 specific features
   features:
@@ -55,10 +80,16 @@ engine:
     models:
       # Add your Aura-2 model links here
       # Replace with actual model links provided by Deepgram
-      add: []
+      add:
         # Example (replace with your actual model links):
-        # - "https://path.to/aura-2-en-model"
-        # - "https://path.to/aura-2-es-model"
+        # - https://path.to/aura-2-en-model
+        # - https://path.to/aura-2-es-model
+        # - ...
+      remove:
+        # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
+        # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
+        # - name-of-old-model-3.dg #   this will likely be empty.
+        # - ...
 
     # Configure volume storage for models
     volumes:
