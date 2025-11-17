@@ -107,13 +107,8 @@ spec:
             memory: "{{ .Values.licenseProxy.resources.limits.memory }}"
             cpu: "{{ .Values.licenseProxy.resources.limits.cpu }}"
         volumeMounts:
-        {{- if .Values.licenseProxy.upstream.useBilling }}
-        - name: working-config
+        - name: {{- if .Values.licenseProxy.upstream.useBilling -}} working-config {{- else -}} configmap-volume {{- end }}
           mountPath: /etc/config
-        {{- else }}
-        - name: configmap-volume
-          mountPath: /etc/config
-        {{- end }}
         ports:
         - name: primary
           containerPort: {{ .Values.licenseProxy.server.port }}

@@ -62,9 +62,6 @@ spec:
             items:
             - key: {{ .Values.billing.licenseFile.secretKey }}
               path: license.dg
-        - name: journal
-          persistentVolumeClaim:
-            claimName: journal
 
       containers:
       - name: {{ .Values.billing.namePrefix }}

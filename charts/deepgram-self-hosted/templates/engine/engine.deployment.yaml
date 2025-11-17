@@ -155,13 +155,8 @@ spec:
             nvidia.com/gpu: {{ $.Values.engine.resources.limits.gpu }}
             {{- end }}
         volumeMounts:
-        {{- if $.Values.billing.enabled }}
-        - name: working-config
+        - name: {{- if $.Values.billing.enabled }} working-config {{- else }} configmap-volume {{- end }}
           mountPath: /etc/config
-        {{- else }}
-        - name: engine-config-volume
-          mountPath: /etc/config
-        {{- end }}
         - name: models-volume
           mountPath: /models
         ports:
@@ -188,13 +183,10 @@ spec:
           failureThreshold: {{ $.Values.engine.readinessProbe.failureThreshold }}
 
       volumes:
-      - name: engine-config-volume
-        configMap:
-          name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
-      {{- if $.Values.billing.enabled }}
       - name: configmap-volume
         configMap:
           name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
+      {{- if $.Values.billing.enabled }}
       - name: working-config
         emptyDir: {}
       {{- end }}

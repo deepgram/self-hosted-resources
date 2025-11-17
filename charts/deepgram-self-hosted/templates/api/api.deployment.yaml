@@ -163,13 +163,8 @@ spec:
             memory: "{{ .Values.api.resources.limits.memory }}"
             cpu: "{{ .Values.api.resources.limits.cpu }}"
         volumeMounts:
-        {{- if .Values.billing.enabled }}
-        - name: working-config
+        - name: {{- if .Values.billing.enabled -}} working-config {{- else -}} configmap-volume {{- end }}
           mountPath: /etc/config
-        {{- else }}
-        - name: api-config-volume
-          mountPath: /etc/config
-        {{- end }}
         ports:
         - name: primary
           containerPort: {{ .Values.api.server.port }}
@@ -190,13 +185,10 @@ spec:
           timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
 
       volumes:
-      - name: api-config-volume
-        configMap:
-          name: {{ .Values.api.namePrefix }}-config
-      {{- if .Values.billing.enabled }}
       - name: configmap-volume
         configMap:
           name: {{ .Values.api.namePrefix }}-config
+      {{- if .Values.billing.enabled }}
       - name: working-config
         emptyDir: {}
       {{- end }}
