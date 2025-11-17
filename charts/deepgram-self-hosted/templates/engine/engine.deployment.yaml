@@ -155,7 +155,7 @@ spec:
             nvidia.com/gpu: {{ $.Values.engine.resources.limits.gpu }}
             {{- end }}
         volumeMounts:
-        - name: {{- if $.Values.billing.enabled }} working-config {{- else }} configmap-volume {{- end }}
+        - name: "{{ if .Values.billing.enabled }}working-config{{ else }}configmap-volume{{ end }}"
           mountPath: /etc/config
         - name: models-volume
           mountPath: /models
