@@ -53,15 +53,6 @@ spec:
       serviceAccountName: {{ default (printf "%s-sa" .Values.api.namePrefix) .Values.api.serviceAccount.name }}
       {{- end }}
 
-      volumes:
-        - name: configmap-volume
-          configMap:
-            name: {{ .Values.api.namePrefix }}-config
-        {{- if .Values.billing.enabled }}
-        - name: working-config
-          emptyDir: {}
-        {{- end }}
-
       {{- if .Values.billing.enabled }}
       initContainers:
         - name: config-render
@@ -162,12 +153,21 @@ spec:
           {{- else }}
           value: ""
           {{- end }}
+        command: [ "stem" ]
+        args: ["-v", "serve", "/etc/config/api.toml"]
+        resources:
+          requests:
+            memory: "{{ .Values.api.resources.requests.memory }}"
+            cpu: "{{ .Values.api.resources.requests.cpu }}"
+          limits:
+            memory: "{{ .Values.api.resources.limits.memory }}"
+            cpu: "{{ .Values.api.resources.limits.cpu }}"
         volumeMounts:
         {{- if .Values.billing.enabled }}
         - name: working-config
           mountPath: /etc/config
         {{- else }}
-        - name: configmap-volume
+        - name: api-config-volume
           mountPath: /etc/config
         {{- end }}
         ports:
@@ -188,12 +188,15 @@ spec:
           initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
-        command: ["stem"]
-        args: ["-v", "serve", "/etc/config/api.toml"]
-        resources:
-          requests:
-            memory: "{{ .Values.api.resources.requests.memory }}"
-            cpu: "{{ .Values.api.resources.requests.cpu }}"
-          limits:
-            memory: "{{ .Values.api.resources.limits.memory }}"
-            cpu: "{{ .Values.api.resources.limits.cpu }}"
+
+      volumes:
+      - name: api-config-volume
+        configMap:
+          name: {{ .Values.api.namePrefix }}-config
+      {{- if .Values.billing.enabled }}
+      - name: configmap-volume
+        configMap:
+          name: {{ .Values.api.namePrefix }}-config
+      - name: working-config
+        emptyDir: {}
+      {{- end }}

@@ -73,38 +73,6 @@ spec:
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
 
-      volumes:
-        - name: configmap-volume
-          configMap:
-            name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
-        {{- if $.Values.billing.enabled }}
-        - name: working-config
-          emptyDir: {}
-        {{- end }}
-        - name: models-volume
-          persistentVolumeClaim:
-            {{- $customClaimEnabled := $.Values.engine.modelManager.volumes.customVolumeClaim.enabled }}
-            {{- $customClaimName := $.Values.engine.modelManager.volumes.customVolumeClaim.name }}
-            {{- $awsEfsEnabled := $.Values.engine.modelManager.volumes.aws.efs.enabled }}
-            {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
-            {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) }}
-            {{- if eq $enabledCount 0 }}
-            {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled must be set to true." }}
-            {{- else if gt $enabledCount 1 }}
-            {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled can be set to true." }}
-            {{- end }}
-            {{- if $customClaimEnabled }}
-              {{- if not $customClaimName }}
-              {{- fail "Error: customVolumeClaim.name must be set when customVolumeClaim.enabled is true." }}
-              {{- else }}
-            claimName: {{ $customClaimName }}
-              {{- end }}
-            {{- else if $awsEfsEnabled }}
-            claimName: {{ $.Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
-            {{- else if $gcpGpdEnabled }}
-            claimName: {{ $.Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
-            {{- end }}
-
       {{- if $.Values.billing.enabled }}
       initContainers:
         - name: config-render
@@ -191,7 +159,7 @@ spec:
         - name: working-config
           mountPath: /etc/config
         {{- else }}
-        - name: configmap-volume
+        - name: engine-config-volume
           mountPath: /etc/config
         {{- end }}
         - name: models-volume
@@ -218,4 +186,42 @@ spec:
           initialDelaySeconds: {{ $.Values.engine.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.engine.readinessProbe.periodSeconds }}
           failureThreshold: {{ $.Values.engine.readinessProbe.failureThreshold }}
+
+      volumes:
+      - name: engine-config-volume
+        configMap:
+          name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
+      {{- if $.Values.billing.enabled }}
+      - name: configmap-volume
+        configMap:
+          name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
+      - name: working-config
+        emptyDir: {}
+      {{- end }}
+      - name: models-volume
+        persistentVolumeClaim:
+          {{- $customClaimEnabled := $.Values.engine.modelManager.volumes.customVolumeClaim.enabled }}
+          {{- $customClaimName := $.Values.engine.modelManager.volumes.customVolumeClaim.name }}
+          {{- $awsEfsEnabled := $.Values.engine.modelManager.volumes.aws.efs.enabled }}
+          {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
+
+          {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) }}
+
+          {{- if eq $enabledCount 0 }}
+          {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled must be set to true." }}
+          {{- else if gt $enabledCount 1 }}
+          {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled can be set to true." }}
+          {{- end }}
+
+          {{- if $customClaimEnabled }}
+            {{- if not $customClaimName }}
+            {{- fail "Error: customVolumeClaim.name must be set when customVolumeClaim.enabled is true." }}
+            {{- else }}
+          claimName: {{ $customClaimName }}
+            {{- end }}
+          {{- else if $awsEfsEnabled }}
+          claimName: {{ $.Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
+          {{- else if $gcpGpdEnabled }}
+          claimName: {{ $.Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
+          {{- end }}
 {{- end }}
