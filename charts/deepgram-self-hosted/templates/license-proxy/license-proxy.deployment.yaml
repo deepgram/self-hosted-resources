@@ -55,9 +55,12 @@ spec:
         - name: configmap-volume
           configMap:
             name: {{ .Values.licenseProxy.namePrefix }}-config
+        {{- if .Values.licenseProxy.upstream.useBilling }}
         - name: working-config
           emptyDir: {}
+        {{- end }}
 
+      {{- if .Values.licenseProxy.upstream.useBilling }}
       initContainers:
         - name: config-render
           image: alpine:latest
@@ -67,16 +70,13 @@ spec:
             - apk add --no-cache gettext-envsubst && envsubst < /config/license-proxy.toml > /work/license-proxy.toml
           envFrom:
             - secretRef:
-                name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-            {{- if .Values.licenseProxy.upstream.useBilling }}
-            - secretRef:
                 name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
-            {{- end }}
           volumeMounts:
             - name: configmap-volume
               mountPath: /config
             - name: working-config
               mountPath: /work
+      {{- end }}
 
       containers:
       - name: {{ .Values.licenseProxy.namePrefix }}
@@ -87,9 +87,10 @@ spec:
         image: {{ .Values.licenseProxy.image.path }}:{{ .Values.licenseProxy.image.tag }}
         imagePullPolicy: {{ .Values.licenseProxy.image.pullPolicy }}
         envFrom:
+        {{- if not .Values.licenseProxy.upstream.useBilling }}
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {{- if .Values.licenseProxy.upstream.useBilling }}
+        {{- else }}
         - secretRef:
             name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
         {{- end }}
@@ -106,8 +107,13 @@ spec:
             memory: "{{ .Values.licenseProxy.resources.limits.memory }}"
             cpu: "{{ .Values.licenseProxy.resources.limits.cpu }}"
         volumeMounts:
+        {{- if .Values.licenseProxy.upstream.useBilling }}
         - name: working-config
           mountPath: /etc/config
+        {{- else }}
+        - name: configmap-volume
+          mountPath: /etc/config
+        {{- end }}
         ports:
         - name: primary
           containerPort: {{ .Values.licenseProxy.server.port }}

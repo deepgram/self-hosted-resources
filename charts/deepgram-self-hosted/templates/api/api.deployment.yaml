@@ -57,9 +57,12 @@ spec:
         - name: configmap-volume
           configMap:
             name: {{ .Values.api.namePrefix }}-config
+        {{- if .Values.billing.enabled }}
         - name: working-config
           emptyDir: {}
+        {{- end }}
 
+      {{- if .Values.billing.enabled }}
       initContainers:
         - name: config-render
           image: alpine:latest
@@ -69,16 +72,13 @@ spec:
             - apk add --no-cache gettext-envsubst && envsubst < /config/api.toml > /work/api.toml
           envFrom:
             - secretRef:
-                name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-            {{- if .Values.billing.enabled }}
-            - secretRef:
                 name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
-            {{- end }}
           volumeMounts:
             - name: configmap-volume
               mountPath: /config
             - name: working-config
               mountPath: /work
+      {{- end }}
 
       containers:
       - name: {{ .Values.api.namePrefix }}
@@ -89,9 +89,10 @@ spec:
         image: {{ .Values.api.image.path }}:{{ .Values.api.image.tag }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         envFrom:
+        {{- if not .Values.billing.enabled }}
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
-        {{- if .Values.billing.enabled }}
+        {{- else }}
         - secretRef:
             name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
         {{- end }}
@@ -162,8 +163,13 @@ spec:
           value: ""
           {{- end }}
         volumeMounts:
+        {{- if .Values.billing.enabled }}
         - name: working-config
           mountPath: /etc/config
+        {{- else }}
+        - name: configmap-volume
+          mountPath: /etc/config
+        {{- end }}
         ports:
         - name: primary
           containerPort: {{ .Values.api.server.port }}
