@@ -668,6 +668,8 @@ engine:
     # -- Enables format entity tags on streaming audio
     # *if* a valid NER model is available.
     streamingNer: true
+    # -- Enables use of 36-language detection model.
+    useV2LanguageDetection: false
 
   flux:
     # -- Enables Flux turn-based streaming STT

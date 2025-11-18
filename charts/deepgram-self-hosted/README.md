@@ -322,6 +322,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers. |
 | engine.customToml | string | `nil` | Custom TOML sections can be added to extend engine.toml |
 | engine.features.streamingNer | bool | `true` | Enables format entity tags on streaming audio *if* a valid NER model is available. |
+| engine.features.useV2LanguageDetection | bool | `false` | Enables use of 36-language detection model. |
 | engine.flux.enabled | bool | `false` | Enables Flux turn-based streaming STT |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
