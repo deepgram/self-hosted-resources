@@ -339,6 +339,8 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.modelManager.volumes.aws.efs.fileSystemId | string | `nil` | FileSystemId of existing AWS Elastic File System where Deepgram model files will be persisted. You can find it using the AWS CLI: ``` $ aws efs describe-file-systems --query "FileSystems[*].FileSystemId" ``` |
 | engine.modelManager.volumes.aws.efs.forceDownload | bool | `false` | Whether to force a fresh download of all model links provided, even if models are already present in EFS. |
 | engine.modelManager.volumes.aws.efs.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in AWS EFS. |
+| engine.modelManager.volumes.aws.efs.storageClass.create | bool | `true` | Specifies whether a StorageClass should be created |
+| engine.modelManager.volumes.aws.efs.storageClass.name | string | `nil` | The name of the StorageClass to use. If not set, a name is generated using `<namePrefix>-aws-efs-sc` |
 | engine.modelManager.volumes.customVolumeClaim.enabled | bool | `false` | You may manually create your own PersistentVolume and PersistentVolumeClaim to store and expose model files to the Deepgram Engine. Configure your storage beforehand, and enable here. Note: Make sure the PV and PVC accessMode are set to `readWriteMany` or `readOnlyMany` |
 | engine.modelManager.volumes.customVolumeClaim.modelsDirectory | string | `"/"` | Name of the directory within your pre-configured PersistentVolume where the models are stored |
 | engine.modelManager.volumes.customVolumeClaim.name | string | `nil` | Name of your pre-configured PersistentVolumeClaim |

@@ -626,6 +626,12 @@ engine:
           # -- Whether to force a fresh download of all model links provided,
           # even if models are already present in EFS.
           forceDownload: false
+          # -- Configuration for the EFS StorageClass
+          storageClass:
+            # -- Specifies whether a StorageClass should be created
+            create: true
+            # -- The name of the StorageClass to use.
+            name:
       gcp:
         gpd:
           # -- Whether to use an [GKE Persistent Disks](https://cloud.google.com/kubernetes-engine/docs/concepts/persistent-volumes)
