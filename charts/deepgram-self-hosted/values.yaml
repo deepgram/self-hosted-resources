@@ -14,6 +14,16 @@ global:
   # Only required when billing.enabled is true.
   deepgramLicenseSecretRef:
 
+  # Init container configuration for envsubst-based config rendering (used when billing is enabled)
+  initContainer:
+    image:
+      registry: docker.io
+      repository: ubuntu
+      tag: "22.04"
+      pullPolicy: IfNotPresent
+    # Optional: Override imagePullSecrets for init container (defaults to global.pullSecretRef)
+    pullSecretRef: ""  # Leave empty to use global.pullSecretRef
+
   # -- Additional labels to add to all Deepgram resources
   additionalLabels: {}
 

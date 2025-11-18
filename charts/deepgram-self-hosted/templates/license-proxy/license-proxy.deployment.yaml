@@ -63,7 +63,8 @@ spec:
       {{- if .Values.licenseProxy.upstream.useBilling }}
       initContainers:
         - name: config-render
-          image: ubuntu:22.04
+          image: {{ .Values.global.initContainer.image.registry }}/{{ .Values.global.initContainer.image.repository }}:{{ .Values.global.initContainer.image.tag }}
+          imagePullPolicy: {{ .Values.global.initContainer.image.pullPolicy }}
           command: ["/bin/sh"]
           args:
             - -c
