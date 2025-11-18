@@ -8,9 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.24.0] - 2025-11-18
 
+### Added
+
+- Added `use_v2_language_detection` feature flag to support 36-language detection (disabled by default).
+
 ### Changed
 
 - Updated default container tags to November 2025 release (`release-251118`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-november-2025-release-251118) for additional details.
+- Updated `/v1/status` endpoint to raise four statuses: Initializing, Ready, Healthy, and Critical. See [status endpoint documentation](https://developers.deepgram.com/docs/self-hosted-status-endpoint) for details.
 
 ## [0.23.1] - 2025-11-04
 
