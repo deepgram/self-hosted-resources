@@ -922,9 +922,15 @@ billing:
   # WARNING: Do not delete or lose this volume as it contains critical billing data.
   # @default -- ``
   journal:
-    # -- (string) Storage class to use for the journal PVC. If empty, uses cluster default.
+    # -- (string) Name of an existing PVC to use for journal storage (e.g., EFS-backed shared volume).
+    # When set, each Billing pod writes to its own subdirectory: journal-<pod-name>/
+    # Leave empty to auto-provision per-pod EBS volumes via volumeClaimTemplates (default).
+    existingPvcName: ""
+
+    # -- (string) Storage class to use for the journal PVC. Only used if existingPvcName is empty.
     storageClass: ""
-    # -- Size of the journal volume. The journal is plain text and typically only needs 1Gi.
+
+    # -- Size of the journal volume. Only used if existingPvcName is empty.
     size: "1Gi"
 
   updateStrategy:
