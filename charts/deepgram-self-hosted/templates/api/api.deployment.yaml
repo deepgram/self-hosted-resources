@@ -61,7 +61,7 @@ spec:
           command: ["/bin/sh"]
           args:
             - -c
-            - envsubst < /config/api.toml > /work/api.toml
+            - sed "s|\${DEEPGRAM_LICENSE_KEY}|${DEEPGRAM_LICENSE_KEY}|g" /config/api.toml > /work/api.toml
           envFrom:
             - secretRef:
                 name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
@@ -89,6 +89,11 @@ spec:
             name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
         {{- end }}
         env:
+        {{- if .Values.billing.enabled }}
+        # API container requires DEEPGRAM_API_KEY env var, but it's not used for airgapped
+        - name: DEEPGRAM_API_KEY
+          value: "airgapped-mode"
+        {{- end }}
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
         - name: OPENAI_API_KEY

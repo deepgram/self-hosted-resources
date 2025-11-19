@@ -14,7 +14,7 @@ global:
   # Only required when billing.enabled is true.
   deepgramLicenseSecretRef:
 
-  # Init container configuration for envsubst-based config rendering (used when billing is enabled)
+  # Init container configuration for config rendering (used when billing is enabled)
   initContainer:
     image:
       registry: docker.io
