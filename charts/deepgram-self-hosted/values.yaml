@@ -875,6 +875,13 @@ licenseProxy:
 # The Billing container is used for airgapped deployments where API and Engine
 # cannot reach license.deepgram.com. It validates licenses locally using a
 # license file and maintains a usage journal.
+#
+# Prerequisites for airgapped deployments:
+# 1. License key secret: global.deepgramLicenseSecretRef (must contain DEEPGRAM_LICENSE_KEY)
+# 2. License file secret: billing.licenseFile.secretRef (must contain the .dg license file)
+# 3. Optional: Set licenseProxy.upstream.useBilling=true to use License Proxy as a caching layer
+#
+# See samples/06-basic-setup-aws-airgapped.values.yaml for a complete example.
 # @default -- ``
 billing:
   # -- Enable the Billing container for airgapped deployments.

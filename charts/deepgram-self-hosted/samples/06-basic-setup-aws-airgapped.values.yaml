@@ -1,8 +1,43 @@
-# See the Chart [README](https://github.com/deepgram/self-hosted-resources/blob/main/charts/deepgram-self-hosted#values)
-#   for documentation on all available options.
+# Deepgram Self-Hosted - Airgapped Deployment (AWS EKS)
 #
-# This sample is for AIRGAPPED deployments using the Billing container.
-
+# This configuration deploys Deepgram in an airgapped environment where components
+# cannot reach license.deepgram.com. The Billing container acts as the license terminal.
+#
+# ARCHITECTURE:
+#   API → Billing (license validation)
+#   Engine → Billing
+#   License Proxy → disabled (optional: enable and set licenseProxy.upstream.useBilling=true)
+#
+# PREREQUISITES:
+#
+# 1. Create namespace:
+#    kubectl create namespace dg-self-hosted
+#
+# 2. Create license key secret:
+#    kubectl create secret generic dg-license-key \
+#      --from-literal=DEEPGRAM_LICENSE_KEY='your-license-key-here' \
+#      -n dg-self-hosted
+#
+# 3. Create license file secret:
+#    kubectl create secret generic dg-license-file \
+#      --from-file=license.dg=/path/to/your/license.dg \
+#      -n dg-self-hosted
+#
+# 4. Create image pull secret:
+#    kubectl create secret docker-registry dg-regcred \
+#      --docker-server=quay.io \
+#      --docker-username=your-username \
+#      --docker-password=your-password \
+#      -n dg-self-hosted
+#
+# DEPLOYMENT:
+#    eksctl create cluster -f samples/06-basic-setup-aws-airgapped.cluster-config.yaml
+#    helm install deepgram-self-hosted ./charts/deepgram-self-hosted \
+#      -f samples/06-basic-setup-aws-airgapped.values.yaml \
+#      -n dg-self-hosted
+#
+# For more general information, see samples/README.md
+# ---
 global:
   # pullSecretRef should refer to a K8s secret that
   # must be created prior to installing this Chart.
@@ -19,16 +54,7 @@ global:
   # ```
   pullSecretRef: "dg-regcred"
 
-  # deepgramSecretRef should refer to a K8s secret that
-  # must be created prior to installing this Chart.
-  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
-  #
-  # You can create a secret for your Deepgram self-hosted API key
-  # with the following command:
-  # ```bash
-  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
-  # ```
-  deepgramSecretRef: "dg-self-hosted-api-key"
+  # deepgramSecretRef - API key for self-hosted deployments (not used in airgapped mode)
 
   # deepgramLicenseSecretRef should refer to a K8s secret that
   # must be created prior to installing this Chart for airgapped deployments.
@@ -223,4 +249,3 @@ gpu-operator:
     enabled: false
   toolkit:
     enabled: false
-    
