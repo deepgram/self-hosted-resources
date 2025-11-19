@@ -36,7 +36,7 @@
 #      -f samples/06-basic-setup-aws-airgapped.values.yaml \
 #      -n dg-self-hosted
 #
-# For more general information, see samples/README.md
+# For more information, see samples/airgapped.md and samples/README.md
 # ---
 global:
   # pullSecretRef should refer to a K8s secret that
