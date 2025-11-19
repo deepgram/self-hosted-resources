@@ -304,7 +304,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | aura2.enabled | bool | `false` | Enable Aura-2 features and configuration |
 | aura2.english | object | `` | English language configuration for Aura-2 |
 | aura2.spanish | object | `` | Spanish language configuration for Aura-2 |
-| billing | object | `` | Configuration options for the Deepgram Billing container. The Billing container is used for airgapped deployments where API and Engine cannot reach license.deepgram.com. It validates licenses locally using a license file and maintains a usage journal. |
+| billing | object | `` | Configuration options for the Deepgram Billing container. The Billing container is used for airgapped deployments where API and Engine cannot reach license.deepgram.com. It validates licenses locally using a license file and maintains a usage journal.  For complete airgapped deployment instructions, see samples/airgapped.md |
 | billing.additionalAnnotations | object | `nil` | Additional annotations to add to the Billing deployment |
 | billing.additionalLabels | object | `{}` | Additional labels to add to Billing resources |
 | billing.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Billing pods. |
