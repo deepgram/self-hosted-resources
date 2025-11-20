@@ -402,7 +402,6 @@ This copies all files and subdirectories.
 
 ## Additional Resources
 
-- Sample airgapped AWS configuration: [`samples/06-basic-setup-aws-airgapped.values.yaml`](samples/06-basic-setup-aws-airgapped.values.yaml)
-- Full configuration reference: [`values.yaml`](../../values.yaml)
-- Sample files: [`samples/06-basic-setup-aws-airgapped.values.yaml`](samples/06-basic-setup-aws-airgapped.values.yaml)
-- Main chart docs: [`README.md`](../../README.md)
+- Sample airgapped AWS configuration: [`06-basic-setup-aws-airgapped.values.yaml`](./06-basic-setup-aws-airgapped.values.yaml)
+- Full configuration reference: [`values.yaml`](../values.yaml)
+- Main chart docs: [`README.md`](./README.md)
