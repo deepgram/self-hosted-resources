@@ -4,25 +4,25 @@ Deploy Deepgram Self-Hosted in environments without external network access.
 
 ## Overview
 
-In airgapped deployments, the **Billing container** validates licenses locally and manages a journal file for usage/billing.
+In airgapped deployments, the Billing container validates licenses locally and manages a journal file for usage/billing.
 
-| Aspect             | Cloud                  | Airgapped                   |
-|--------------------|-----------------------|-----------------------------|
-| License Server     | license.deepgram.com   | Billing container           |
-| Required Secrets   | API key                | License key + License file  |
-| Journal Management | Automatic              | Manual retrieval required   |
+| Aspect             | Cloud                   | Airgapped                    |
+|--------------------|------------------------|------------------------------|
+| License Server     | license.deepgram.com   | Billing container            |
+| Required Secrets   | API key                | License key + License file   |
+| Journal Management | Automatic              | Manual retrieval required    |
 
 ## Architecture
 
-- **Standard:** API/Engine → Billing Container
-- **High Availability:** API/Engine → License Proxy → Billing Container
+- Standard: API/Engine → Billing Container
+- High Availability: API/Engine → License Proxy → Billing Container
 
 ## Prerequisites
 
 Obtain from Deepgram:
-- **License Key** (`DEEPGRAM_LICENSE_KEY`)
-- **License File** (`.dg`)
-- **Registry Access** for `quay.io/deepgram/*`
+- License Key (`DEEPGRAM_LICENSE_KEY`)
+- License File (`.dg`)
+- Registry Access for `quay.io/deepgram/*` (including for Billing container)
 
 ## Example Configurations
 
@@ -129,22 +129,48 @@ kubectl get pods -n dg-self-hosted
 
 ### Troubleshooting
 
-- **Pods not starting:**  
+- Pods not starting:
   ```kubectl get secrets -n dg-self-hosted```  
   ```kubectl logs -n dg-self-hosted deepgram-billing-0```
-- **PVC pending:**  
+- PVC pending:
   ```kubectl get storageclass```  
   Ensure `storageClass` is set in values.yaml.
 
 ---
 
-## Journal Retrieval (Critical)
+## Journal Retrieval
 
-**You must regularly retrieve the journal file and provide it to Deepgram for billing.**
+**IMPORTANT:** The billing container maintains a usage journal that **must be provided to Deepgram regularly**.
 
-### Method 1: One-Time Retrieval (Debug Pod)
+---
 
-1. Create `debug-pod.yaml`:
+## Manual Journal Retrieval
+
+This method uses a temporary debug pod to access the journal file.
+
+### 1. Find Your Billing Pod Name
+
+```bash
+kubectl get pods -n dg-self-hosted | grep billing
+```
+
+Example output:
+
+```
+deepgram-billing-0       1/1     Running
+```
+
+### 2. Find Your Journal PVC Name
+
+```bash
+kubectl get pvc -n dg-self-hosted | grep journal
+```
+
+Note the exact PVC name corresponding to your billing pod (e.g. `journal-deepgram-billing-0`).
+
+### 3. Create Debug Pod YAML
+
+Create a file named `journal-debug-pod.yaml`:
 
 ```yaml
 apiVersion: v1
@@ -155,29 +181,86 @@ metadata:
 spec:
   containers:
   - name: shell
-    image: alpine:latest
+    image: ubuntu:22.04
     command: ["sleep", "3600"]
     volumeMounts:
-      - mountPath: /mnt
-        name: journal-pvc
+    - mountPath: /mnt
+      name: journal-pvc
   volumes:
-    - name: journal-pvc
-      persistentVolumeClaim:
-        claimName: journal-deepgram-billing-0
+  - name: journal-pvc
+    persistentVolumeClaim:
+      claimName: journal-deepgram-billing-0 # Replace with your actual PVC name
 ```
 
-2. Retrieve the journal file:
+**Important:** Replace `claimName` with your journal PVC name from step 2.
+
+### 4. Deploy the Debug Pod
 
 ```bash
-kubectl apply -f debug-pod.yaml
-kubectl wait --for=condition=ready pod/billing-journal-debug -n dg-self-hosted
-kubectl cp dg-self-hosted/billing-journal-debug:/mnt/journal ./billing-journal-backup
+kubectl apply -f journal-debug-pod.yaml
+kubectl wait --for=condition=ready pod/billing-journal-debug -n dg-self-hosted --timeout=60s
+```
+
+### 5. Verify Journal File Exists
+
+```bash
+kubectl exec -n dg-self-hosted billing-journal-debug -- ls -lh /mnt/
+```
+
+You should see output similar to:
+
+```
+-rw-r--r--    1 root     root        12.3K Nov 20 01:23 journal
+```
+
+### 6. Download the Journal File
+
+```bash
+kubectl cp dg-self-hosted/billing-journal-debug:/mnt/journal ./billing-journal-$(date +%Y%m%d).backup
+```
+
+You’ll now have e.g. `billing-journal-20251120.backup` in your current directory.
+
+### 7. Verify Download
+
+```bash
+ls -lh billing-journal-*.backup
+```
+
+The file should have non-zero size.
+
+### 8. Clean Up Debug Pod
+
+```bash
 kubectl delete pod billing-journal-debug -n dg-self-hosted
 ```
 
-### Method 2: Automated Backup (CronJob)
+### 9. Send to Deepgram
 
-Edit and apply this example as needed:
+Send the journal backup to Deepgram by email or via a cloud storage download link.
+
+---
+
+### Validation Checklist
+
+Before setting up automated backups, verify:
+
+- You successfully downloaded a journal file manually
+- The file size is greater than 0 bytes
+- You can send the file to Deepgram
+- Your Deepgram contact confirms they received and can process it
+
+---
+
+## Automated Backup (Recommended for Production)
+
+Use a Kubernetes CronJob to automate regular journal backups.
+
+Note for fully airgapped environments: Replace the aws s3 cp command below with your local storage solution (mount to NFS, copy to local PV, etc.).
+
+### 1. Create CronJob YAML
+
+Create a file named `billing-journal-cronjob.yaml`:
 
 ```yaml
 apiVersion: batch/v1
@@ -186,38 +269,143 @@ metadata:
   name: billing-journal-backup
   namespace: dg-self-hosted
 spec:
-  schedule: "0 2 * * *"  # Daily at 2AM
+  schedule: "0 2 * * *" # Daily at 2 AM UTC
   jobTemplate:
     spec:
       template:
         spec:
           containers:
           - name: backup
-            image: amazon/aws-cli:latest
+            image: ubuntu:22.04
             command: ["/bin/sh", "-c"]
             args:
-              - tar czf /tmp/journal-$(date +%Y%m%d).tar.gz -C /mnt . && \
-                aws s3 cp /tmp/journal-$(date +%Y%m%d).tar.gz s3://your-bucket/deepgram-journals/
+            - |
+              apt-get update -qq && apt-get install -y -qq awscli tar gzip > /dev/null
+              DATE=$(date +%Y%m%d-%H%M%S)
+              tar czf /tmp/journal-${DATE}.tar.gz -C /mnt .
+              aws s3 cp /tmp/journal-${DATE}.tar.gz s3://YOUR-BUCKET/deepgram-journals/
+              echo "Backup complete: journal-${DATE}.tar.gz"
+            env:
+            - name: AWS_REGION
+              value: "us-west-2"  # Change to your region
             volumeMounts:
-              - name: journal
-                mountPath: /mnt
+            - name: journal
+              mountPath: /mnt
           restartPolicy: OnFailure
           volumes:
-            - name: journal
-              persistentVolumeClaim:
-                claimName: journal-deepgram-billing-0
+          - name: journal
+            persistentVolumeClaim:
+              claimName: journal-deepgram-billing-0  # Replace with your PVC name
+```
+
+**Be sure to:**
+- Replace `YOUR-BUCKET` with your S3 bucket name.
+- Replace `claimName` with your journal PVC name.
+- Ensure proper S3 write permissions (IAM, access keys, etc.).
+
+#### AWS Credentials Setup:
+
+The CronJob needs AWS credentials. Choose one method:
+
+**Option A: IAM Role for Service Account (Recommended)**
+
+- Create IAM policy for S3 write access, then associate with Kubernetes service account. See AWS IRSA documentation for your EKS cluster.
+
+**Option B: AWS Secret**
+
+- Create a secret with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, then add envFrom to the CronJob container to reference it.
+
+---
+
+For Multiple Billing Pods:
+
+The example above only backs up ONE PVC. If you have multiple billing replicas with multiple PVCs, you need to back up each one. Either:
+
+- Create separate CronJobs for each PVC, OR
+- Modify the script to loop through all journal PVCs
+
+---
+
+### 2. Deploy the CronJob
+
+```bash
+kubectl apply -f billing-journal-cronjob.yaml
+```
+
+### 3. Check CronJob Creation
+
+```bash
+kubectl get cronjob -n dg-self-hosted
+```
+
+### 4. Test Backup Job Immediately (Optional)
+
+```bash
+kubectl create job --from=cronjob/billing-journal-backup billing-journal-test -n dg-self-hosted
+kubectl logs -n dg-self-hosted job/billing-journal-test
+```
+
+### 5. Monitor Backups
+
+Check if jobs are scheduled and running:
+
+```bash
+kubectl get jobs -n dg-self-hosted | grep billing-journal-backup
+aws s3 ls s3://YOUR-BUCKET/deepgram-journals/
 ```
 
 ---
 
-### Best Practices
+## Multi-Replica Billing Pods
 
-- **Backup frequency:** Daily (minimum: weekly)
-- **Retention:** Keep historical journals for audit
-- **High Availability:** 
-  - EBS (default): Each pod has its own PVC (`journal-deepgram-billing-0`, `journal-deepgram-billing-1`, etc.)
-  - EFS (shared): All pods write to subdirectories under one PVC (`/mnt/journal-deepgram-billing-0/`, etc.)
-- **Security:** Encrypt journal files when transferring to Deepgram
+### If Using EBS (Default, One PVC per Pod)
+
+Each billing pod has its own PVC. Retrieve journals for **each pod**:
+
+```bash
+kubectl get pvc -n dg-self-hosted | grep journal
+```
+
+For each PVC:
+- Update the debug pod manifest with the correct `claimName`.
+- Repeat the manual retrieval steps above for every PVC (e.g., `journal-deepgram-billing-0`, `journal-deepgram-billing-1`, ...).
+
+### If Using EFS (Shared PVC)
+
+All billing pods write to separate subdirectories within one shared PVC.
+
+To download all journals:
+
+```bash
+kubectl cp dg-self-hosted/billing-journal-debug:/mnt/ ./all-billing-journals/
+```
+
+This copies all files and subdirectories.
+
+---
+
+## Troubleshooting
+
+- `kubectl cp` fails with "tar: command not found":
+  Use `alpine:latest` for the debug pod (it includes `tar`).
+- Journal file is empty (0 bytes):
+  The billing container may not be running yet. If the journal file only contains a single initialization line, it's likely that no billing activity has started and the container isn't up. Check the status:
+  ```kubectl get pods -n dg-self-hosted -l app=deepgram-billing```
+- CronJob never runs:
+  Check status:
+  ```kubectl describe cronjob billing-journal-backup -n dg-self-hosted```
+- "Permission denied" accessing journal:
+  The debug pod defaults to root — shouldn't occur, but check pod spec/image.
+
+---
+
+## Best Practices
+
+- Backup frequency: Daily via automated CronJob (see above)
+- Retention: Retain all journal files until they have been delivered to Deepgram.
+- Testing: Verify you can retrieve and restore journal files before going to production
+- Documentation: Record your backup/retrieval process for your team
+
 ---
 
 ## Additional Resources
