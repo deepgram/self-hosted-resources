@@ -6,11 +6,11 @@ Deploy Deepgram Self-Hosted in environments without external network access.
 
 In airgapped deployments, the Billing container validates licenses locally and manages a journal file for usage/billing.
 
-| Aspect             | Cloud                   | Airgapped                    |
+| Method             | Self-Hosted            | Airgapped                    |
 |--------------------|------------------------|------------------------------|
-| License Server     | license.deepgram.com   | Billing container            |
+| License Server     | `license.deepgram.com` | Billing container            |
 | Required Secrets   | API key                | License key + License file   |
-| Journal Management | Automatic              | Manual retrieval required    |
+| Journal Management | Not applicable         | Retrieval & return required  |
 
 ## Architecture
 
@@ -20,9 +20,9 @@ In airgapped deployments, the Billing container validates licenses locally and m
 ## Prerequisites
 
 Obtain from Deepgram:
-- License Key (`DEEPGRAM_LICENSE_KEY`)
-- License File (`.dg`)
-- Registry Access for `quay.io/deepgram/*` (including for Billing container)
+- License key (`DEEPGRAM_LICENSE_KEY`)
+- License file (`.dg`)
+- Registry access for `quay.io/deepgram/*` (including for Billing container)
 
 ## Example Configurations
 
@@ -115,7 +115,7 @@ kubectl create secret generic dg-license-file \
 helm install deepgram-self-hosted ./charts/deepgram-self-hosted \
   -f samples/06-basic-setup-aws-airgapped.values.yaml \
   -n dg-self-hosted \
-  --timeout 45m
+  --timeout 1h
 ```
 
 ### 3. Verify
@@ -126,15 +126,6 @@ kubectl get pods -n dg-self-hosted
 # deepgram-billing-0       1/1  Running
 # deepgram-engine-xxxxx    1/1  Running
 ```
-
-### Troubleshooting
-
-- Pods not starting:
-  ```kubectl get secrets -n dg-self-hosted```  
-  ```kubectl logs -n dg-self-hosted deepgram-billing-0```
-- PVC pending:
-  ```kubectl get storageclass```  
-  Ensure `storageClass` is set in values.yaml.
 
 ---
 
@@ -237,7 +228,7 @@ kubectl delete pod billing-journal-debug -n dg-self-hosted
 
 ### 9. Send to Deepgram
 
-Send the journal backup to Deepgram by email or via a cloud storage download link.
+Send the journal backup to Deepgram by email in an attachment or a cloud storage download link.
 
 ---
 
@@ -245,8 +236,9 @@ Send the journal backup to Deepgram by email or via a cloud storage download lin
 
 Before setting up automated backups, verify:
 
+- Your airgapped deployment has processed at least one API request
 - You successfully downloaded a journal file manually
-- The file size is greater than 0 bytes
+- The file size is greater than `0` bytes
 - You can send the file to Deepgram
 - Your Deepgram contact confirms they received and can process it
 
@@ -254,9 +246,9 @@ Before setting up automated backups, verify:
 
 ## Automated Backup (Recommended for Production)
 
-Use a Kubernetes CronJob to automate regular journal backups.
+Use a Kubernetes `CronJob` to automate regular journal backups.
 
-Note for fully airgapped environments: Replace the aws s3 cp command below with your local storage solution (mount to NFS, copy to local PV, etc.).
+Note for fully airgapped environments: Replace the `aws s3 cp` command below with your local storage solution (mount to NFS, copy to local PV, etc.).
 
 ### 1. Create CronJob YAML
 
@@ -301,27 +293,27 @@ spec:
 **Be sure to:**
 - Replace `YOUR-BUCKET` with your S3 bucket name.
 - Replace `claimName` with your journal PVC name.
-- Ensure proper S3 write permissions (IAM, access keys, etc.).
+- Ensure proper S3 write permissions (`IAM`, access keys, etc.).
 
 #### AWS Credentials Setup:
 
-The CronJob needs AWS credentials. Choose one method:
+The `CronJob` needs AWS credentials. Choose one method:
 
 **Option A: IAM Role for Service Account (Recommended)**
 
-- Create IAM policy for S3 write access, then associate with Kubernetes service account. See AWS IRSA documentation for your EKS cluster.
+- Create `IAM` policy for S3 write access, then associate with Kubernetes service account. See AWS IRSA documentation for your EKS cluster.
 
 **Option B: AWS Secret**
 
-- Create a secret with AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY, then add envFrom to the CronJob container to reference it.
+- Create a secret with `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`, then add `envFrom` to the CronJob container to reference it.
 
 ---
 
 For Multiple Billing Pods:
 
-The example above only backs up ONE PVC. If you have multiple billing replicas with multiple PVCs, you need to back up each one. Either:
+The example above only backs up **one** PVC. If you have multiple billing replicas with multiple PVCs, you need to back up each one. Either:
 
-- Create separate CronJobs for each PVC, OR
+- Create separate `CronJob`s for each PVC, OR
 - Modify the script to loop through all journal PVCs
 
 ---
@@ -386,23 +378,23 @@ This copies all files and subdirectories.
 
 ## Troubleshooting
 
-- `kubectl cp` fails with "tar: command not found":
+- `kubectl cp` fails with `"tar: command not found"`:<br>
   Use `alpine:latest` for the debug pod (it includes `tar`).
-- Journal file is empty (0 bytes):
+- Journal file is empty (`0` bytes):<br>
   The billing container may not be running yet. If the journal file only contains a single initialization line, it's likely that no billing activity has started and the container isn't up. Check the status:
   ```kubectl get pods -n dg-self-hosted -l app=deepgram-billing```
-- CronJob never runs:
+- `CronJob` never runs:<br>
   Check status:
   ```kubectl describe cronjob billing-journal-backup -n dg-self-hosted```
-- "Permission denied" accessing journal:
-  The debug pod defaults to root — shouldn't occur, but check pod spec/image.
+- `"Permission denied"` accessing journal:<br>
+  The debug pod defaults to `root` — shouldn't occur, but check pod spec/image.
 
 ---
 
 ## Best Practices
 
-- Backup frequency: Daily via automated CronJob (see above)
-- Retention: Retain all journal files until they have been delivered to Deepgram.
+- Backup frequency: Daily via automated `CronJob` (see above)
+- Retention: Retain all journal files until they have been delivered to Deepgram
 - Testing: Verify you can retrieve and restore journal files before going to production
 - Documentation: Record your backup/retrieval process for your team
 
@@ -410,6 +402,7 @@ This copies all files and subdirectories.
 
 ## Additional Resources
 
-- Full configuration reference: `values.yaml`
-- Sample files: `samples/06-basic-setup-aws-airgapped.values.yaml`
-- Main chart docs: `README.md`
+- Sample airgapped AWS configuration: [`samples/06-basic-setup-aws-airgapped.values.yaml`](samples/06-basic-setup-aws-airgapped.values.yaml)
+- Full configuration reference: [`values.yaml`](../../values.yaml)
+- Sample files: [`samples/06-basic-setup-aws-airgapped.values.yaml`](samples/06-basic-setup-aws-airgapped.values.yaml)
+- Main chart docs: [`README.md`](../../README.md)
