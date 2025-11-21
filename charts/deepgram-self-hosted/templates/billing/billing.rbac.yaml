@@ -1,0 +1,38 @@
+{{- if and .Values.billing.enabled .Values.billing.serviceAccount.create }}
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ default (printf "%s-sa" .Values.billing.namePrefix) .Values.billing.serviceAccount.name }}
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ .Values.billing.namePrefix }}-role
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps"]
+    resourceNames: ["{{ .Values.billing.namePrefix }}-config"]
+    verbs: ["get", "list", "watch"]
+  - apiGroups: [""]
+    resources: ["secrets"]
+    resourceNames: ["{{ .Values.global.pullSecretRef }}", "{{ .Values.billing.licenseFile.secretRef }}"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ .Values.billing.namePrefix }}-rolebinding
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+subjects:
+  - kind: ServiceAccount
+    name: {{ default (printf "%s-sa" .Values.billing.namePrefix) .Values.billing.serviceAccount.name }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ .Values.billing.namePrefix }}-role
+{{- end }}

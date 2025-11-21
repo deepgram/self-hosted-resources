@@ -1,0 +1,21 @@
+{{- if .Values.billing.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.billing.namePrefix }}-internal
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+    {{- range $key, $val := .Values.billing.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end}}
+spec:
+  selector:
+    app: deepgram-billing
+    {{ include "deepgram-self-hosted.selectorLabels" . }}
+  type: ClusterIP
+  clusterIP: None
+  ports:
+    - name: "primary"
+      port: {{ .Values.billing.server.port }}
+      targetPort: {{ .Values.billing.server.port }}
+{{- end -}}
