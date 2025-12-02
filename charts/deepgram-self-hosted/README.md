@@ -328,6 +328,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
 | engine.image.tag | string | `"release-251118"` | tag defines which Deepgram release to use for Engine containers |
+| engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
 | engine.metricsServer | object | `` | metricsServer exposes an endpoint on each Engine container for reporting inference-specific system metrics. See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine for more details. |
 | engine.metricsServer.host | string | `"0.0.0.0"` | host is the IP address to listen on for metrics requests. You will want to listen on all interfaces to interact with other pods in the cluster. |

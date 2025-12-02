@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Changed
+
+- Added an optional `engine.lifecycle.postStart.command` hook to run custom commands after Engine container startup.
+
 ## [0.24.0] - 2025-11-18
 
 ### Added
