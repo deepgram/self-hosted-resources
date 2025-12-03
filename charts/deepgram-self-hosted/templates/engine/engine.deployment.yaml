@@ -80,6 +80,12 @@ spec:
         {{- end }}
         image: {{ $.Values.engine.image.path }}:{{ $.Values.engine.image.tag }}
         imagePullPolicy: {{ $.Values.engine.image.pullPolicy }}
+        {{- if gt (len $.Values.engine.lifecycle.postStart.command) 0 }}
+        lifecycle:
+          postStart:
+            exec:
+              command: {{ toJson $.Values.engine.lifecycle.postStart.command }}
+        {{- end }}
         envFrom:
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" $.Values.global.deepgramSecretRef }}

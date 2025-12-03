@@ -548,6 +548,14 @@ engine:
   # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers.
   containerSecurityContext: {}
 
+  # -- Configuration for container lifecycle hooks
+  # @default -- ``
+  lifecycle:
+    postStart:
+      # -- (list) Command to execute in a postStart hook. Leave empty to disable.
+      # Example: ["/sbin/ldconfig"]
+      command: []
+
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
     create: true
