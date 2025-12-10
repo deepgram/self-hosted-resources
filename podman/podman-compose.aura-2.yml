@@ -4,7 +4,7 @@ services:
   # The speech API service.
   # English Language Aura-2
   api-en:
-    image: quay.io/deepgram/self-hosted-api:release-251118
+    image: quay.io/deepgram/self-hosted-api:release-251210
     restart: always
 
     # Here we expose the API port to the host machine. The container port
@@ -33,7 +33,7 @@ services:
 
   # Spanish Language Aura-2
   api-es:
-    image: quay.io/deepgram/self-hosted-api:release-251118
+    image: quay.io/deepgram/self-hosted-api:release-251210
     restart: always
 
     # Here we expose the API port to the host machine. The container port
@@ -63,7 +63,7 @@ services:
   # The speech engine service.
   # English Language Aura-2 Driver
   engine-en:
-    image: quay.io/deepgram/self-hosted-engine:release-251118
+    image: quay.io/deepgram/self-hosted-engine:release-251210
     restart: always
 
     # Utilize a GPU, if available.
@@ -99,7 +99,7 @@ services:
 
   # Spanish Language Aura-2 Driver
   engine-es:
-    image: quay.io/deepgram/self-hosted-engine:release-251118
+    image: quay.io/deepgram/self-hosted-engine:release-251210
     restart: always
 
     # Utilize a GPU, if available.
@@ -135,7 +135,7 @@ services:
 
   # The service to validate your Deepgram license
   license-proxy:
-    image: quay.io/deepgram/self-hosted-license-proxy:release-251118
+    image: quay.io/deepgram/self-hosted-license-proxy:release-251210
     restart: always
 
     # Here we expose the License Proxy status port to the host machine. The container port
