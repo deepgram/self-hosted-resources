@@ -15,7 +15,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated default container tags to December 2025 release (`release-251210`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-december-2025-release-251210) for additional details.
-- Improved entity formatting for URLs and numeric entities.
 
 ## [0.24.0] - 2025-11-18
 
