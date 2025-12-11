@@ -11,7 +11,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added an optional `engine.lifecycle.postStart.command` hook to run custom commands after Engine container startup.
-- Added support for multilingual keyterm prompting for Nova-3 Multi model.
 
 ### Changed
 
