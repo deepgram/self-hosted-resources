@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `engine.flux.max_streams` configuration to override the maximum number of concurrent Flux streams per Engine pod
+
 ## [0.22.0] - 2025-10-15
 
 ### Added
