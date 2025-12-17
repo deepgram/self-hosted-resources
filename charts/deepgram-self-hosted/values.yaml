@@ -237,7 +237,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-251015
+    tag: release-251210
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -443,7 +443,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-251015
+    tag: release-251210
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -547,6 +547,14 @@ engine:
 
   # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers.
   containerSecurityContext: {}
+
+  # -- Configuration for container lifecycle hooks
+  # @default -- ``
+  lifecycle:
+    postStart:
+      # -- (list) Command to execute in a postStart hook. Leave empty to disable.
+      # Example: ["/sbin/ldconfig"]
+      command: []
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
@@ -668,6 +676,8 @@ engine:
     # -- Enables format entity tags on streaming audio
     # *if* a valid NER model is available.
     streamingNer: true
+    # -- Enables use of 36-language detection model.
+    useV2LanguageDetection: false
 
   flux:
     # -- Enables Flux turn-based streaming STT
@@ -737,7 +747,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-251015
+    tag: release-251210
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent

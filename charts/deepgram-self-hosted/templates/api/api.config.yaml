@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.api.namePrefix }}-config
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    {{- range $key, $val := .Values.engine.additionalLabels }}
+    {{- range $key, $val := .Values.api.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
 data:
@@ -106,7 +106,7 @@ data:
       name = {{ $config.name | quote }}
       [voice_agent.llm_providers.{{ $provider }}.models]
       {{- range $modelId, $model := $config.models }}
-        {{ $modelId }} = { name = {{ $model.name | quote }}, tier = {{ $model.tier | quote }}, public = {{ $model.public }} }
+        {{ $modelId | quote }} = { name = {{ $model.name | quote }}, tier = {{ $model.tier | quote }}, public = {{ $model.public }} }
       {{- end }}
     {{- end }}
     {{- end }}

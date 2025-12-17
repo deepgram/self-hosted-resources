@@ -16,7 +16,7 @@ metadata:
   {{- end }}
 spec:
   selector:
-    app: deepgram-license-proxy
+    app: {{ .Values.licenseProxy.namePrefix }}
     {{ include "deepgram-self-hosted.selectorLabels" . }}
   type: {{ .Values.licenseProxy.service.type | default "ClusterIP" }}
   {{- if and (eq .Values.licenseProxy.service.type "LoadBalancer") .Values.licenseProxy.service.loadBalancerSourceRanges }}
@@ -46,7 +46,7 @@ metadata:
     {{- end}}
 spec:
   selector:
-    app: deepgram-license-proxy
+    app: {{ .Values.licenseProxy.namePrefix }}
     {{ include "deepgram-self-hosted.selectorLabels" . }}
   type: ClusterIP
   ports:

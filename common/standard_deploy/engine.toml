@@ -52,6 +52,8 @@ multichannel = true # or false
 language_detection = true # or false
 ### Enables streaming entity formatting *if* a valid NER model is available
 streaming_ner = true # or false
+### Enables use of 36-language detection model
+use_v2_language_detection = false
 
 ### Enable Flux turn-based streaming STT
 [flux]
