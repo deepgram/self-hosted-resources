@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
+          token: "${{ secrets.DGPAT }}"
 
       # `chart-releaser-action` only performs a `git diff` on Chart files. If we have a workflow where we want to
       # merge something without bumping the Chart version yet to create a release, the chart-releaser-action will
@@ -63,7 +63,7 @@ jobs:
         if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
         uses: azure/setup-helm@v4
         env:
-          GITHUB_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
+          GITHUB_TOKEN: "${{ secrets.DGPAT }}"
 
       - name: Add Helm chart repositories for chart dependencies
         if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
@@ -77,4 +77,4 @@ jobs:
         if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
         uses: helm/chart-releaser-action@v1.6.0
         env:
-          CR_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
+          CR_TOKEN: "${{ secrets.DGPAT }}"
