@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.26.0] - 2025-12-29
+
+### Changed
+
+- Updated default container tags to December 2025 release (`release-251229`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-december-2025-release-251229) for additional details.
+
 ## [0.25.0] - 2025-12-10
 
 ### Added

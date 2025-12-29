@@ -22,7 +22,7 @@ scaling:
 # API configuration for English Aura-2
 api:
   image:
-    tag: release-251210
+    tag: release-251229
   
   # Enable Aura-2 specific features
   features:
@@ -38,7 +38,7 @@ api:
 # Engine configuration for Aura-2
 engine:
   image:
-    tag: release-251210
+    tag: release-251229
   
   # Aura-2 requires more resources than standard models
   resources:
@@ -89,7 +89,7 @@ licenseProxy:
   keepUpstreamServerAsBackup: true
   
   image:
-    tag: release-251210
+    tag: release-251229
 
 # Monitoring configuration for Aura-2
 # Enable Prometheus stack for metrics collection
