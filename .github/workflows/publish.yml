@@ -86,4 +86,4 @@ jobs:
         if: steps.check-chart-version.outputs.SHOULD_RELEASE_CHART == 'true'
         uses: helm/chart-releaser-action@v1.6.0
         env:
-          CR_TOKEN: "${{ github.token }}"
+          CR_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
