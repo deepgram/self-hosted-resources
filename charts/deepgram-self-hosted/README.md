@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.25.0](https://img.shields.io/badge/Version-0.25.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-251210](https://img.shields.io/badge/AppVersion-release--251210-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.26.0](https://img.shields.io/badge/Version-0.26.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-251229](https://img.shields.io/badge/AppVersion-release--251229-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -272,7 +272,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-251210"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-251229"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
@@ -327,7 +327,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-251210"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-251229"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -395,7 +395,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.enabled | bool | `false` | The License Proxy is optional, but highly recommended to be deployed in production to enable highly available environments. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-251210"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-251229"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |

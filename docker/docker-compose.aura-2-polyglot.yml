@@ -35,8 +35,8 @@ services:
     depends_on:
       - license-proxy
 
-  # Spanish Language Aura-2
-  api-es:
+  # Polyglot Aura-2 (Dutch, German, French, Italian, Japanese)
+  api-polyglot:
     image: quay.io/deepgram/self-hosted-api:release-251229
     restart: always
 
@@ -53,7 +53,7 @@ services:
     # The path on the right of the colon ':' is an in-container path. It must match the path
     #     specified in the `command` header below.
     volumes:
-      - "./api.aura-2-es.toml:/api.toml:ro,Z"
+      - "./api.aura-2-polyglot.toml:/api.toml:ro,Z"
 
     # Invoke the API server
     command: -v serve /api.toml
@@ -96,8 +96,8 @@ services:
     depends_on:
       - license-proxy
 
-  # Spanish Language Aura-2 Driver
-  engine-es:
+  # Polyglot (Dutch, German, French, Italian, Japanese) Aura-2 Driver
+  engine-polyglot:
     image: quay.io/deepgram/self-hosted-engine:release-251229
     restart: always
 
@@ -110,8 +110,8 @@ services:
     environment:
       <<: *env
       IMPELLER_AURA2_MAX_BATCH_SIZE: 8
-      IMPELLER_AURA2_T2C_UUID: "5d53d105-c6a4-47f5-b670-61adb6e8a880"
-      IMPELLER_AURA2_C2A_UUID: "4d5c93ad-9e20-4ebf-a1f0-0fb88ac73ef5"
+      IMPELLER_AURA2_T2C_UUID: "04975889-c601-4f80-a02f-0f2f9c22deaf"
+      IMPELLER_AURA2_C2A_UUID: "9e94567e-11e7-4619-adbc-d28212194367"
       CUDA_VISIBLE_DEVICES: 2,3
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
@@ -120,7 +120,7 @@ services:
       # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
       - "/path/to/models:/models:ro,Z"
       # In-container config path below must match the path specified in the `command` header below.
-      - "./engine.aura-2-es.toml:/engine.toml:ro,Z"
+      - "./engine.aura-2-polyglot.toml:/engine.toml:ro,Z"
 
     # Invoke the Engine service
     command: -v serve /engine.toml
