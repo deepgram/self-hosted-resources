@@ -387,7 +387,7 @@ api:
     # -- Enables format entity tags on pre-recorded audio
     # *if* a valid NER model is available.
     formatEntityTags: true
-    
+
     # -- Enables usage metadata redaction; set to false to disable redaction of usage metadata
     redactUsage: true
 
@@ -712,6 +712,12 @@ engine:
     # them. You can explicitly enable or disable this behavior with the state parameter
     # which supports `"enable"`, `"disabled"`, and `"auto"`.
     state: "auto"
+
+  health:
+    # -- Engine will automatically fall back to CPU when a GPU is not detected. You can
+    # explicitly require a GPU by setting this option to true, production deployments
+    # must use a GPU for acceptable performance.
+    gpuRequired: false
 
 # -- Configuration options for the optional
 # [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy).
@@ -1038,7 +1044,7 @@ prometheus-adapter:
 aura2:
   # -- Enable Aura-2 features and configuration
   enabled: false
-  
+
   # -- English language configuration for Aura-2
   # @default -- ``
   english:
@@ -1047,7 +1053,7 @@ aura2:
     t2cUuid: ""
     c2aUuid: ""
     cudaVisibleDevices: "0,1"
-    
+
   # -- Spanish language configuration for Aura-2
   # @default -- ``
   spanish:

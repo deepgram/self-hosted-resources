@@ -71,6 +71,9 @@ data:
     [half_precision]
       state = "{{ .Values.engine.halfPrecision.state }}"
 
+    [health]
+      gpu_required = {{ .Values.engine.health.gpuRequired }}
+
     {{- if .Values.engine.customToml }}
     {{ .Values.engine.customToml | nindent 4 }}
     {{- end }}
