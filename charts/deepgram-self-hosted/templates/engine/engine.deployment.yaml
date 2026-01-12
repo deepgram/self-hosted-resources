@@ -12,7 +12,7 @@ metadata:
   name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" $ | indent 4}}
-    app: deepgram-engine
+    app: {{ $.Values.engine.namePrefix }}
     {{- if $type }}
     engine-type: {{ $type }}
     {{- end }}
@@ -26,7 +26,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: deepgram-engine
+      app: {{ $.Values.engine.namePrefix }}
       {{- if $type }}
       engine-type: {{ $type }}
       {{- end }}
@@ -100,6 +100,12 @@ spec:
         {{- end }}
         image: {{ $.Values.engine.image.path }}:{{ $.Values.engine.image.tag }}
         imagePullPolicy: {{ $.Values.engine.image.pullPolicy }}
+        {{- if gt (len $.Values.engine.lifecycle.postStart.command) 0 }}
+        lifecycle:
+          postStart:
+            exec:
+              command: {{ toJson $.Values.engine.lifecycle.postStart.command }}
+        {{- end }}
         envFrom:
         {{- if not $.Values.billing.enabled }}
         - secretRef:

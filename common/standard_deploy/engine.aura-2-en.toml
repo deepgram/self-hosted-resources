@@ -75,6 +75,10 @@ enabled = false # or true
 ### representative for more details.
 # step = 1.0
 
+### Models may be pre-loaded in GPU memory to reduce request latency after startup.
+### https://support.deepgram.com/en-US/deepgram/article/ART-528-how-can-i-preload-models-to-reduce-cold-start-latency
+[preload_models]
+blocking = false
 
 ### Engine will automatically enable half precision operations if your GPU supports
 ### them. You can explicitly enable or disable this behavior with the state parameter

@@ -252,7 +252,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-251118
+    tag: release-251229
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -402,7 +402,7 @@ api:
     # -- Enables format entity tags on pre-recorded audio
     # *if* a valid NER model is available.
     formatEntityTags: true
-    
+
     # -- Enables usage metadata redaction; set to false to disable redaction of usage metadata
     redactUsage: true
 
@@ -458,7 +458,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-251118
+    tag: release-251229
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -562,6 +562,14 @@ engine:
 
   # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers.
   containerSecurityContext: {}
+
+  # -- Configuration for container lifecycle hooks
+  # @default -- ``
+  lifecycle:
+    postStart:
+      # -- (list) Command to execute in a postStart hook. Leave empty to disable.
+      # Example: ["/sbin/ldconfig"]
+      command: []
 
   serviceAccount:
     # -- Specifies whether to create a default service account for the Deepgram Engine Deployment.
@@ -720,6 +728,12 @@ engine:
     # which supports `"enable"`, `"disabled"`, and `"auto"`.
     state: "auto"
 
+  health:
+    # -- Engine will automatically fall back to CPU when a GPU is not detected. You can
+    # explicitly require a GPU by setting this option to true, production deployments
+    # must use a GPU for acceptable performance.
+    gpuRequired: false
+
 # -- Configuration options for the optional
 # [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy).
 # @default -- ``
@@ -760,7 +774,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-251118
+    tag: release-251229
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -1190,7 +1204,7 @@ prometheus-adapter:
 aura2:
   # -- Enable Aura-2 features and configuration
   enabled: false
-  
+
   # -- English language configuration for Aura-2
   # @default -- ``
   english:
@@ -1199,7 +1213,7 @@ aura2:
     t2cUuid: ""
     c2aUuid: ""
     cudaVisibleDevices: "0,1"
-    
+
   # -- Spanish language configuration for Aura-2
   # @default -- ``
   spanish:
