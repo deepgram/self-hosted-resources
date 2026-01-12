@@ -115,6 +115,15 @@ spec:
           value: "{{ $.Values.aura2.spanish.c2aUuid }}"
         - name: CUDA_VISIBLE_DEVICES
           value: "{{ $.Values.aura2.spanish.cudaVisibleDevices }}"
+        {{- else if $.Values.aura2.polyglot.enabled }}
+        - name: IMPELLER_AURA2_MAX_BATCH_SIZE
+          value: "{{ $.Values.aura2.polyglot.maxBatchSize }}"
+        - name: IMPELLER_AURA2_T2C_UUID
+          value: "{{ $.Values.aura2.polyglot.t2cUuid }}"
+        - name: IMPELLER_AURA2_C2A_UUID
+          value: "{{ $.Values.aura2.polyglot.c2aUuid }}"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "{{ $.Values.aura2.polyglot.cudaVisibleDevices }}"
         {{- end }}
         {{- end }}
         command: [ "impeller" ]
