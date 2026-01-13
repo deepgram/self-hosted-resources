@@ -303,6 +303,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | aura2 | object | `` | Aura-2 specific configuration options |
 | aura2.enabled | bool | `false` | Enable Aura-2 features and configuration |
 | aura2.english | object | `` | English language configuration for Aura-2 |
+| aura2.polyglot | object | `` | Polyglot language configuration for Aura-2 (Dutch, German, French, Italian, Japanese) |
 | aura2.spanish | object | `` | Spanish language configuration for Aura-2 |
 | cluster-autoscaler.autoDiscovery.clusterName | string | `nil` | Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
 | cluster-autoscaler.awsRegion | string | `nil` | Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
@@ -325,7 +326,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.features.useV2LanguageDetection | bool | `false` | Enables use of 36-language detection model. |
 | engine.flux.enabled | bool | `false` | Enables Flux turn-based streaming STT |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
-| engine.health.gpuRequired | bool | `false` | Engine will automatically fallback to CPU if a GPU is not detected. You can explicity require a GPU by setting this to `true`. |
+| engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
 | engine.image.tag | string | `"release-251229"` | tag defines which Deepgram release to use for Engine containers |
