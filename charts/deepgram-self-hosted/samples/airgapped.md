@@ -24,6 +24,29 @@ Obtain from Deepgram:
 - License file (`.dg`)
 - Registry access for `quay.io/deepgram/*` (including for Billing container)
 
+## Storage Options
+
+Choose your journal storage backend based on your requirements:
+
+| Storage Type | Access Mode | Journal Retrieval | HA Support | AWS Example | GCP Example |
+|--------------|-------------|-------------------|------------|-------------|-------------|
+| Block Storage (EBS/PD) | ReadWriteOnce (RWO) | Requires downtime (~30-60s) | No | gp2, gp3 | pd-standard, pd-ssd |
+| Shared Storage (EFS/Filestore) | ReadWriteMany (RWX) | Zero downtime | Yes | efs-sc | Filestore |
+
+### When to Use EBS/Block Storage
+- Default, simpler setup (auto-provisioned)
+- Single billing replica
+- Infrequent journal retrieval (weekly, monthly, or less)
+- Scheduled maintenance windows acceptable
+
+### When to Use EFS/Shared Storage
+- Zero-downtime journal retrieval required
+- High availability (multiple billing replicas needed)
+- Frequent journal retrieval (daily automated backups)
+- Production environments with strict SLAs
+
+Default: The sample configurations use EBS for simplicity. For production with strict uptime requirements, use EFS.
+
 ## Example Configurations
 
 <details>
@@ -137,6 +160,13 @@ kubectl get pods -n dg-self-hosted
 
 ## Manual Journal Retrieval
 
+**Important for EBS/gp2 Users**: If using the default EBS storage (ReadWriteOnce), manual retrieval requires **briefly scaling down the billing container** (30-60 seconds of downtime). Consider:
+- Using EFS (ReadWriteMany) for zero-downtime retrieval
+- Scheduling retrievals during maintenance windows
+- Using the automated CronJob approach with scheduled downtime
+
+For EFS users, the debug pod can run alongside the billing container with no downtime.
+
 This method uses a temporary debug pod to access the journal file.
 
 ### 1. Find Your Billing Pod Name
@@ -185,14 +215,27 @@ spec:
 
 **Important:** Replace `claimName` with your journal PVC name from step 2.
 
-### 4. Deploy the Debug Pod
+### 4. Scale Down Billing (EBS/RWO only)
+
+Skip this step if using EFS/shared storage.
+
+For EBS users, temporarily scale down billing to free the volume:
+
+```bash
+kubectl scale statefulset deepgram-billing -n dg-self-hosted --replicas=0
+
+# Wait for billing pod to terminate (this takes 30-60 seconds).
+kubectl wait --for=delete pod/deepgram-billing-0 -n dg-self-hosted --timeout=60s
+```
+
+### 5. Deploy the Debug Pod
 
 ```bash
 kubectl apply -f journal-debug-pod.yaml
 kubectl wait --for=condition=ready pod/billing-journal-debug -n dg-self-hosted --timeout=60s
 ```
 
-### 5. Verify Journal File Exists
+### 6. Verify Journal File Exists
 
 ```bash
 kubectl exec -n dg-self-hosted billing-journal-debug -- ls -lh /mnt/
@@ -204,7 +247,7 @@ You should see output similar to:
 -rw-r--r--    1 root     root        12.3K Nov 20 01:23 journal
 ```
 
-### 6. Download the Journal File
+### 7. Download the Journal File
 
 ```bash
 kubectl cp dg-self-hosted/billing-journal-debug:/mnt/journal ./billing-journal-$(date +%Y%m%d).backup
@@ -212,7 +255,7 @@ kubectl cp dg-self-hosted/billing-journal-debug:/mnt/journal ./billing-journal-$
 
 You’ll now have e.g. `billing-journal-20251120.backup` in your current directory.
 
-### 7. Verify Download
+### 8. Verify Download
 
 ```bash
 ls -lh billing-journal-*.backup
@@ -220,13 +263,23 @@ ls -lh billing-journal-*.backup
 
 The file should have non-zero size.
 
-### 8. Clean Up Debug Pod
+### 9. Clean Up Debug Pod
 
 ```bash
 kubectl delete pod billing-journal-debug -n dg-self-hosted
 ```
 
-### 9. Send to Deepgram
+### 10. Restore Billing (EBS/RWO only)
+
+Skip this step if using EFS/shared storage.
+
+Scale billing back up:
+
+```bash
+kubectl scale statefulset deepgram-billing -n dg-self-hosted --replicas=1
+```
+
+### 11. Send to Deepgram
 
 Send the journal backup to Deepgram by email in an attachment or a cloud storage download link.
 
@@ -247,6 +300,11 @@ Before setting up automated backups, verify:
 ## Automated Backup (Recommended for Production)
 
 Use a Kubernetes `CronJob` to automate regular journal backups.
+
+**Important for EBS Users**: With EBS storage, only one pod can access the journal volume at a time. This means the CronJob cannot run while the billing container is running. To use automated backups with EBS:
+- Schedule the CronJob during maintenance windows when billing is scaled down
+- Modify the Job script to scale down billing before backup and scale it back up after
+- Or switch to EFS for zero-downtime backups
 
 Note for fully airgapped environments: Replace the `aws s3 cp` command below with your local storage solution (mount to NFS, copy to local PV, etc.).
 
@@ -379,7 +437,7 @@ This copies all files and subdirectories.
 ## Troubleshooting
 
 - `kubectl cp` fails with `"tar: command not found"`:<br>
-  Use `alpine:latest` for the debug pod (it includes `tar`).
+  Use `ubuntu:22.04` for the debug pod (it includes `tar`).
 - Journal file is empty (`0` bytes):<br>
   The billing container may not be running yet. If the journal file only contains a single initialization line, it's likely that no billing activity has started and the container isn't up. Check the status:
   ```kubectl get pods -n dg-self-hosted -l app=deepgram-billing```
