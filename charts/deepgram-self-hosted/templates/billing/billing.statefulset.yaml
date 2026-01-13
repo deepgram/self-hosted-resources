@@ -24,7 +24,7 @@ spec:
   updateStrategy:
     type: RollingUpdate
     rollingUpdate:
-      maxUnavailable: 0
+      maxUnavailable: {{ .Values.billing.updateStrategy.rollingUpdate.maxUnavailable }}
   template:
     metadata:
       labels: *labels
