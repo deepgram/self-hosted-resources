@@ -312,7 +312,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.enabled | bool | `false` | Enable the Billing container for airgapped deployments. When enabled, API and Engine will connect to the billing container instead of license.deepgram.com or license-proxy. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-251029"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-251229"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. |
 | billing.journal.existingPvcName | string | `""` | Name of an existing PVC to use for journal storage (e.g., EFS-backed shared volume). When set, each Billing pod writes to its own subdirectory: journal-<pod-name>/ Leave empty to auto-provision per-pod EBS volumes via volumeClaimTemplates (default). |
 | billing.journal.size | string | `"1Gi"` | Size of the journal volume. Only used if existingPvcName is empty. |
@@ -415,7 +415,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | global.initContainer.image.registry | string | `"docker.io"` |  |
 | global.initContainer.image.repository | string | `"ubuntu"` |  |
 | global.initContainer.image.tag | string | `"22.04"` |  |
-| global.initContainer.pullSecretRef | string | `""` |  |
+| global.initContainer.pullSecretRef | string | `""` | Optional: Override imagePullSecrets for init container Leave empty to default to global.pullSecretRef |
 | global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. 1800 / 60 sec/min = 30 mins |
 | global.pullSecretRef | string | `nil` | If using images from the Deepgram Quay image repositories, or another private registry to which your cluster doesn't have default access, you will need to provide a pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs. |

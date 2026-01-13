@@ -21,8 +21,9 @@ global:
       repository: ubuntu
       tag: "22.04"
       pullPolicy: IfNotPresent
-    # Optional: Override imagePullSecrets for init container (defaults to global.pullSecretRef)
-    pullSecretRef: ""  # Leave empty to use global.pullSecretRef
+    # -- (string) Optional: Override imagePullSecrets for init container.
+    # Leave empty to default to global.pullSecretRef
+    pullSecretRef: ""
 
   # -- Additional labels to add to all Deepgram resources
   additionalLabels: {}
