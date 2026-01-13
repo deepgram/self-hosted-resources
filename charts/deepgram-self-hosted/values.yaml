@@ -912,7 +912,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-251029
+    tag: release-251229
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent
