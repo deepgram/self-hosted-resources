@@ -49,8 +49,7 @@ Default: The sample configurations use EBS for simplicity. For production with s
 
 ## Example Configurations
 
-<details>
-<summary>Minimal Airgapped Setup</summary>
+#### Minimal Airgapped Setup
 
 ```yaml
 global:
@@ -68,10 +67,8 @@ billing:
 licenseProxy:
   enabled: false
 ```
-</details>
 
-<details>
-<summary>With License Proxy</summary>
+#### With License Proxy
 
 ```yaml
 billing:
@@ -81,10 +78,8 @@ licenseProxy:
   upstream:
     useBilling: true
 ```
-</details>
 
-<details>
-<summary>High Availability with EFS</summary>
+#### High Availability with EFS
 
 ```yaml
 billing:
@@ -92,10 +87,8 @@ billing:
   journal:
     existingPvcName: my-efs-pvc # shared EFS pvc
 ```
-</details>
 
-<details>
-<summary>Custom Init Container (private registry)</summary>
+#### Custom Init Container (private registry)
 
 ```yaml
 global:
@@ -106,7 +99,6 @@ global:
       tag: 22.04
     pullSecretRef: dg-regcred
 ```
-</details>
 
 ---
 
@@ -436,15 +428,15 @@ This copies all files and subdirectories.
 
 ## Troubleshooting
 
-- `kubectl cp` fails with `"tar: command not found"`:<br>
+- `kubectl cp` fails with `"tar: command not found"`:
   Use `ubuntu:22.04` for the debug pod (it includes `tar`).
-- Journal file is empty (`0` bytes):<br>
+- Journal file is empty (`0` bytes):
   The billing container may not be running yet. If the journal file only contains a single initialization line, it's likely that no billing activity has started and the container isn't up. Check the status:
   ```kubectl get pods -n dg-self-hosted -l app=deepgram-billing```
-- `CronJob` never runs:<br>
+- `CronJob` never runs:
   Check status:
   ```kubectl describe cronjob billing-journal-backup -n dg-self-hosted```
-- `"Permission denied"` accessing journal:<br>
+- `"Permission denied"` accessing journal:
   The debug pod defaults to `root` — shouldn't occur, but check pod spec/image.
 
 ---
