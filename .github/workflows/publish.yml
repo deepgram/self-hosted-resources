@@ -85,5 +85,7 @@ jobs:
       - name: Run chart-releaser
         if: steps.check-chart-version.outputs.SHOULD_RELEASE_CHART == 'true'
         uses: helm/chart-releaser-action@v1.6.0
+        with:
+          pages_branch: gh-pages-test
         env:
           CR_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
