@@ -88,4 +88,4 @@ jobs:
         with:
           pages_branch: gh-pages-test
         env:
-          CR_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW_CLASSIC }}"
+          CR_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
