@@ -55,12 +55,12 @@ spec:
         - name: configmap-volume
           configMap:
             name: {{ .Values.licenseProxy.namePrefix }}-config
-        {{- if .Values.licenseProxy.upstream.useBilling }}
+        {{- if .Values.billing.enabled }}
         - name: working-config
           emptyDir: {}
         {{- end }}
 
-      {{- if .Values.licenseProxy.upstream.useBilling }}
+      {{- if .Values.billing.enabled }}
       initContainers:
         - name: config-render
           image: {{ .Values.global.initContainer.image.registry }}/{{ .Values.global.initContainer.image.repository }}:{{ .Values.global.initContainer.image.tag }}
@@ -88,7 +88,7 @@ spec:
         image: {{ .Values.licenseProxy.image.path }}:{{ .Values.licenseProxy.image.tag }}
         imagePullPolicy: {{ .Values.licenseProxy.image.pullPolicy }}
         envFrom:
-        {{- if not .Values.licenseProxy.upstream.useBilling }}
+        {{- if not .Values.billing.enabled }}
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
         {{- else }}
@@ -96,7 +96,7 @@ spec:
             name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
         {{- end }}
         env:
-        {{- if .Values.licenseProxy.upstream.useBilling }}
+        {{- if .Values.billing.enabled }}
         # License Proxy container requires DEEPGRAM_API_KEY env var, but it's not used for airgapped
         - name: DEEPGRAM_API_KEY
           value: "airgapped-mode"
@@ -113,7 +113,7 @@ spec:
             memory: "{{ .Values.licenseProxy.resources.limits.memory }}"
             cpu: "{{ .Values.licenseProxy.resources.limits.cpu }}"
         volumeMounts:
-        - name: "{{ if .Values.licenseProxy.upstream.useBilling }}working-config{{ else }}configmap-volume{{ end }}"
+        - name: "{{ if .Values.billing.enabled }}working-config{{ else }}configmap-volume{{ end }}"
           mountPath: /etc/config
         ports:
         - name: primary

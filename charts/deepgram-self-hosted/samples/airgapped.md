@@ -75,8 +75,6 @@ billing:
   enabled: true
 licenseProxy:
   enabled: true
-  upstream:
-    useBilling: true
 ```
 
 #### High Availability with EFS

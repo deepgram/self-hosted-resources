@@ -756,15 +756,6 @@ licenseProxy:
   # and only the License Proxy should send egress traffic to the upstream license server.
   keepUpstreamServerAsBackup: true
 
-  # -- Configuration for license-proxy to use billing container as upstream
-  # in airgapped deployments. Only applies when both licenseProxy.enabled
-  # and billing.enabled are true.
-  # @default -- ``
-  upstream:
-    # -- Set to true to configure license-proxy to use the billing container
-    # as its upstream server instead of license.deepgram.com.
-    useBilling: false
-
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram License Proxy containers.
   namePrefix: "deepgram-license-proxy"

@@ -6,7 +6,7 @@
 # ARCHITECTURE:
 #   API → Billing (license validation)
 #   Engine → Billing
-#   License Proxy → disabled (optional: enable and set licenseProxy.upstream.useBilling=true)
+#   License Proxy → disabled (optional: enable to add trust-caching layer)
 #
 # PREREQUISITES:
 #
@@ -214,8 +214,6 @@ billing:
 
 licenseProxy:
   enabled: true
-  upstream:
-    useBilling: true
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:

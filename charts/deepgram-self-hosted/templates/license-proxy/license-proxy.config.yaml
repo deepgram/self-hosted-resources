@@ -10,7 +10,7 @@ metadata:
     {{- end}}
 data:
   license-proxy.toml: |
-    {{- if .Values.licenseProxy.upstream.useBilling }}
+    {{- if .Values.billing.enabled }}
     [license]
       server_url = "https://{{ .Values.billing.namePrefix }}-internal:{{ .Values.billing.server.port}}"
       key = "${DEEPGRAM_LICENSE_KEY}"
