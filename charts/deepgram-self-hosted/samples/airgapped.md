@@ -102,45 +102,13 @@ global:
 
 ---
 
-## Quick Start
+## Getting Started
 
-### 1. Create Namespace & Secrets
-
-```bash
-kubectl create namespace dg-self-hosted
-
-kubectl create secret docker-registry dg-regcred \
-  --docker-server=quay.io \
-  --docker-username='YOUR_USERNAME' \
-  --docker-password='YOUR_PASSWORD' \
-  -n dg-self-hosted
-
-kubectl create secret generic dg-license-key \
-  --from-literal=DEEPGRAM_LICENSE_KEY='your-key-here' \
-  -n dg-self-hosted
-
-kubectl create secret generic dg-license-file \
-  --from-file=license.dg=/path/to/your/license.dg \
-  -n dg-self-hosted
-```
-
-### 2. Deploy
-
-```bash
-helm install deepgram-self-hosted ./charts/deepgram-self-hosted \
-  -f samples/06-basic-setup-aws-airgapped.values.yaml \
-  -n dg-self-hosted \
-  --timeout 1h
-```
-
-### 3. Verify
-
-```bash
-kubectl get pods -n dg-self-hosted
-# deepgram-api-xxxxx       1/1  Running
-# deepgram-billing-0       1/1  Running
-# deepgram-engine-xxxxx    1/1  Running
-```
+See the [Deepgram Kubernetes docs](https://developers.deepgram.com/docs/kubernetes)
+for step-by-step instructions on deploying Deepgram to
+[Amazon Elastic Kubernetes Service (EKS)](https://developers.deepgram.com/docs/aws-k8s),
+[Google Kubernetes Engine (GKE)](https://developers.deepgram.com/docs/gcp-k8s), or
+[self-managed Kubernetes](https://developers.deepgram.com/docs/self-managed-kubernetes).
 
 ---
 
