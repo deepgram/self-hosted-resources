@@ -10,11 +10,11 @@ global:
   deepgramSecretRef:
 
   # -- (string) Name of the pre-configured K8s Secret containing your Deepgram
-  # license key for airgapped deployments with billing container.
+  # license key for airgapped deployments with Billing container.
   # Only required when billing.enabled is true.
   deepgramLicenseSecretRef:
 
-  # Init container configuration for config rendering (used when billing is enabled)
+  # Init container configuration for config rendering (used when Billing is enabled)
   initContainer:
     image:
       registry: docker.io
@@ -886,11 +886,11 @@ licenseProxy:
 # @default -- ``
 billing:
   # -- Enable the Billing container for airgapped deployments.
-  # When enabled, API and Engine will connect to the billing container instead of
-  # license.deepgram.com or license-proxy.
+  # When enabled, API and Engine will connect to the Billing container instead of
+  # license.deepgram.com.
   enabled: false
 
-  # -- Number of billing replicas. Default is 1 (singleton).
+  # -- Number of Billing replicas. Default is 1 (singleton).
   # Can be increased for high availability. Each replica maintains its own journal file.
   replicas: 1
 
@@ -928,6 +928,7 @@ billing:
   # -- Configuration for the usage journal volume.
   # The journal tracks usage for billing purposes and must be persisted.
   # WARNING: Do not delete or lose this volume as it contains critical billing data.
+  # Failure to persist and return journal files may result in suspension of service.
   # @default -- ``
   journal:
     # -- (string) Name of an existing PVC to use for journal storage (e.g., EFS-backed shared volume).
@@ -942,11 +943,11 @@ billing:
     size: "1Gi"
 
   updateStrategy:
-    # -- For StatefulSets, we use maxUnavailable: 0 to ensure at least one billing pod
-    # is always available during updates.
+    # -- Update strategy for the Billing StatefulSet.
+    # StatefulSets update pods one at a time in reverse ordinal order (e.g. billing-2, billing-1, billing-0).
     # @default -- ``
     rollingUpdate:
-      # -- The maximum number of extra Billing pods that can be created during a rollingUpdate.
+      # -- Maximum number of Billing pods that can be unavailable during updates.
       maxUnavailable: 0
 
   # -- Configure resource limits per Billing container.
@@ -1002,7 +1003,7 @@ billing:
     # you wish to attach to the Billing deployment.
     name:
 
-  # -- Configure how the billing container will listen for licensing requests.
+  # -- Configure how the Billing container will listen for licensing requests.
   # @default -- ``
   server:
     # -- host is the IP address to listen on. You will want to listen
