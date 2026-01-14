@@ -10,7 +10,6 @@ This directory contains examples of how to use the Deepgram Helm chart in variou
 - **04-aura-2-setup.yaml** - Aura-2 model deployment with English and Spanish language support
 - **05-voice-agent-aws.values.yaml** - AWS EKS Voice Agent deployment configuration
 - **06-basic-setup-aws-airgapped.values.yaml** - AWS EKS airgapped deployment ([see airgapped.md](./airgapped.md) for full guide)
-- **06-basic-setup-aws-airgapped.cluster-config.yaml** - Cluster configuration for airgapped deployments
 
 ## AWS EKS Samples
 See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in AWS.
