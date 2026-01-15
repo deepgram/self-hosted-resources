@@ -22,7 +22,7 @@ For deploying Aura-2 models, use the `04-aura-2-setup.values.yaml` sample config
 
 - Aura-2 specific environment variables and UUIDs
 - Multi-language support (separate engine instances for each language)
-- GPU resource allocation (English on GPUs 0,1 and Spanish/Polyglot on GPUs 2,3)
+- GPU resource allocation (English on GPUs 0,1 and either Spanish or Polyglot on GPUs 2,3)
 - Model management configuration
 - License proxy setup for production deployments
 
