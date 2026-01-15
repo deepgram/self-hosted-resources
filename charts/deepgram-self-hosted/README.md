@@ -56,6 +56,15 @@ To upgrade the Deepgram components to a new version, follow these steps:
     helm upgrade -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 60m
     ```
 
+> [!IMPORTANT]
+> **January 2026 Release (release-260115) - Breaking Change for TTS Deployments**
+>
+> The January 2026 self-hosted release includes changes to improve TTS response times. This release is **not backwards-compatible** with previous releases when serving TTS traffic due to changes in how API and Engine containers communicate.
+>
+> To avoid downtime, the updated Engine container (3.107.0-1) **must be deployed before** the updated API container (1.176.0). The new Engine version is compatible with previous API versions, so deploy Engine first. [Blue-green deployment](https://developers.deepgram.com/docs/blue-green-deployment) is one strategy that satisfies this requirement. **This only applies to deployments serving TTS traffic**; STT-only deployments are unaffected.
+>
+> See the [January 2026 changelog](https://developers.deepgram.com/changelog/2026/1/15#deepgram-self-hosted-january-2026-release-260115) for more details.
+
 If you encounter any issues during the upgrade process, you can perform a rollback to the previous version:
 
 ```bash
