@@ -1062,3 +1062,12 @@ aura2:
     t2cUuid: ""
     c2aUuid: ""
     cudaVisibleDevices: "2,3"
+
+  # -- Polyglot language configuration for Aura-2 (Dutch, German, French, Italian, Japanese)
+  # @default -- ``
+  polyglot:
+    enabled: false
+    maxBatchSize: 8
+    t2cUuid: ""
+    c2aUuid: ""
+    cudaVisibleDevices: "2,3"
