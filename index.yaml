@@ -2,6 +2,98 @@ apiVersion: v1
 entries:
   deepgram-self-hosted:
   - apiVersion: v2
+    appVersion: release-251229
+    created: "2026-01-14T23:10:00.000000000Z"
+    dependencies:
+    - condition: gpu-operator.enabled
+      name: gpu-operator
+      repository: https://helm.ngc.nvidia.com/nvidia
+      version: ^24.3.0
+    - condition: cluster-autoscaler.enabled
+      name: cluster-autoscaler
+      repository: https://kubernetes.github.io/autoscaler
+      version: ^9.37.0
+    - condition: kube-prometheus-stack.includeDependency,scaling.auto.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: ^60.2.0
+    - condition: prometheus-adapter.includeDependency,scaling.auto.enabled
+      name: prometheus-adapter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: ^4.10.0
+    description: A Helm chart for running Deepgram services in a self-hosted environment
+    digest: 6fcab0947c16b9e3c27b850f084ae1324ce6e1f10643b3688d05e6b185799c20
+    home: https://developers.deepgram.com/docs/self-hosted-introduction
+    icon: https://www.dropbox.com/scl/fi/v4jtfbsrx881pbevcga3j/D-icon-black-square-250x250.png?rlkey=barv5jeuhd7t2lczz0m3nane7&dl=1
+    keywords:
+    - voice ai
+    - text-to-speech
+    - tts
+    - aura
+    - speech-to-text
+    - stt
+    - asr
+    - nova
+    - voice agent
+    - self-hosted
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - email: self.hosted@deepgram.com
+      name: Deepgram Self-Hosted
+    name: deepgram-self-hosted
+    sources:
+    - https://github.com/deepgram/self-hosted-resources
+    type: application
+    urls:
+    - https://github.com/deepgram/self-hosted-resources/releases/download/deepgram-self-hosted-0.26.0.tgz
+    version: 0.26.0
+  - apiVersion: v2
+    appVersion: release-251210
+    created: "2025-12-30T23:06:00.000000000Z"
+    dependencies:
+    - condition: gpu-operator.enabled
+      name: gpu-operator
+      repository: https://helm.ngc.nvidia.com/nvidia
+      version: ^24.3.0
+    - condition: cluster-autoscaler.enabled
+      name: cluster-autoscaler
+      repository: https://kubernetes.github.io/autoscaler
+      version: ^9.37.0
+    - condition: kube-prometheus-stack.includeDependency,scaling.auto.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: ^60.2.0
+    - condition: prometheus-adapter.includeDependency,scaling.auto.enabled
+      name: prometheus-adapter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: ^4.10.0
+    description: A Helm chart for running Deepgram services in a self-hosted environment
+    digest: 826bd69d13e35916c97e6abf61e215bca3b4505a12ab56f58e73e348927a5652
+    home: https://developers.deepgram.com/docs/self-hosted-introduction
+    icon: https://www.dropbox.com/scl/fi/v4jtfbsrx881pbevcga3j/D-icon-black-square-250x250.png?rlkey=barv5jeuhd7t2lczz0m3nane7&dl=1
+    keywords:
+    - voice ai
+    - text-to-speech
+    - tts
+    - aura
+    - speech-to-text
+    - stt
+    - asr
+    - nova
+    - voice agent
+    - self-hosted
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - email: self.hosted@deepgram.com
+      name: Deepgram Self-Hosted
+    name: deepgram-self-hosted
+    sources:
+    - https://github.com/deepgram/self-hosted-resources
+    type: application
+    urls:
+    - https://github.com/deepgram/self-hosted-resources/releases/download/deepgram-self-hosted-0.25.0.tgz
+    version: 0.25.0
+  - apiVersion: v2
     appVersion: release-251118
     created: "2025-11-18T17:56:21.9930254Z"
     dependencies:
@@ -1438,4 +1530,4 @@ entries:
     urls:
     - https://github.com/deepgram/self-hosted-resources/releases/download/deepgram-self-hosted-0.1.0-alpha/deepgram-self-hosted-0.1.0-alpha.tgz
     version: 0.1.0-alpha
-generated: "2025-11-18T17:56:21.993295967Z"
+generated: "2026-01-15T23:05:43.369777Z"
