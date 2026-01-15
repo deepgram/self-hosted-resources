@@ -3,7 +3,7 @@ entries:
   deepgram-self-hosted:
   - apiVersion: v2
     appVersion: release-251229
-    created: "2026-01-15T17:05:43.410358-06:00"
+    created: "2026-01-14T23:10:00.000000000Z"
     dependencies:
     - condition: gpu-operator.enabled
       name: gpu-operator
@@ -49,7 +49,7 @@ entries:
     version: 0.26.0
   - apiVersion: v2
     appVersion: release-251210
-    created: "2026-01-15T17:05:43.390765-06:00"
+    created: "2025-12-30T23:06:00.000000000Z"
     dependencies:
     - condition: gpu-operator.enabled
       name: gpu-operator
