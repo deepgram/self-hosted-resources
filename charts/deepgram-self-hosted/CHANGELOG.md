@@ -6,10 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.27.0] - 2026-01-15
+
 ### Added
 
 - Added `engine.health.gpuRequired` to indicate whether GPU availability is required to be considered healthy. Defaults to `false`.
 - Added support for Aura-2 Polyglot TTS (Dutch, German, French, Italian, Japanese)
+
+### Changed
+
+- Updated default container tags to January 2026 release (`release-260115`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-january-2026-release-260115) for additional details.
 
 ## [0.26.0] - 2025-12-29
 
