@@ -15,7 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
-- Updated default container tags to January 2026 release (`release-260115`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-january-2026-release-260115) for additional details.
+- Updated default container tags to January 2026 release (`release-260115`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-january-2026-release-260115) for additional details. The changelog describes the details of a TTS breaking change for which we recommend using a blue-green deployment strategy.
 
 ## [0.26.0] - 2025-12-29
 
