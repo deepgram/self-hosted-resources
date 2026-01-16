@@ -303,6 +303,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | aura2 | object | `` | Aura-2 specific configuration options |
 | aura2.enabled | bool | `false` | Enable Aura-2 features and configuration |
 | aura2.english | object | `` | English language configuration for Aura-2 |
+| aura2.polyglot | object | `` | Polyglot language configuration for Aura-2 (Dutch, German, French, Italian, Japanese) |
 | aura2.spanish | object | `` | Spanish language configuration for Aura-2 |
 | billing | object | `` | Configuration options for the Deepgram Billing container. The Billing container is used for airgapped deployments where API and Engine cannot reach license.deepgram.com. It validates licenses locally using a license file and maintains a usage journal.  For complete airgapped deployment instructions, see samples/airgapped.md |
 | billing.additionalAnnotations | object | `nil` | Additional annotations to add to the Billing deployment |

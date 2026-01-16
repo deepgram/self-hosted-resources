@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added `engine.health.gpuRequired` to indicate whether GPU availability is required to be considered healthy. Defaults to `false`.
+- Added support for Aura-2 Polyglot TTS (Dutch, German, French, Italian, Japanese)
 - Added Billing container support for airgapped deployments
 
 ## [0.26.0] - 2025-12-29
