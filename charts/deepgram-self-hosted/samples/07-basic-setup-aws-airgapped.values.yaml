@@ -166,8 +166,9 @@ billing:
     secretKey: "license.dg"
   
   journal:
-    size: "1Gi"
-    storageClass: gp2
+    aws:
+      efs:
+        enabled: true
 
   affinity:
     nodeAffinity:

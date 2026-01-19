@@ -321,11 +321,14 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.enabled | bool | `false` | Enable the Billing container for airgapped deployments. When enabled, API and Engine will connect to the Billing container instead of license.deepgram.com. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-251229"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
+| billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
+| billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
+| billing.journal.aws.efs.storageClassName | string | `""` | StorageClass to use for the EFS PVC. Leave empty to automatically use the StorageClass created by engine.modelManager.volumes.aws.efs. Set a custom value to use a different StorageClass. |
 | billing.journal.existingPvcName | string | `""` | Name of an existing PVC to use for journal storage (e.g., EFS-backed shared volume). When set, each Billing pod writes to its own subdirectory: journal-<pod-name>/ Leave empty to auto-provision per-pod EBS volumes via volumeClaimTemplates (default). |
-| billing.journal.size | string | `"1Gi"` | Size of the journal volume. Only used if existingPvcName is empty. |
-| billing.journal.storageClass | string | `""` | Storage class to use for the journal PVC. Only used if existingPvcName is empty. |
+| billing.journal.size | string | `"1Gi"` | Size of the journal volume. Only used if existingPvcName is empty and aws.efs.enabled is false. |
+| billing.journal.storageClass | string | `""` | Storage class to use for the journal PVC. Only used if existingPvcName is empty and aws.efs.enabled is false. |
 | billing.licenseFile | object | `` | Configuration for the Deepgram license file. The license file is a 1-line JSON file provided by Deepgram for airgapped deployments. You must create a Kubernetes Secret containing this file before installing the chart. |
 | billing.licenseFile.secretKey | string | `"license.dg"` | Key within the Secret that contains the license file content |
 | billing.licenseFile.secretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license file |

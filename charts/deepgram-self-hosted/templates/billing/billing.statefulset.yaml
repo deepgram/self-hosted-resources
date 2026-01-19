@@ -66,6 +66,10 @@ spec:
         - name: journal
           persistentVolumeClaim:
             claimName: {{ .Values.billing.journal.existingPvcName }}
+        {{- else if .Values.billing.journal.aws.efs.enabled }}
+        - name: journal
+          persistentVolumeClaim:
+            claimName: {{ .Values.billing.journal.aws.efs.existingPvcName | default (printf "%s-aws-efs-pvc" .Values.engine.modelManager.volumes.aws.efs.namePrefix) }}
         {{- end }}
 
       containers:
@@ -79,7 +83,7 @@ spec:
         env:
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
-        {{- if .Values.billing.journal.existingPvcName }}
+        {{- if or .Values.billing.journal.existingPvcName .Values.billing.journal.aws.efs.enabled }}
         - name: POD_NAME
           valueFrom:
             fieldRef:
@@ -101,7 +105,7 @@ spec:
           readOnly: true
         - name: journal
           mountPath: /journal
-          {{- if .Values.billing.journal.existingPvcName }}
+          {{- if or .Values.billing.journal.existingPvcName .Values.billing.journal.aws.efs.enabled }}
           subPathExpr: journal-$(POD_NAME)
           {{- end }}
         ports:
@@ -119,7 +123,7 @@ spec:
           initialDelaySeconds: {{ .Values.billing.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.billing.readinessProbe.periodSeconds }}
           failureThreshold: {{ .Values.billing.readinessProbe.failureThreshold }}
-{{- if not .Values.billing.journal.existingPvcName }}
+{{- if not (or .Values.billing.journal.existingPvcName .Values.billing.journal.aws.efs.enabled) }}
   volumeClaimTemplates:
   - metadata:
       name: journal
