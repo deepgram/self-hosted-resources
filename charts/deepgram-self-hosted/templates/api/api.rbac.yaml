@@ -23,7 +23,7 @@ rules:
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["services"]
-    resourceNames: ["{{ .Values.engine.namePrefix }}-internal"{{- if .Values.licenseProxy.enabled -}}, "{{ .Values.licenseProxy.namePrefix }}-internal"{{- end -}}]
+    resourceNames: ["{{ .Values.engine.namePrefix }}-internal"{{- if .Values.billing.enabled -}}, "{{ .Values.billing.namePrefix }}-internal"{{- end -}}{{- if .Values.licenseProxy.enabled -}}, "{{ .Values.licenseProxy.namePrefix }}-internal"{{- end -}}]
     verbs: ["get"]
 ---
 apiVersion: rbac.authorization.k8s.io/v1

@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.27.1] - 2026-01-21
+
+### Added
+
+- Added Billing container support for airgapped deployments
+
 ## [0.27.0] - 2026-01-15
 
 ### Added
@@ -332,7 +338,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.1...HEAD
+[0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...deepgram-self-hosted-0.27.1
 [0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.26.0...deepgram-self-hosted-0.27.0
 [0.26.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.25.0...deepgram-self-hosted-0.26.0
 [0.25.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.24.0...deepgram-self-hosted-0.25.0
