@@ -6,12 +6,6 @@ Deploy Deepgram Self-Hosted in environments without external network access.
 
 In airgapped deployments, the Billing container validates licenses locally and manages a journal file for usage/billing.
 
-| Method             | Self-Hosted            | Airgapped                    |
-|--------------------|------------------------|------------------------------|
-| License Server     | `license.deepgram.com` | Billing container            |
-| Required Secrets   | API key                | License key + License file   |
-| Journal Management | Not applicable         | Retrieval & return required  |
-
 ## Architecture
 
 - Standard: API/Engine → Billing Container
@@ -28,128 +22,172 @@ Obtain from Deepgram:
 
 Choose your journal storage backend based on your requirements:
 
-| Storage Type | Access Mode | Journal Retrieval | HA Support | AWS Example | GCP Example |
-|--------------|-------------|-------------------|------------|-------------|-------------|
-| Block Storage (EBS/PD) | ReadWriteOnce (RWO) | Requires downtime (~30-60s) | No | gp2, gp3 | pd-standard, pd-ssd |
-| Shared Storage (EFS/Filestore) | ReadWriteMany (RWX) | Zero downtime | Yes | efs-sc | Filestore |
-
-### When to Use EBS/Block Storage
-- Default, simpler setup (auto-provisioned)
-- Single billing replica
-- Infrequent journal retrieval (weekly, monthly, or less)
-- Scheduled maintenance windows acceptable
+| Storage Type                  | Access Mode     | Journal Retrieval      | HA Support  | AWS Example | GCP Example       |
+|-------------------------------|-----------------|-----------------------|-------------|-------------|-------------------|
+| Shared Storage (EFS/Filestore)| ReadWriteMany   | Zero downtime         | Yes         | efs-sc      | Filestore         |
+| Block Storage (EBS/PD)        | ReadWriteOnce   | Requires downtime (~30-60s) | No    | gp2, gp3    | pd-standard, pd-ssd|
 
 ### When to Use EFS/Shared Storage
+- Default and recommended for most installations
 - Zero-downtime journal retrieval required
 - High availability (multiple billing replicas needed)
 - Frequent journal retrieval (daily automated backups)
 - Production environments with strict SLAs
 
-Default: The sample configurations use EBS for simplicity. For production with strict uptime requirements, use EFS.
+When sharing the models PVC, billing creates a subdirectory for journals (e.g., `journal-deepgram-billing-0/`). This allows zero-downtime journal retrieval without affecting model storage.
 
-## Example Configurations
-
-#### Minimal Airgapped Setup
-
-```yaml
-global:
-  pullSecretRef: dg-regcred
-  deepgramLicenseSecretRef: dg-license-key
-
-billing:
-  enabled: true
-  licenseFile:
-    secretRef: dg-license-file
-  journal:
-    storageClass: gp2 # or your StorageClass
-    size: 1Gi
-
-licenseProxy:
-  enabled: false
-```
-
-#### With License Proxy
-
-```yaml
-billing:
-  enabled: true
-licenseProxy:
-  enabled: true
-```
-
-#### High Availability with EFS
-
-```yaml
-billing:
-  replicas: 3
-  journal:
-    existingPvcName: my-efs-pvc # shared EFS pvc
-```
-
-#### Custom Init Container (private registry)
-
-```yaml
-global:
-  initContainer:
-    image:
-      registry: your-private-registry.com
-      repository: ubuntu
-      tag: 22.04
-    pullSecretRef: dg-regcred
-```
-
----
+### When to Use EBS/Block Storage
+- Simpler setup
+- Single billing replica
+- Infrequent journal retrieval (weekly, monthly, or less)
+- Scheduled maintenance windows acceptable
 
 ## Getting Started
 
 See the [Deepgram Kubernetes docs](https://developers.deepgram.com/docs/kubernetes)
-for step-by-step instructions on deploying Deepgram to
-[Amazon Elastic Kubernetes Service (EKS)](https://developers.deepgram.com/docs/aws-k8s),
-[Google Kubernetes Engine (GKE)](https://developers.deepgram.com/docs/gcp-k8s), or
-[self-managed Kubernetes](https://developers.deepgram.com/docs/self-managed-kubernetes).
+for step-by-step instructions on deploying Deepgram to:
+- [Amazon Elastic Kubernetes Service (EKS)](https://developers.deepgram.com/docs/aws-k8s)
+- [Google Kubernetes Engine (GKE)](https://developers.deepgram.com/docs/gcp-k8s)
+- [Self-managed Kubernetes](https://developers.deepgram.com/docs/self-managed-kubernetes)
 
----
+Additional repository resources:
+- Sample airgapped AWS configuration: [`07-basic-setup-aws-airgapped.values.yaml`](./07-basic-setup-aws-airgapped.values.yaml)
+- Full configuration reference: [`values.yaml`](../values.yaml)
+- Main chart docs: [`README.md`](./README.md)
 
 ## Journal Retrieval
 
-**IMPORTANT:** The billing container maintains a usage journal that **must be provided to Deepgram regularly**.
+**IMPORTANT:** The billing container maintains a usage journal that must be provided to Deepgram regularly.
 
----
+### Manual Journal Retrieval
 
-## Manual Journal Retrieval
+#### For EFS/Shared Storage Users (Zero Downtime)
 
-**Important for EBS/gp2 Users**: If using the default EBS storage (ReadWriteOnce), manual retrieval requires **briefly scaling down the billing container** (30-60 seconds of downtime). Consider:
-- Using EFS (ReadWriteMany) for zero-downtime retrieval
-- Scheduling retrievals during maintenance windows
-- Using the automated CronJob approach with scheduled downtime
+If billing uses EFS (either dedicated or shared with models), you can retrieve journals with zero downtime using a temporary helper pod.
 
-For EFS users, the debug pod can run alongside the billing container with no downtime.
+1. **Identify the PVC**
 
-This method uses a temporary debug pod to access the journal file.
-
-### 1. Find Your Billing Pod Name
+First, identify the name of your billing pod(s):
 
 ```bash
 kubectl get pods -n dg-self-hosted | grep billing
 ```
 
-Example output:
+Then, check which PVC the billing pod is using (replace `<billing-pod-name>` with the pod name you found):
+
+```bash
+kubectl describe pod <billing-pod-name> -n dg-self-hosted | grep -A 3 "journal:"
+```
+
+You'll see output like:
 
 ```
-deepgram-billing-0       1/1     Running
+journal:
+  Type:       PersistentVolumeClaim
+  ClaimName:  dg-models-aws-efs-pvc
 ```
 
-### 2. Find Your Journal PVC Name
+2. **Create Helper Pod**
+
+Create a temporary pod with the PVC mounted:
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: v1
+kind: Pod
+metadata:
+  name: billing-efs-helper
+  namespace: dg-self-hosted
+spec:
+  containers:
+  - name: helper
+    image: busybox
+    command: ["sleep", "3600"]
+    volumeMounts:
+    - name: efs-volume
+      mountPath: /efs
+  volumes:
+  - name: efs-volume
+    persistentVolumeClaim:
+      claimName: dg-models-aws-efs-pvc  # Use your PVC name from step 1
+EOF
+```
+
+Wait for the temporary pod to be ready:
+
+```bash
+kubectl wait --for=condition=Ready pod/billing-efs-helper -n dg-self-hosted --timeout=60s
+```
+
+3. **Locate the Journal File**
+
+List the EFS contents to find the journal directory:
+
+```bash
+kubectl exec -n dg-self-hosted billing-efs-helper -- ls -lah /efs/
+```
+
+You should see a directory like `journal-deepgram-billing-0/`. List its contents:
+
+```bash
+kubectl exec -n dg-self-hosted billing-efs-helper -- ls -lah /efs/journal-deepgram-billing-0/
+```
+
+The journal file is typically named `journal`.
+
+4. **Download the Journal File**
+
+```bash
+kubectl cp dg-self-hosted/billing-efs-helper:/efs/journal-deepgram-billing-0/journal ./billing_journal_$(date +%Y%m%d).db
+```
+
+5. **Verify Download**
+
+```bash
+ls -lh billing_journal_*.db
+cat billing_journal_*.db
+```
+
+Example journal JSON-lines contents:
+
+```
+{"d":"...","s":"..."}
+{"d":"...","s":"..."}
+```
+
+6. **Clean Up Helper Pod**
+
+```bash
+kubectl delete pod billing-efs-helper -n dg-self-hosted
+```
+
+Billing continues running throughout this entire process.
+
+7. **Send to Deepgram**
+
+Send the journal file to your Deepgram contact via email attachment or cloud storage link.
+
+---
+
+#### For EBS/Block Storage Users (Requires Downtime)
+
+**Important:** If using EBS storage (ReadWriteOnce), manual retrieval requires scaling down the billing container (30-60 seconds of downtime). Consider using EFS for zero-downtime retrieval or scheduling retrievals during maintenance windows.
+
+1. **Find Your Billing Pod Name**
+
+```bash
+kubectl get pods -n dg-self-hosted | grep billing
+```
+
+2. **Find Your Journal PVC Name**
 
 ```bash
 kubectl get pvc -n dg-self-hosted | grep journal
 ```
 
-Note the exact PVC name corresponding to your billing pod (e.g. `journal-deepgram-billing-0`).
+Note the exact PVC name (e.g. `journal-deepgram-billing-0`).
 
-### 3. Create Debug Pod YAML
-
-Create a file named `journal-debug-pod.yaml`:
+3. **Create Debug Pod YAML**
 
 ```yaml
 apiVersion: v1
@@ -168,78 +206,56 @@ spec:
   volumes:
   - name: journal-pvc
     persistentVolumeClaim:
-      claimName: journal-deepgram-billing-0 # Replace with your actual PVC name
+      claimName: journal-deepgram-billing-0 # Use your actual PVC name
 ```
 
-**Important:** Replace `claimName` with your journal PVC name from step 2.
-
-### 4. Scale Down Billing (EBS/RWO only)
-
-Skip this step if using EFS/shared storage.
-
-For EBS users, temporarily scale down billing to free the volume:
+4. **Scale Down Billing**
 
 ```bash
 kubectl scale statefulset deepgram-billing -n dg-self-hosted --replicas=0
-
-# Wait for billing pod to terminate (this takes 30-60 seconds).
 kubectl wait --for=delete pod/deepgram-billing-0 -n dg-self-hosted --timeout=60s
 ```
 
-### 5. Deploy the Debug Pod
+5. **Deploy the Debug Pod**
 
 ```bash
 kubectl apply -f journal-debug-pod.yaml
 kubectl wait --for=condition=ready pod/billing-journal-debug -n dg-self-hosted --timeout=60s
 ```
 
-### 6. Verify Journal File Exists
+6. **Verify Journal File Exists**
 
 ```bash
 kubectl exec -n dg-self-hosted billing-journal-debug -- ls -lh /mnt/
 ```
 
-You should see output similar to:
-
-```
--rw-r--r--    1 root     root        12.3K Nov 20 01:23 journal
-```
-
-### 7. Download the Journal File
+7. **Download the Journal File**
 
 ```bash
 kubectl cp dg-self-hosted/billing-journal-debug:/mnt/journal ./billing-journal-$(date +%Y%m%d).backup
 ```
 
-You’ll now have e.g. `billing-journal-20251120.backup` in your current directory.
-
-### 8. Verify Download
+8. **Verify Download**
 
 ```bash
 ls -lh billing-journal-*.backup
 ```
 
-The file should have non-zero size.
-
-### 9. Clean Up Debug Pod
+9. **Clean Up Debug Pod**
 
 ```bash
 kubectl delete pod billing-journal-debug -n dg-self-hosted
 ```
 
-### 10. Restore Billing (EBS/RWO only)
-
-Skip this step if using EFS/shared storage.
-
-Scale billing back up:
+10. **Restore Billing**
 
 ```bash
 kubectl scale statefulset deepgram-billing -n dg-self-hosted --replicas=1
 ```
 
-### 11. Send to Deepgram
+11. **Send to Deepgram**
 
-Send the journal backup to Deepgram by email in an attachment or a cloud storage download link.
+Send the journal backup to Deepgram by email or via download link.
 
 ---
 
@@ -251,11 +267,11 @@ Before setting up automated backups, verify:
 - You successfully downloaded a journal file manually
 - The file size is greater than `0` bytes
 - You can send the file to Deepgram
-- Your Deepgram contact confirms they received and can process it
+- Your Deepgram contact confirms they received and can validate it
 
 ---
 
-## Automated Backup (Recommended for Production)
+### Automated Journal Backup (Recommended for Production)
 
 Use a Kubernetes `CronJob` to automate regular journal backups.
 
@@ -266,7 +282,7 @@ Use a Kubernetes `CronJob` to automate regular journal backups.
 
 Note for fully airgapped environments: Replace the `aws s3 cp` command below with your local storage solution (mount to NFS, copy to local PV, etc.).
 
-### 1. Create CronJob YAML
+**1. Create CronJob YAML**
 
 Create a file named `billing-journal-cronjob.yaml`:
 
@@ -306,12 +322,12 @@ spec:
               claimName: journal-deepgram-billing-0  # Replace with your PVC name
 ```
 
-**Be sure to:**
+Be sure to:
 - Replace `YOUR-BUCKET` with your S3 bucket name.
 - Replace `claimName` with your journal PVC name.
 - Ensure proper S3 write permissions (`IAM`, access keys, etc.).
 
-#### AWS Credentials Setup:
+#### AWS Credentials Setup
 
 The `CronJob` needs AWS credentials. Choose one method:
 
@@ -334,26 +350,26 @@ The example above only backs up **one** PVC. If you have multiple billing replic
 
 ---
 
-### 2. Deploy the CronJob
+**2. Deploy the CronJob**
 
 ```bash
 kubectl apply -f billing-journal-cronjob.yaml
 ```
 
-### 3. Check CronJob Creation
+**3. Check CronJob Creation**
 
 ```bash
 kubectl get cronjob -n dg-self-hosted
 ```
 
-### 4. Test Backup Job Immediately (Optional)
+**4. Test Backup Job Immediately (Recommended)**
 
 ```bash
 kubectl create job --from=cronjob/billing-journal-backup billing-journal-test -n dg-self-hosted
 kubectl logs -n dg-self-hosted job/billing-journal-test
 ```
 
-### 5. Monitor Backups
+**5. Monitor Backups**
 
 Check if jobs are scheduled and running:
 
@@ -366,7 +382,7 @@ aws s3 ls s3://YOUR-BUCKET/deepgram-journals/
 
 ## Multi-Replica Billing Pods
 
-### If Using EBS (Default, One PVC per Pod)
+### If Using EBS (One PVC per Pod)
 
 Each billing pod has its own PVC. Retrieve journals for **each pod**:
 
@@ -380,30 +396,32 @@ For each PVC:
 
 ### If Using EFS (Shared PVC)
 
-All billing pods write to separate subdirectories within one shared PVC.
+When billing uses EFS (shared or dedicated), each billing pod writes to its own subdirectory within the PVC.
+
+View all billing journal directories:
+
+```bash
+kubectl exec -n dg-self-hosted billing-efs-helper -- ls -lah /efs/ | grep journal
+```
+
+You'll see directories like:
+
+```
+journal-deepgram-billing-0/
+journal-deepgram-billing-1/
+journal-deepgram-billing-2/
+...
+```
 
 To download all journals:
 
 ```bash
-kubectl cp dg-self-hosted/billing-journal-debug:/mnt/ ./all-billing-journals/
+for dir in $(kubectl exec -n dg-self-hosted billing-efs-helper -- ls -1 /efs/ | grep '^journal-deepgram-billing-[0-9]\+/$\|^journal-deepgram-billing-[0-9]\+$'); do
+  podnum=$(echo "$dir" | grep -o '[0-9]\+$')
+  kubectl cp dg-self-hosted/billing-efs-helper:/efs/${dir%/}/journal \
+    ./billing_journal_pod${podnum}_$(date +%Y%m%d).db
+done
 ```
-
-This copies all files and subdirectories.
-
----
-
-## Troubleshooting
-
-- `kubectl cp` fails with `"tar: command not found"`:
-  Use `ubuntu:22.04` for the debug pod (it includes `tar`).
-- Journal file is empty (`0` bytes):
-  The billing container may not be running yet. If the journal file only contains a single initialization line, it's likely that no billing activity has started and the container isn't up. Check the status:
-  ```kubectl get pods -n dg-self-hosted -l app=deepgram-billing```
-- `CronJob` never runs:
-  Check status:
-  ```kubectl describe cronjob billing-journal-backup -n dg-self-hosted```
-- `"Permission denied"` accessing journal:
-  The debug pod defaults to `root` — shouldn't occur, but check pod spec/image.
 
 ---
 
@@ -413,11 +431,3 @@ This copies all files and subdirectories.
 - Retention: Retain all journal files until they have been delivered to Deepgram
 - Testing: Verify you can retrieve and restore journal files before going to production
 - Documentation: Record your backup/retrieval process for your team
-
----
-
-## Additional Resources
-
-- Sample airgapped AWS configuration: [`06-basic-setup-aws-airgapped.values.yaml`](./06-basic-setup-aws-airgapped.values.yaml)
-- Full configuration reference: [`values.yaml`](../values.yaml)
-- Main chart docs: [`README.md`](./README.md)
