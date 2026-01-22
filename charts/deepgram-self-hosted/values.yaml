@@ -503,15 +503,19 @@ engine:
   # for more details.
   # @default -- ``
   resources:
+    # -- Name of the GPU resource to use (e.g., nvidia.com/gpu for standard GPUs,
+    # or nvidia.com/mig-4g.40gb for MIG slices). This allows using different GPU resource
+    # naming conventions as configured by the NVIDIA GPU Operator.
+    gpuResourceName: "nvidia.com/gpu"
     requests:
       memory: "30Gi"
       cpu: "4000m"
-      # -- gpu maps to the nvidia.com/gpu resource parameter
+      # -- Number of GPUs to request
       gpu: 1
     limits:
       memory: "40Gi"
       cpu: "8000m"
-      # -- gpu maps to the nvidia.com/gpu resource parameter
+      # -- Number of GPUs to limit
       gpu: 1
 
   # -- The startupProbe combination of `periodSeconds` and `failureThreshold` allows
