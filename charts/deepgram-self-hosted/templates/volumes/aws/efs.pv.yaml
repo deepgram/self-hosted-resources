@@ -16,7 +16,7 @@ spec:
   claimRef:
     name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
     namespace: {{ .Release.Namespace }}
-  storageClassName: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-sc
+  storageClassName: {{ default (printf "%s-aws-efs-sc" .Values.engine.modelManager.volumes.aws.efs.namePrefix) .Values.engine.modelManager.volumes.aws.efs.storageClass.name }}
   persistentVolumeReclaimPolicy: Retain
   csi:
     driver: efs.csi.aws.com

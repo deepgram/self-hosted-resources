@@ -44,6 +44,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added `use_v2_language_detection` feature flag to support 36-language detection (disabled by default).
+- Added optional EFS StorageClass creation with `engine.modelManager.volumes.aws.efs.storageClass.create` flag to support restricted environments where StorageClass creation is not permitted.
 
 ### Changed
 
