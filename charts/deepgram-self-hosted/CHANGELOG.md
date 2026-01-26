@@ -10,6 +10,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added `engine.flux.max_streams` configuration to override the maximum number of concurrent Flux streams per Engine pod
 
+## [0.27.1] - 2026-01-21
+
+### Added
+
+- Added Billing container support for airgapped deployments
+
+## [0.27.0] - 2026-01-15
+
+### Added
+
+- Added `engine.health.gpuRequired` to indicate whether GPU availability is required to be considered healthy. Defaults to `false`.
+- Added support for Aura-2 Polyglot TTS (Dutch, German, French, Italian, Japanese)
+
+### Changed
+
+- Updated default container tags to January 2026 release (`release-260115`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-january-2026-release-260115) for additional details. The changelog describes the details of a TTS breaking change for which we recommend using a blue-green deployment strategy.
+
+## [0.26.0] - 2025-12-29
+
+### Changed
+
+- Updated default container tags to December 2025 release (`release-251229`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-december-2025-release-251229) for additional details.
+
 ## [0.25.0] - 2025-12-10
 
 ### Added
@@ -319,7 +342,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Initial implementation of the Helm chart.
 
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.1...HEAD
+[0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...deepgram-self-hosted-0.27.1
+[0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.26.0...deepgram-self-hosted-0.27.0
+[0.26.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.25.0...deepgram-self-hosted-0.26.0
+[0.25.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.24.0...deepgram-self-hosted-0.25.0
+[0.24.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.1...deepgram-self-hosted-0.24.0
+[0.23.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.0...deepgram-self-hosted-0.23.1
 [0.23.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.22.0...deepgram-self-hosted-0.23.0
 [0.22.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.21.0...deepgram-self-hosted-0.22.0
 [0.21.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.20.0...deepgram-self-hosted-0.21.0

@@ -9,6 +9,22 @@ global:
   # self-hosted API key. See chart docs for more details.
   deepgramSecretRef:
 
+  # -- (string) Name of the pre-configured K8s Secret containing your Deepgram
+  # license key for airgapped deployments with Billing container.
+  # Only required when billing.enabled is true.
+  deepgramLicenseSecretRef:
+
+  # Init container configuration for config rendering (used when Billing is enabled)
+  initContainer:
+    image:
+      registry: docker.io
+      repository: ubuntu
+      tag: "22.04"
+      pullPolicy: IfNotPresent
+    # -- (string) Optional: Override imagePullSecrets for init container.
+    # Leave empty to default to global.pullSecretRef
+    pullSecretRef: ""
+
   # -- Additional labels to add to all Deepgram resources
   additionalLabels: {}
 
@@ -237,7 +253,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-251210
+    tag: release-260115
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -387,7 +403,7 @@ api:
     # -- Enables format entity tags on pre-recorded audio
     # *if* a valid NER model is available.
     formatEntityTags: true
-    
+
     # -- Enables usage metadata redaction; set to false to disable redaction of usage metadata
     redactUsage: true
 
@@ -443,7 +459,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-251210
+    tag: release-260115
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -716,6 +732,12 @@ engine:
     # which supports `"enable"`, `"disabled"`, and `"auto"`.
     state: "auto"
 
+  health:
+    # -- Engine will automatically fall back to CPU when a GPU is not detected. You can
+    # explicitly require a GPU by setting this option to true, production deployments
+    # must use a GPU for acceptable performance.
+    gpuRequired: false
+
 # -- Configuration options for the optional
 # [Deepgram License Proxy](https://developers.deepgram.com/docs/license-proxy).
 # @default -- ``
@@ -747,7 +769,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-251210
+    tag: release-260115
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -857,6 +879,166 @@ licenseProxy:
 
     # -- statusPort is the port to listen on for the status/health endpoint.
     statusPort: 8080
+
+# -- Configuration options for the Deepgram Billing container.
+# The Billing container is used for airgapped deployments where API and Engine
+# cannot reach license.deepgram.com. It validates licenses locally using a
+# license file and maintains a usage journal.
+#
+# For complete airgapped deployment instructions, see samples/airgapped.md
+# @default -- ``
+billing:
+  # -- Enable the Billing container for airgapped deployments.
+  # When enabled, API and Engine will connect to the Billing container instead of
+  # license.deepgram.com.
+  enabled: false
+
+  # -- Number of Billing replicas. Default is 1 (singleton).
+  # Can be increased for high availability. Each replica maintains its own journal file.
+  replicas: 1
+
+  # -- namePrefix is the prefix to apply to the name of all K8s objects
+  # associated with the Deepgram Billing containers.
+  namePrefix: "deepgram-billing"
+
+  image:
+    # -- path configures the image path to use for creating Billing containers.
+    # You may change this from the public Quay image path if you have imported
+    # Deepgram images into a private container registry.
+    path: quay.io/deepgram/self-hosted-billing
+    # -- tag defines which Deepgram release to use for Billing containers
+    tag: release-260115
+    # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
+    # Billing image
+    pullPolicy: IfNotPresent
+
+  # -- Additional labels to add to Billing resources
+  additionalLabels: {}
+
+  # -- (object) Additional annotations to add to the Billing deployment
+  additionalAnnotations:
+
+  # -- Configuration for the Deepgram license file.
+  # The license file is a 1-line JSON file provided by Deepgram for airgapped deployments.
+  # You must create a Kubernetes Secret containing this file before installing the chart.
+  # @default -- ``
+  licenseFile:
+    # -- (string) Name of the pre-configured K8s Secret containing your Deepgram license file
+    secretRef:
+    # -- Key within the Secret that contains the license file content
+    secretKey: "license.dg"
+
+  # -- Configuration for the usage journal volume.
+  # The journal tracks usage for billing purposes and must be persisted.
+  # WARNING: Do not delete or lose this volume as it contains critical billing data.
+  # Failure to persist and return journal files may result in suspension of service.
+  # @default -- ``
+  journal:
+    # -- (string) Name of an existing PVC to use for journal storage (e.g., EFS-backed shared volume).
+    # When set, each Billing pod writes to its own subdirectory: journal-<pod-name>/
+    # Leave empty to auto-provision per-pod EBS volumes via volumeClaimTemplates (default).
+    existingPvcName: ""
+
+    # -- (string) Storage class to use for the journal PVC. Only used if existingPvcName is empty
+    # and aws.efs.enabled is false.
+    storageClass: ""
+
+    # -- Size of the journal volume. Only used if existingPvcName is empty
+    # and aws.efs.enabled is false.
+    size: "1Gi"
+
+    # -- AWS-specific volume configuration for billing journals
+    # @default -- ``
+    aws:
+      efs:
+        # Enable using the shared EFS volume from model storage for billing journals.
+        # Reuses the existing models PVC, providing ReadWriteMany access.
+        # Set to false to use EBS (per-pod persistent volumes; ReadWriteOnce).
+        enabled: true
+
+        # Name of the existing EFS PVC to use for journals.
+        # Leave empty to automatically use the PVC from engine.modelManager.volumes.aws.efs
+        existingPvcName: ""
+
+        # -- (string) StorageClass to use for the EFS PVC.
+        # Leave empty to automatically use the StorageClass created by engine.modelManager.volumes.aws.efs.
+        # Set a custom value to use a different StorageClass.
+        storageClassName: ""
+
+        # -- Size of the EFS PVC for journals.
+        size: "1Gi"
+
+  updateStrategy:
+    # -- Update strategy for the Billing StatefulSet.
+    # StatefulSets update pods one at a time in reverse ordinal order (e.g. billing-2, billing-1, billing-0).
+    # @default -- ``
+    rollingUpdate:
+      # -- Maximum number of Billing pods that can be unavailable during updates.
+      maxUnavailable: 0
+
+  # -- Configure resource limits per Billing container.
+  # @default -- ``
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "1000m"
+    limits:
+      memory: "8Gi"
+      cpu: "2000m"
+
+  # -- Readiness probe customization for Billing pods.
+  # @default -- ``
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 1
+  # -- Liveness probe customization for Billing pods.
+  # @default -- ``
+  livenessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+
+  # -- [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity)
+  # to apply for Billing pods.
+  affinity: {}
+  # -- [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/)
+  # to apply to Billing pods.
+  tolerations: []
+  # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
+  # to apply to Billing pods.
+  topologySpreadConstraints: []
+
+  # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
+  # to apply to Billing pods.
+  nodeSelector: {}
+
+  # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods.
+  securityContext: {}
+
+  # -- [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Billing containers.
+  containerSecurityContext: {}
+
+  serviceAccount:
+    # -- Specifies whether to create a default service account for the Deepgram Billing Deployment.
+    create: true
+    # -- (string) Allows providing a custom service account name for the Billing component.
+    # If left empty, the default service account name will be used.
+    # If specified, and `billing.serviceAccount.create = true`, this defines the name of the default service account.
+    # If specified, and `billing.serviceAccount.create = false`, this provides the name of a preconfigured service account
+    # you wish to attach to the Billing deployment.
+    name:
+
+  # -- Configure how the Billing container will listen for licensing requests.
+  # @default -- ``
+  server:
+    # -- host is the IP address to listen on. You will want to listen
+    # on all interfaces to interact with other pods in the cluster.
+    host: "0.0.0.0"
+    # -- port to listen on.
+    port: 8443
+    # -- baseUrl is the prefix for incoming license verification requests.
+    baseUrl: "/"
 
 # -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
 # You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.
@@ -1041,7 +1223,7 @@ prometheus-adapter:
 aura2:
   # -- Enable Aura-2 features and configuration
   enabled: false
-  
+
   # -- English language configuration for Aura-2
   # @default -- ``
   english:
@@ -1050,10 +1232,19 @@ aura2:
     t2cUuid: ""
     c2aUuid: ""
     cudaVisibleDevices: "0,1"
-    
+
   # -- Spanish language configuration for Aura-2
   # @default -- ``
   spanish:
+    enabled: false
+    maxBatchSize: 8
+    t2cUuid: ""
+    c2aUuid: ""
+    cudaVisibleDevices: "2,3"
+
+  # -- Polyglot language configuration for Aura-2 (Dutch, German, French, Italian, Japanese)
+  # @default -- ``
+  polyglot:
     enabled: false
     maxBatchSize: 8
     t2cUuid: ""

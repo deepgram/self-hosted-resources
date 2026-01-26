@@ -72,6 +72,26 @@ spec:
       {{- if or $.Values.engine.serviceAccount.create $.Values.engine.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
+
+      {{- if $.Values.billing.enabled }}
+      initContainers:
+        - name: config-render
+          image: {{ $.Values.global.initContainer.image.registry }}/{{ $.Values.global.initContainer.image.repository }}:{{ $.Values.global.initContainer.image.tag }}
+          imagePullPolicy: {{ $.Values.global.initContainer.image.pullPolicy }}
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - sed "s|\${DEEPGRAM_LICENSE_KEY}|${DEEPGRAM_LICENSE_KEY}|g" /config/engine.toml > /work/engine.toml
+          envFrom:
+            - secretRef:
+                name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" $.Values.global.deepgramLicenseSecretRef }}
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /config
+            - name: working-config
+              mountPath: /work
+      {{- end }}
+
       containers:
       - name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
         {{- with $.Values.engine.containerSecurityContext }}
@@ -87,9 +107,19 @@ spec:
               command: {{ toJson $.Values.engine.lifecycle.postStart.command }}
         {{- end }}
         envFrom:
+        {{- if not $.Values.billing.enabled }}
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" $.Values.global.deepgramSecretRef }}
+        {{- else }}
+        - secretRef:
+            name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" $.Values.global.deepgramLicenseSecretRef }}
+        {{- end }}
         env:
+        {{- if $.Values.billing.enabled }}
+        # Engine container requires DEEPGRAM_API_KEY env var, but it's not used for airgapped
+        - name: DEEPGRAM_API_KEY
+          value: "airgapped-mode"
+        {{- end }}
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" $ }}
         {{- if le (int $.Values.engine.resources.requests.gpu) 0 }}
@@ -115,6 +145,15 @@ spec:
           value: "{{ $.Values.aura2.spanish.c2aUuid }}"
         - name: CUDA_VISIBLE_DEVICES
           value: "{{ $.Values.aura2.spanish.cudaVisibleDevices }}"
+        {{- else if $.Values.aura2.polyglot.enabled }}
+        - name: IMPELLER_AURA2_MAX_BATCH_SIZE
+          value: "{{ $.Values.aura2.polyglot.maxBatchSize }}"
+        - name: IMPELLER_AURA2_T2C_UUID
+          value: "{{ $.Values.aura2.polyglot.t2cUuid }}"
+        - name: IMPELLER_AURA2_C2A_UUID
+          value: "{{ $.Values.aura2.polyglot.c2aUuid }}"
+        - name: CUDA_VISIBLE_DEVICES
+          value: "{{ $.Values.aura2.polyglot.cudaVisibleDevices }}"
         {{- end }}
         {{- end }}
         command: [ "impeller" ]
@@ -137,7 +176,7 @@ spec:
             nvidia.com/gpu: {{ $.Values.engine.resources.limits.gpu }}
             {{- end }}
         volumeMounts:
-        - name: engine-config-volume
+        - name: "{{ if $.Values.billing.enabled }}working-config{{ else }}configmap-volume{{ end }}"
           mountPath: /etc/config
         - name: models-volume
           mountPath: /models
@@ -163,10 +202,15 @@ spec:
           initialDelaySeconds: {{ $.Values.engine.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.engine.readinessProbe.periodSeconds }}
           failureThreshold: {{ $.Values.engine.readinessProbe.failureThreshold }}
+
       volumes:
-      - name: engine-config-volume
+      - name: configmap-volume
         configMap:
-          name: {{ $.Values.engine.namePrefix }}-config
+          name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
+      {{- if $.Values.billing.enabled }}
+      - name: working-config
+        emptyDir: {}
+      {{- end }}
       - name: models-volume
         persistentVolumeClaim:
           {{- $customClaimEnabled := $.Values.engine.modelManager.volumes.customVolumeClaim.enabled }}

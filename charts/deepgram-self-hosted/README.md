@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.25.0](https://img.shields.io/badge/Version-0.25.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-251210](https://img.shields.io/badge/AppVersion-release--251210-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.27.1](https://img.shields.io/badge/Version-0.27.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260115](https://img.shields.io/badge/AppVersion-release--260115-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -55,6 +55,14 @@ To upgrade the Deepgram components to a new version, follow these steps:
     ```bash
     helm upgrade -f my-values.yaml [RELEASE_NAME] deepgram/deepgram-self-hosted --atomic --timeout 60m
     ```
+> [!IMPORTANT]
+> **January 2026 Release (`release-260115`) - Breaking Change for TTS Deployments**
+>
+> The January 2026 self-hosted release includes changes to improve TTS response times. This release is **not backwards-compatible** with previous releases when serving TTS traffic due to changes in how API and Engine containers communicate.
+>
+> To avoid downtime, the updated Engine container (`3.107.0-1`) **must be deployed before** the updated API container (`1.176.0`). The new Engine version is compatible with previous API versions, so deploy Engine first. [Blue-green deployment](https://developers.deepgram.com/docs/blue-green-deployment) is one strategy that satisfies this requirement. **This only applies to deployments serving TTS traffic**; STT-only deployments are unaffected.
+>
+> See the [January 2026 changelog](https://developers.deepgram.com/changelog/2026/1/15#deepgram-self-hosted-january-2026-release-260115) for more details.
 
 If you encounter any issues during the upgrade process, you can perform a rollback to the previous version:
 
@@ -272,7 +280,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-251210"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
@@ -303,7 +311,44 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | aura2 | object | `` | Aura-2 specific configuration options |
 | aura2.enabled | bool | `false` | Enable Aura-2 features and configuration |
 | aura2.english | object | `` | English language configuration for Aura-2 |
+| aura2.polyglot | object | `` | Polyglot language configuration for Aura-2 (Dutch, German, French, Italian, Japanese) |
 | aura2.spanish | object | `` | Spanish language configuration for Aura-2 |
+| billing | object | `` | Configuration options for the Deepgram Billing container. The Billing container is used for airgapped deployments where API and Engine cannot reach license.deepgram.com. It validates licenses locally using a license file and maintains a usage journal.  For complete airgapped deployment instructions, see samples/airgapped.md |
+| billing.additionalAnnotations | object | `nil` | Additional annotations to add to the Billing deployment |
+| billing.additionalLabels | object | `{}` | Additional labels to add to Billing resources |
+| billing.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Billing pods. |
+| billing.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Billing containers. |
+| billing.enabled | bool | `false` | Enable the Billing container for airgapped deployments. When enabled, API and Engine will connect to the Billing container instead of license.deepgram.com. |
+| billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
+| billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
+| billing.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for Billing containers |
+| billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
+| billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
+| billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
+| billing.journal.aws.efs.storageClassName | string | `""` | StorageClass to use for the EFS PVC. Leave empty to automatically use the StorageClass created by engine.modelManager.volumes.aws.efs. Set a custom value to use a different StorageClass. |
+| billing.journal.existingPvcName | string | `""` | Name of an existing PVC to use for journal storage (e.g., EFS-backed shared volume). When set, each Billing pod writes to its own subdirectory: journal-<pod-name>/ Leave empty to auto-provision per-pod EBS volumes via volumeClaimTemplates (default). |
+| billing.journal.size | string | `"1Gi"` | Size of the journal volume. Only used if existingPvcName is empty and aws.efs.enabled is false. |
+| billing.journal.storageClass | string | `""` | Storage class to use for the journal PVC. Only used if existingPvcName is empty and aws.efs.enabled is false. |
+| billing.licenseFile | object | `` | Configuration for the Deepgram license file. The license file is a 1-line JSON file provided by Deepgram for airgapped deployments. You must create a Kubernetes Secret containing this file before installing the chart. |
+| billing.licenseFile.secretKey | string | `"license.dg"` | Key within the Secret that contains the license file content |
+| billing.licenseFile.secretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license file |
+| billing.livenessProbe | object | `` | Liveness probe customization for Billing pods. |
+| billing.namePrefix | string | `"deepgram-billing"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Billing containers. |
+| billing.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to Billing pods. |
+| billing.readinessProbe | object | `` | Readiness probe customization for Billing pods. |
+| billing.replicas | int | `1` | Number of Billing replicas. Default is 1 (singleton). Can be increased for high availability. Each replica maintains its own journal file. |
+| billing.resources | object | `` | Configure resource limits per Billing container. |
+| billing.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods. |
+| billing.server | object | `` | Configure how the Billing container will listen for licensing requests. |
+| billing.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
+| billing.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
+| billing.server.port | int | `8443` | port to listen on. |
+| billing.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Billing Deployment. |
+| billing.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the Billing component. If left empty, the default service account name will be used. If specified, and `billing.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `billing.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the Billing deployment. |
+| billing.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to Billing pods. |
+| billing.topologySpreadConstraints | list | `[]` | [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field) to apply to Billing pods. |
+| billing.updateStrategy.rollingUpdate | object | `` | Update strategy for the Billing StatefulSet. StatefulSets update pods one at a time in reverse ordinal order (e.g. billing-2, billing-1, billing-0). |
+| billing.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | Maximum number of Billing pods that can be unavailable during updates. |
 | cluster-autoscaler.autoDiscovery.clusterName | string | `nil` | Name of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
 | cluster-autoscaler.awsRegion | string | `nil` | Region of your AWS EKS cluster. Using the [Cluster Autoscaler](https://github.com/kubernetes/autoscaler) on AWS requires knowledge of certain cluster metadata. |
 | cluster-autoscaler.enabled | bool | `false` | Set to `true` to enable node autoscaling with AWS EKS. Note needed for GKE, as autoscaling is enabled by a [cli option on cluster creation](https://cloud.google.com/kubernetes-engine/docs/how-to/cluster-autoscaler#creating_a_cluster_with_autoscaling). |
@@ -325,9 +370,10 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.features.useV2LanguageDetection | bool | `false` | Enables use of 36-language detection model. |
 | engine.flux.enabled | bool | `false` | Enables Flux turn-based streaming STT |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
+| engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-251210"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -375,7 +421,13 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
+| global.deepgramLicenseSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license key for airgapped deployments with Billing container. Only required when billing.enabled is true. |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
+| global.initContainer.image.pullPolicy | string | `"IfNotPresent"` |  |
+| global.initContainer.image.registry | string | `"docker.io"` |  |
+| global.initContainer.image.repository | string | `"ubuntu"` |  |
+| global.initContainer.image.tag | string | `"22.04"` |  |
+| global.initContainer.pullSecretRef | string | `""` | Optional: Override imagePullSecrets for init container. Leave empty to default to global.pullSecretRef |
 | global.outstandingRequestGracePeriod | int | `1800` | When an API or Engine container is signaled to shutdown via Kubernetes sending a SIGTERM signal, the container will stop listening on its port, and no new requests will be routed to that container. However, the container will continue to run until all existing batch or streaming requests have completed, after which it will gracefully shut down.  Batch requests should be finished within 10-15 minutes, but streaming requests can proceed indefinitely.  outstandingRequestGracePeriod defines the period (in sec) after which Kubernetes will forcefully shutdown the container, terminating any outstanding connections. 1800 / 60 sec/min = 30 mins |
 | global.pullSecretRef | string | `nil` | If using images from the Deepgram Quay image repositories, or another private registry to which your cluster doesn't have default access, you will need to provide a pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs. |
@@ -395,7 +447,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.enabled | bool | `false` | The License Proxy is optional, but highly recommended to be deployed in production to enable highly available environments. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-251210"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
