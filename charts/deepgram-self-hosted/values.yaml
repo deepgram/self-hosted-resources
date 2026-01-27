@@ -698,6 +698,8 @@ engine:
   flux:
     # -- Enables Flux turn-based streaming STT
     enabled: false
+    # -- Specify the maximum number of streams for the Flux model in the Engine process
+    max_streams:
 
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy

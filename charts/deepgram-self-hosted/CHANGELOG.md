@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+- Added Flux `max_streams` setting to Engine configuration
+
 ## [0.27.1] - 2026-01-21
 
 ### Added

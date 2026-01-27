@@ -60,6 +60,8 @@ use_v2_language_detection = false
 ### Enable Flux turn-based streaming STT
 [flux]
 enabled = false # or true
+### Specify the maximum number of concurrent streams to the Flux model in the Engine process
+# max_streams = 40
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]
