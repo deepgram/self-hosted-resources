@@ -698,7 +698,7 @@ engine:
   flux:
     # -- Enables Flux turn-based streaming STT
     enabled: false
-    # -- Specify the maximum number of streams for Flux: L40S 200, A10G 70, L4 100, T4 50
+    # -- Specify the maximum number of streams for the Flux model in the Engine process: L40S 200, A10G 70, L4 100, T4 50
     # max_streams: 40
 
   # -- chunking defines the size of audio chunks to process in seconds.
