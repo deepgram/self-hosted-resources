@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.28.0] - 2026-01-27
+
+### Added
+
 - Added Flux `max_streams` setting to Engine configuration
 
 ## [0.27.1] - 2026-01-21
@@ -339,9 +343,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.1...HEAD
-[0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...deepgram-self-hosted-0.27.1
+[0.28.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.1...deepgram-self-hosted-0.28.0
+[0.27.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...deepgram-self-hosted-0.27.1
 [0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.26.0...deepgram-self-hosted-0.27.0
 [0.26.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.25.0...deepgram-self-hosted-0.26.0
 [0.25.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.24.0...deepgram-self-hosted-0.25.0
@@ -377,5 +380,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [0.2.0-beta]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.1-alpha...deepgram-self-hosted-0.2.0-beta
 [0.1.1-alpha]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.0-alpha...deepgram-self-hosted-0.1.1-alpha
 [0.1.0-alpha]: https://github.com/deepgram/self-hosted-resources/releases/tag/deepgram-self-hosted-0.1.0-alpha
-
-
