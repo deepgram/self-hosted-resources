@@ -1,0 +1,21 @@
+{{- if .Values.billing.enabled -}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Values.billing.namePrefix }}-config
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+    {{- range $key, $val := .Values.billing.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end}}
+data:
+  billing.toml: |
+    [license]
+      file = "/license/license.dg"
+      journal = "/journal/journal"
+
+    [server]
+      host = "{{ .Values.billing.server.host }}"
+      port = {{ .Values.billing.server.port }}
+      base_url = "{{ .Values.billing.server.baseUrl }}"
+{{- end -}}

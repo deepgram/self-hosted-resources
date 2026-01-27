@@ -5,7 +5,9 @@
 ### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
 ### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
 [license]
-server_url = ["https://license.deepgram.com"]
+### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
+### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
+server_url = ["https://license-proxy:8443", "https://license.deepgram.com"]
 
 
 ### Configure how the API will listen for your requests
@@ -68,10 +70,10 @@ summarization = true # or false
 entity_detection = false # or true
 
 ### Enables pre-recorded entity-based redaction *if* a valid entity detection model is available
-entity_redaction = true # or false
+entity_redaction = false # or true
 
 ### Enables pre-recorded entity formatting *if* a valid NER model is available
-format_entity_tags = true # or false
+format_entity_tags = false # or true
 
 ### If API is receiving requests faster than Engine can process them, a request
 ### queue will form. By default, this queue is stored in memory. Under high load,
@@ -112,7 +114,7 @@ listen_v2 = false # or true
 ###
 ### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
 ### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
-url = "https://engine:8080/v2"
+url = "https://engine-polyglot:8080/v2"
 ### Factor to increase the timeout by for each additional retry (for
 ### exponential backoff).
 timeout_backoff = 1.2

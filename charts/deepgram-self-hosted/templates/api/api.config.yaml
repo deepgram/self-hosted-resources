@@ -4,12 +4,16 @@ metadata:
   name: {{ .Values.api.namePrefix }}-config
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    {{- range $key, $val := .Values.engine.additionalLabels }}
+    {{- range $key, $val := .Values.api.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
 data:
   api.toml: |
     [license]
+      {{- if .Values.billing.enabled }}
+      server_url = ["https://{{ .Values.billing.namePrefix }}-internal:{{ .Values.billing.server.port}}"]
+      key = "${DEEPGRAM_LICENSE_KEY}"
+      {{- else }}
       server_url = [
         {{- if .Values.licenseProxy.enabled }}
         "https://{{ .Values.licenseProxy.namePrefix }}-internal:{{ .Values.licenseProxy.server.port}}{{ .Values.licenseProxy.server.baseUrl }}"
@@ -18,6 +22,7 @@ data:
         {{- if .Values.licenseProxy.enabled -}},{{- end -}}"https://license.deepgram.com"
         {{- end }}
       ]
+      {{- end }}
 
     [server]
       base_url = "{{ .Values.api.server.baseUrl }}"
@@ -50,6 +55,7 @@ data:
       format_entity_tags = {{ .Values.api.features.formatEntityTags }}
       speak_streaming = true
       redact_usage = {{ .Values.api.features.redactUsage }}
+      listen_v2 = {{ .Values.api.features.listenV2 }}
 
       {{- if .Values.api.features.diskBufferPath }}
       disk_buffer_path = "{{ .Values.api.features.diskBufferPath }}"
@@ -105,7 +111,7 @@ data:
       name = {{ $config.name | quote }}
       [voice_agent.llm_providers.{{ $provider }}.models]
       {{- range $modelId, $model := $config.models }}
-        {{ $modelId }} = { name = {{ $model.name | quote }}, tier = {{ $model.tier | quote }}, public = {{ $model.public }} }
+        {{ $modelId | quote }} = { name = {{ $model.name | quote }}, tier = {{ $model.tier | quote }}, public = {{ $model.public }} }
       {{- end }}
     {{- end }}
     {{- end }}

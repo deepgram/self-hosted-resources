@@ -4,8 +4,8 @@ metadata:
   name: {{ .Values.api.namePrefix }}
   labels: &labels
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-    app: deepgram-api
-    {{- range $key, $val := .Values.engine.additionalLabels }}
+    app: {{ .Values.api.namePrefix }}
+    {{- range $key, $val := .Values.api.additionalLabels }}
     {{ $key }}: {{ $val | quote }}
     {{- end}}
   {{- with .Values.api.additionalAnnotations }}
@@ -15,7 +15,7 @@ metadata:
 spec:
   selector:
     matchLabels:
-      app: deepgram-api
+      app: {{ .Values.api.namePrefix }}
       {{ include "deepgram-self-hosted.selectorLabels" . }}
   {{- if not .Values.scaling.auto.enabled }}
   replicas: {{ .Values.scaling.replicas.api }}
@@ -52,6 +52,26 @@ spec:
       {{- if or .Values.api.serviceAccount.create .Values.api.serviceAccount.name }}
       serviceAccountName: {{ default (printf "%s-sa" .Values.api.namePrefix) .Values.api.serviceAccount.name }}
       {{- end }}
+
+      {{- if .Values.billing.enabled }}
+      initContainers:
+        - name: config-render
+          image: {{ .Values.global.initContainer.image.registry }}/{{ .Values.global.initContainer.image.repository }}:{{ .Values.global.initContainer.image.tag }}
+          imagePullPolicy: {{ .Values.global.initContainer.image.pullPolicy }}
+          command: ["/bin/sh"]
+          args:
+            - -c
+            - sed "s|\${DEEPGRAM_LICENSE_KEY}|${DEEPGRAM_LICENSE_KEY}|g" /config/api.toml > /work/api.toml
+          envFrom:
+            - secretRef:
+                name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
+          volumeMounts:
+            - name: configmap-volume
+              mountPath: /config
+            - name: working-config
+              mountPath: /work
+      {{- end }}
+
       containers:
       - name: {{ .Values.api.namePrefix }}
         {{- with .Values.api.containerSecurityContext }}
@@ -61,9 +81,19 @@ spec:
         image: {{ .Values.api.image.path }}:{{ .Values.api.image.tag }}
         imagePullPolicy: {{ .Values.api.image.pullPolicy }}
         envFrom:
+        {{- if not .Values.billing.enabled }}
         - secretRef:
             name: {{ required "Missing Deepgram self-hosted API key - see `global.deepgramSecretRef`" .Values.global.deepgramSecretRef }}
+        {{- else }}
+        - secretRef:
+            name: {{ required "Missing Deepgram license key - see `global.deepgramLicenseSecretRef`" .Values.global.deepgramLicenseSecretRef }}
+        {{- end }}
         env:
+        {{- if .Values.billing.enabled }}
+        # API container requires DEEPGRAM_API_KEY env var, but it's not used for airgapped
+        - name: DEEPGRAM_API_KEY
+          value: "airgapped-mode"
+        {{- end }}
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
         - name: OPENAI_API_KEY
@@ -139,7 +169,7 @@ spec:
             memory: "{{ .Values.api.resources.limits.memory }}"
             cpu: "{{ .Values.api.resources.limits.cpu }}"
         volumeMounts:
-        - name: api-config-volume
+        - name: "{{ if .Values.billing.enabled }}working-config{{ else }}configmap-volume{{ end }}"
           mountPath: /etc/config
         ports:
         - name: primary
@@ -159,7 +189,12 @@ spec:
           initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
+
       volumes:
-      - name: api-config-volume
+      - name: configmap-volume
         configMap:
           name: {{ .Values.api.namePrefix }}-config
+      {{- if .Values.billing.enabled }}
+      - name: working-config
+        emptyDir: {}
+      {{- end }}

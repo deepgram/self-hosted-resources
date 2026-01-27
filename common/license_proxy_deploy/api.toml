@@ -70,7 +70,7 @@ summarization = true # or false
 entity_detection = false # or true
 
 ### Enables pre-recorded entity-based redaction *if* a valid entity detection model is available
-entity_redaction = false # or true
+entity_redaction = true # or false
 
 ### Enables pre-recorded entity formatting *if* a valid NER model is available
 format_entity_tags = false # or true
@@ -90,6 +90,9 @@ speak_streaming = true # or false
 
 ### Toggles usage data redaction; set to false to disable redaction of usage data; defaults to true if not present
 # redact_usage = true # or false
+
+### Enables Flux turn-based streaming STT
+listen_v2 = false # or true
 
 ### Configure the backend pool of speech engines (generically referred to as
 ### "drivers" here). The API will load-balance among drivers in the standard

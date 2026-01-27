@@ -1,0 +1,141 @@
+{{- if .Values.billing.enabled -}}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Values.billing.namePrefix }}
+  labels: &labels
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+    app: deepgram-billing
+    {{- range $key, $val := .Values.billing.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+  {{- with .Values.billing.additionalAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  serviceName: {{ .Values.billing.namePrefix }}-internal
+  selector:
+    matchLabels:
+       app: deepgram-billing
+       {{ include "deepgram-self-hosted.selectorLabels" . }}
+  replicas: {{ .Values.billing.replicas }}
+  podManagementPolicy: Parallel
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ .Values.billing.updateStrategy.rollingUpdate.maxUnavailable }}
+  template:
+    metadata:
+      labels: *labels
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/billing/billing.config.yaml") . | sha256sum }}
+        {{- with $.Values.billing.additionalAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      {{- if .Values.global.pullSecretRef }}
+      imagePullSecrets:
+      - name: {{ .Values.global.pullSecretRef }}
+      {{- end }}
+      affinity:
+        {{- toYaml .Values.billing.affinity | nindent 8 }}
+      tolerations:
+        {{- toYaml .Values.billing.tolerations | nindent 8 }}
+      topologySpreadConstraints:
+        {{- toYaml .Values.billing.topologySpreadConstraints | nindent 8 }}
+      nodeSelector:
+        {{- toYaml .Values.billing.nodeSelector | nindent 8 }}
+      securityContext:
+        {{- toYaml .Values.billing.securityContext | nindent 8 }}
+      {{- if or .Values.billing.serviceAccount.create .Values.billing.serviceAccount.name }}
+      serviceAccountName: {{ default (printf "%s-sa" .Values.billing.namePrefix) .Values.billing.serviceAccount.name }}
+      {{- end }}
+
+      volumes:
+        - name: configmap-volume
+          configMap:
+            name: {{ .Values.billing.namePrefix }}-config
+        - name: license-file
+          secret:
+            secretName: {{ required "Missing Deepgram license file secret - see `billing.licenseFile.secretRef`" .Values.billing.licenseFile.secretRef }}
+            items:
+            - key: {{ .Values.billing.licenseFile.secretKey }}
+              path: license.dg
+        {{- if .Values.billing.journal.existingPvcName }}
+        - name: journal
+          persistentVolumeClaim:
+            claimName: {{ .Values.billing.journal.existingPvcName }}
+        {{- else if .Values.billing.journal.aws.efs.enabled }}
+        - name: journal
+          persistentVolumeClaim:
+            claimName: {{ .Values.billing.journal.aws.efs.existingPvcName | default (printf "%s-aws-efs-pvc" .Values.engine.modelManager.volumes.aws.efs.namePrefix) }}
+        {{- end }}
+
+      containers:
+      - name: {{ .Values.billing.namePrefix }}
+        {{- with .Values.billing.containerSecurityContext }}
+        securityContext:
+          {{- toYaml . | nindent 10 }}
+        {{- end }}
+        image: {{ .Values.billing.image.path }}:{{ .Values.billing.image.tag }}
+        imagePullPolicy: {{ .Values.billing.image.pullPolicy }}
+        env:
+        - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+          value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        {{- if or .Values.billing.journal.existingPvcName .Values.billing.journal.aws.efs.enabled }}
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        {{- end }}
+        args: ["serve", "--config", "/etc/config/billing.toml"]
+        resources:
+          requests:
+            memory: "{{ .Values.billing.resources.requests.memory }}"
+            cpu: "{{ .Values.billing.resources.requests.cpu }}"
+          limits:
+            memory: "{{ .Values.billing.resources.limits.memory }}"
+            cpu: "{{ .Values.billing.resources.limits.cpu }}"
+        volumeMounts:
+        - name: configmap-volume
+          mountPath: /etc/config
+        - name: license-file
+          mountPath: /license
+          readOnly: true
+        - name: journal
+          mountPath: /journal
+          {{- if or .Values.billing.journal.existingPvcName .Values.billing.journal.aws.efs.enabled }}
+          subPathExpr: journal-$(POD_NAME)
+          {{- end }}
+        ports:
+        - name: primary
+          containerPort: {{ .Values.billing.server.port }}
+        livenessProbe:
+          tcpSocket:
+            port: {{ .Values.billing.server.port }}
+          initialDelaySeconds: {{ .Values.billing.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.billing.livenessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.billing.livenessProbe.failureThreshold }}
+        readinessProbe:
+          tcpSocket:
+            port: {{ .Values.billing.server.port }}
+          initialDelaySeconds: {{ .Values.billing.readinessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.billing.readinessProbe.periodSeconds }}
+          failureThreshold: {{ .Values.billing.readinessProbe.failureThreshold }}
+{{- if not (or .Values.billing.journal.existingPvcName .Values.billing.journal.aws.efs.enabled) }}
+  volumeClaimTemplates:
+  - metadata:
+      name: journal
+      labels:
+{{ include "deepgram-self-hosted.labels" . | indent 8}}
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      {{- if .Values.billing.journal.storageClass }}
+      storageClassName: {{ .Values.billing.journal.storageClass }}
+      {{- end }}
+      resources:
+        requests:
+          storage: {{ .Values.billing.journal.size }}
+{{- end }}
+{{- end -}}

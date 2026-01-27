@@ -1,13 +1,13 @@
-# Sample Helm values for Aura-2 deployment with English and Spanish language support
-# This configuration supports both English and Spanish Aura-2 models
-# 
+# Sample Helm values for Aura-2 deployment with English and Polyglot language support
+# This configuration supports both English and Polyglot Aura-2 models (Dutch, German, French, Italian, Japanese)
+#
 # Usage:
-#   helm install deepgram ./charts/deepgram-self-hosted -f samples/04-aura-2-setup.yaml
+#   helm install deepgram ./charts/deepgram-self-hosted -f samples/06-aura-2-polyglot-setup.values.yaml
 
 global:
   # Set your Deepgram secret containing API key
   deepgramSecretRef: "deepgram-secret"
-  
+
   # Set your image pull secret if using private registry
   # pullSecretRef: "quay-secret"
 
@@ -16,14 +16,14 @@ scaling:
   replicas:
     # Deploy separate API instances for each language
     api: 2
-    # Deploy separate Engine instances for each language  
+    # Deploy separate Engine instances for each language
     engine: 2
 
-# API configuration for English Aura-2
+# API configuration for English and Polyglot Aura-2
 api:
   image:
     tag: release-260115
-  
+
   # Enable Aura-2 specific features
   features:
 
@@ -39,7 +39,7 @@ api:
 engine:
   image:
     tag: release-260115
-  
+
   # Aura-2 requires more resources than standard models
   resources:
     requests:
@@ -58,7 +58,7 @@ engine:
       add: []
         # Example (replace with your actual model links):
         # - "https://path.to/aura-2-en-model"
-        # - "https://path.to/aura-2-es-model"
+        # - "https://path.to/aura-2-polyglot-model"
 
     # Configure volume storage for models
     volumes:
@@ -68,8 +68,8 @@ engine:
           enabled: false
           # fileSystemId: "fs-xxxxxxxxx"
           forceDownload: false
-          
-      # For GCP GKE deployments  
+
+      # For GCP GKE deployments
       gcp:
         gpd:
           enabled: false
@@ -87,7 +87,7 @@ licenseProxy:
   enabled: true
   deploySecondReplica: false
   keepUpstreamServerAsBackup: true
-  
+
   image:
     tag: release-260115
 
@@ -114,7 +114,7 @@ gpu-operator:
 scaling:
   auto:
     enabled: false  # Set to true to enable autoscaling
-    
+
     engine:
       minReplicas: 1
       maxReplicas: 4
@@ -134,7 +134,7 @@ scaling:
 aura2:
   # Aura-2 specific configuration
   enabled: true
-  
+
   # English language configuration
   english:
     enabled: true
@@ -142,11 +142,11 @@ aura2:
     t2cUuid: "15ef8614-52cb-4cd3-a641-d68249c15d53"
     c2aUuid: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
     cudaVisibleDevices: "0,1"
-    
-  # Spanish language configuration  
-  spanish:
+
+  # Polyglot language configuration (Dutch, German, French, Italian, Japanese)
+  polyglot:
     enabled: true
     maxBatchSize: 8
-    t2cUuid: "5d53d105-c6a4-47f5-b670-61adb6e8a880"
-    c2aUuid: "4d5c93ad-9e20-4ebf-a1f0-0fb88ac73ef5"
+    t2cUuid: "04975889-c601-4f80-a02f-0f2f9c22deaf"
+    c2aUuid: "9e94567e-11e7-4619-adbc-d28212194367"
     cudaVisibleDevices: "2,3"

@@ -1,6 +1,10 @@
-# See the Chart [README](https://github.com/deepgram/self-hosted-resources/blob/main/charts/deepgram-self-hosted#values)
-#   for documentation on all available options.
-
+# Deepgram Self-Hosted - Airgapped Deployment (AWS EKS)
+#
+# This configuration deploys Deepgram in an airgapped environment where components
+# cannot reach license.deepgram.com. The Billing container acts as the license terminal.
+#
+# For more information, see samples/airgapped.md and samples/README.md
+# ---
 global:
   # pullSecretRef should refer to a K8s secret that
   # must be created prior to installing this Chart.
@@ -17,16 +21,18 @@ global:
   # ```
   pullSecretRef: "dg-regcred"
 
-  # deepgramSecretRef should refer to a K8s secret that
-  # must be created prior to installing this Chart.
+  # deepgramSecretRef - API key for self-hosted deployments (not used in airgapped mode)
+
+  # deepgramLicenseSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart for airgapped deployments.
   # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
   #
-  # You can create a secret for your Deepgram self-hosted API key
+  # You can create a secret for your Deepgram license key
   # with the following command:
   # ```bash
-  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # kubectl create secret generic dg-license-key --from-literal=DEEPGRAM_LICENSE_KEY='<license-key>'
   # ```
-  deepgramSecretRef: "dg-self-hosted-api-key"
+  deepgramLicenseSecretRef: "dg-license-key"
 
 scaling:
   replicas:
@@ -118,7 +124,7 @@ engine:
   # -- Custom TOML sections can be added here to extend engine.toml
   # customToml: |
   #   # Preload models on engine startup for faster initial requests
-  #   # See https://support.deepgram.com/en-US/deepgram/article/ART-528-how-can-i-preload-models-to-reduce-cold-start-latency
+  #   # See https://deepgram.gitbook.io/help-center/how-can-i-pre-load-models-to-reduce-cold-start-latency
   #   [preload_models]
   #   models = [
   #     # Example model preload configuration:
@@ -144,8 +150,25 @@ engine:
         # - name-of-old-model-3.dg #   this will likely be empty.
         # - ...
 
-licenseProxy:
+billing:
   enabled: true
+  replicas: 1
+  
+  # licenseFile should refer to a K8s secret containing your Deepgram license file.
+  # The license file is a 1-line JSON file provided by Deepgram.
+  #
+  # You can create a secret for your license file with the following command:
+  # ```bash
+  # kubectl create secret generic dg-license-file --from-file=license.dg=/path/to/license.dg
+  # ```
+  licenseFile:
+    secretRef: "dg-license-file"
+    secretKey: "license.dg"
+  
+  journal:
+    aws:
+      efs:
+        enabled: true
 
   affinity:
     nodeAffinity:
@@ -155,14 +178,19 @@ licenseProxy:
               - key: k8s.deepgram.com/node-type
                 operator: In
                 values:
+                  - billing
+
+licenseProxy:
+  enabled: true
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+          - matchExpressions:
+              - key: k8s.deepgram.com/node-type
+                operator: In
+                values:
                   - license-proxy
-  resources:
-    requests:
-      memory: "6Gi"
-      cpu: "1500m"
-    limits:
-      memory: "8Gi"
-      cpu: "2000m"
 
 cluster-autoscaler:
   enabled: true
