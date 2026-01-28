@@ -730,6 +730,12 @@ engine:
     # them. You can explicitly enable or disable this behavior with the state parameter
     # which supports `"enable"`, `"disabled"`, and `"auto"`.
     state: "auto"
+  
+  # -- This determines the number of seconds that the Pod will be retained, for the Deepgram
+  # model manager. As long as this Pod is existing, it will keep a claim on the Kubernetes
+  # PersistentVolumeClaim, which can cause the PVC to hang in the "terminating" state, if the
+  # Helm chart is deleted (uninstalled).
+  ttlSecondsAfterFinished: 900
 
   health:
     # -- Engine will automatically fall back to CPU when a GPU is not detected. You can

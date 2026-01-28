@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+- Adds a 15-minute Time-to-Live (TTL) to the model download pod
+  - This helps to fix an issue where a lock is held on the PersistentVolume resource, when attempting to delete the Deepgram Kubernetes namespace
+
 ## [0.28.0] - 2026-01-27
 
 ### Added
