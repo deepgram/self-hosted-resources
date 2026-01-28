@@ -55,6 +55,9 @@ data:
 
     [flux]
       enabled = {{ .Values.engine.flux.enabled }}
+      {{- if .Values.engine.flux.max_streams }}
+      max_streams = {{ .Values.engine.flux.max_streams }}
+      {{- end }}
 
     [chunking.batch]
       {{- if .Values.engine.chunking.speechToText.batch.minDuration }}

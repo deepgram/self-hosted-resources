@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.27.1](https://img.shields.io/badge/Version-0.27.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260115](https://img.shields.io/badge/AppVersion-release--260115-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.28.0](https://img.shields.io/badge/Version-0.28.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260115](https://img.shields.io/badge/AppVersion-release--260115-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -369,6 +369,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.features.streamingNer | bool | `true` | Enables format entity tags on streaming audio *if* a valid NER model is available. |
 | engine.features.useV2LanguageDetection | bool | `false` | Enables use of 36-language detection model. |
 | engine.flux.enabled | bool | `false` | Enables Flux turn-based streaming STT |
+| engine.flux.max_streams | string | `nil` | Specify the maximum number of streams for the Flux model in the Engine process |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
