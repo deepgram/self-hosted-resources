@@ -61,7 +61,7 @@ use_v2_language_detection = false
 [flux]
 enabled = false # or true
 ### Specify the maximum number of concurrent streams to the Flux model in the Engine process
-# max_streams = 40
+# max_streams = 0 # Placeholder; required for production. Set explicitly based on GPU type.
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]

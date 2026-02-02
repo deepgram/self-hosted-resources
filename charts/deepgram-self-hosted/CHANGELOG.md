@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.29.1] - 2026-02-02
+
+### Changed
+
+- Updated the default value for `flux.max_streams` to be a placeholder value of `0`. This parameter must be set for production workloads based on the GPU type used in the deployment.
+
 ## [0.29.0] - 2026-01-29
 
 ### Changed
@@ -349,7 +355,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.1...HEAD
+[0.29.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.0...deepgram-self-hosted-0.29.1
 [0.29.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.28.0...deepgram-self-hosted-0.29.0
 [0.28.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.1...deepgram-self-hosted-0.28.0
 [0.27.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...deepgram-self-hosted-0.27.1
