@@ -698,7 +698,7 @@ engine:
   flux:
     # -- Enables Flux turn-based streaming STT
     enabled: false
-    # -- Specify the maximum number of streams for the Flux model in the Engine process
+    # -- Specify the maximum number of streams for the Flux model in the Engine process. This must be set for production workloads based on the GPU type used in the deployment.
     max_streams:
 
   # -- chunking defines the size of audio chunks to process in seconds.
