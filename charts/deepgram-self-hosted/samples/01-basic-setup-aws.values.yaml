@@ -90,6 +90,15 @@ api:
   # customToml: |
   #   [custom_section]
 
+  # Extra environment variables (e.g., for proxy configuration)
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: HTTPS_PROXY
+  #     value: "https://proxy.example.com:8080"
+  #   - name: NO_PROXY
+  #     value: "localhost,127.0.0.1,.internal.company.com"
+
 engine:
   affinity:
     nodeAffinity:
@@ -125,6 +134,15 @@ engine:
   #     # { model = "general-nova-3", version = "2025-09-05.12808", language = "multi", format = false }
   #   ]
 
+  # Extra environment variables (e.g., for proxy configuration)
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: HTTPS_PROXY
+  #     value: "https://proxy.example.com:8080"
+  #   - name: NO_PROXY
+  #     value: "localhost,127.0.0.1,.internal.company.com"
+
   modelManager:
     volumes:
       aws:
@@ -146,6 +164,15 @@ engine:
 
 licenseProxy:
   enabled: true
+
+  # Extra environment variables (e.g., for proxy configuration)
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: HTTPS_PROXY
+  #     value: "https://proxy.example.com:8080"
+  #   - name: NO_PROXY
+  #     value: "localhost,127.0.0.1,.internal.company.com"
 
   affinity:
     nodeAffinity:

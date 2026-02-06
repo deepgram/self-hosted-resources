@@ -446,6 +446,21 @@ api:
   # -- Custom TOML sections can be added to extend api.toml
   customToml:
 
+  # -- Extra environment variables for the API container.
+  # @default -- `[]`
+  extraEnv: []
+  # Example usage:
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: MY_CUSTOM_VAR
+  #     value: "some-value"
+  #   - name: SECRET_VAR
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: my-secret
+  #         key: my-key
+
 engine:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram Engine containers.
@@ -593,6 +608,21 @@ engine:
 
   # -- Custom TOML sections can be added to extend engine.toml
   customToml:
+
+  # -- Extra environment variables for the Engine container.
+  # @default -- `[]`
+  extraEnv: []
+  # Example usage:
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: MY_CUSTOM_VAR
+  #     value: "some-value"
+  #   - name: SECRET_VAR
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: my-secret
+  #         key: my-key
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``
@@ -879,6 +909,21 @@ licenseProxy:
     # -- statusPort is the port to listen on for the status/health endpoint.
     statusPort: 8080
 
+  # -- Extra environment variables for the License Proxy container.
+  # @default -- `[]`
+  extraEnv: []
+  # Example usage:
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: MY_CUSTOM_VAR
+  #     value: "some-value"
+  #   - name: SECRET_VAR
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: my-secret
+  #         key: my-key
+
 # -- Configuration options for the Deepgram Billing container.
 # The Billing container is used for airgapped deployments where API and Engine
 # cannot reach license.deepgram.com. It validates licenses locally using a
@@ -1038,6 +1083,21 @@ billing:
     port: 8443
     # -- baseUrl is the prefix for incoming license verification requests.
     baseUrl: "/"
+
+  # -- Extra environment variables for the Billing container.
+  # @default -- `[]`
+  extraEnv: []
+  # Example usage:
+  # extraEnv:
+  #   - name: HTTP_PROXY
+  #     value: "http://proxy.example.com:8080"
+  #   - name: MY_CUSTOM_VAR
+  #     value: "some-value"
+  #   - name: SECRET_VAR
+  #     valueFrom:
+  #       secretKeyRef:
+  #         name: my-secret
+  #         key: my-key
 
 # -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
 # You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.
