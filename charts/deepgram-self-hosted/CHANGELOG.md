@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+- Added `extraEnv` support to API, Engine, License Proxy, and Billing containers for passing custom environment variables via values.yaml.
+
 ## [0.29.1] - 2026-02-02
 
 ### Changed
