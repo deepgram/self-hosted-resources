@@ -1,6 +1,7 @@
 import { WebSocket } from 'k6/experimental/websockets';
 import { setInterval, clearInterval } from 'k6/timers';
 import { Trend } from 'k6/metrics';
+import encoding from 'k6/encoding';
 import { importedoptions } from './streamingstages.js';
 
 export const options = importedoptions;
@@ -26,100 +27,110 @@ const mspm = parseInt(`${__ENV.K6_MSPM}`);
 const bps = parseInt(`${__ENV.K6_BPS}`);
 const bpm = parseInt(`${__ENV.K6_BPM}`);
 
-// Only one of these can be true:
-const measureInterimResults = true;  // i.e. is_final=true
-const measureEndpointing = true;  // i.e. speech_final=true
-
+// LiveKit Inference Gateway settings
+const model = `${__ENV.STT_MODEL}`;       // e.g. "deepgram/nova-3"
+const language = `${__ENV.STT_LANGUAGE}`; // e.g. "en"
+// For pcm_s16le encoding: sample_rate = bps / 2 (2 bytes per sample)
+const sampleRate = __ENV.K6_SAMPLE_RATE ? parseInt(`${__ENV.K6_SAMPLE_RATE}`) : Math.floor(bps / 2);
 
 // Custom Trend metric to track cursor latency
 const interimResultsLatency = new Trend('interimResultsLatency', true);
 const endpointingLatency = new Trend('endpointingLatency', true);
 
-function datainterval(ws, data, amount, d) {
-    let index = d.index
-    ws.send(data.slice(index, index + amount));
-    d.index = index + amount; // update so we can track latency
+function sendAudioChunk(ws, data, amount, state) {
+    if (state.finalized) return;
+
+    let index = state.index;
+    if (index >= data.byteLength) {
+        state.finalized = true;
+        ws.send(JSON.stringify({ type: "session.finalize" }));
+        return;
+    }
+
+    let end = Math.min(index + amount, data.byteLength);
+    let chunk = data.slice(index, end);
+    let b64 = encoding.b64encode(chunk);
+    ws.send(JSON.stringify({
+        type: "input_audio",
+        audio: b64,
+    }));
+    state.index = end;
 }
 
 
 export default function () {
-    const url = `${__ENV.DG_WS_URL}`;
+    const url = `${__ENV.GATEWAY_WS_URL}`;   // wss://<host>/stt
+    const token = `${__ENV.GATEWAY_TOKEN}`;
     const params = {
-      headers: { 'Authorization': 'Token ' + `${__ENV.DEEPGRAM_API_KEY}` },
+        headers: { 'Authorization': 'Bearer ' + token },
     };
     const ws = new WebSocket(url, null, params);
     let interval_id;
-    let audio_state = { index: 0 }; // for tracking how much data has been sent
+    let audio_state = { index: 0, finalized: false };
     let transcript_cursor = 0;
-    let received_metadata = false;
+    let received_session_created = false;
     let last_word = null;
 
     ws.onopen = () => {
-        // console.log('WebSocket connection established!');
-        interval_id = setInterval(datainterval, mspm, ws, fdata, bpm, audio_state);
+        // Send session.create to configure the STT session
+        ws.send(JSON.stringify({
+            type: "session.create",
+            model: model,
+            settings: {
+                language: language,
+                encoding: "pcm_s16le",
+                sample_rate: sampleRate,
+            },
+        }));
     };
-    ws.onmessage = (data) => {
-        //  console.log('a message received');
-        let dg_results = JSON.parse(data.data);
-        // console.log(dg_results);
+    ws.onmessage = (event) => {
+        let msg = JSON.parse(event.data);
 
-        if (measureInterimResults && (dg_results.type == "Results") && (dg_results.is_final == false)) {
-            let elapsed = dg_results.start + dg_results.duration; // times are in seconds
+        if (msg.type === "session.created") {
+            received_session_created = true;
+            // Start streaming audio after session is established
+            interval_id = setInterval(sendAudioChunk, mspm, ws, fdata, bpm, audio_state);
+            return;
+        }
+
+        if (!received_session_created) return;
+
+        if (msg.type === "interim_transcript" && msg.transcript) {
+            // Gateway provides start and duration (seconds), same semantics as Deepgram Results
+            let elapsed = (msg.start || 0) + (msg.duration || 0);
             let audio_cursor = audio_state.index / bps;
-            // The max_latency is the amount of time between when the first bit of audio was sent and when Deepgram returned a result.
-            let max_latency = (audio_cursor - transcript_cursor) * 1000; // times are in ms
-            // The min_latency is the amount of time between when the last bit of audio was sent and when Deepgram returned a result.
-            let min_latency = (audio_cursor - elapsed) * 1000; // times are in ms
+            // max_latency: time between when the first bit of audio was sent and when the gateway returned a result
+            let max_latency = (audio_cursor - transcript_cursor) * 1000;
+            // min_latency: time between when the last bit of audio was sent and when the gateway returned a result
+            let min_latency = (audio_cursor - elapsed) * 1000;
             transcript_cursor = elapsed;
-            // console.log("Cursor latency: ", (audio_state.index / bps) - elapsed);
-
-            // We average the min_latency and max_latency to calculate the average amount of time it took to return an interim result.
             interimResultsLatency.add((min_latency + max_latency) / 2);
-        } else if (measureEndpointing && (dg_results.type == "Results") && (dg_results.is_final == true)) {
-            // Logic for endpoint latency based on endpointing
-            // If the last word is not empty, set last_word to the last word end time
-            let word = dg_results.channel.alternatives[0].words.at(-1)
-            // Update transcript cursor for interim result latency
-            let elapsed = dg_results.start + dg_results.duration; // times are in seconds
+        } else if (msg.type === "final_transcript" && msg.transcript) {
+            let elapsed = (msg.start || 0) + (msg.duration || 0);
             let audio_cursor = audio_state.index / bps;
             transcript_cursor = elapsed;
 
-            if (dg_results.speech_final == true) {
-                if (word.word) {
-                    last_word = word.end
+            // Use word-level timing for endpointing latency
+            if (msg.words && msg.words.length > 0) {
+                let word = msg.words[msg.words.length - 1];
+                if (word.end) {
+                    last_word = word.end;
                 }
-                endpointingLatency.add((audio_cursor - last_word) * 1000);
-                // console.log("Endpointing Audio Last Word: ", last_word)
             }
-        } else if (measureEndpointing && (dg_results.type == "UtteranceEnd")) {
-            // Logic for endpoint latency based on UtteranceEnd
-            // console.log("UtteranceEnd.  Current last word: ", last_word, " last_word_end: ", dg_results.last_word_end)
-
-            if (last_word < dg_results.last_word_end) {
-                // Last word is only updated on speech_final or UtteranceEnd
-                // This is true when the last final result was not a speech_final and UtteranceEnd then fires.
-                last_word = dg_results.last_word_end
-                let audio_cursor = audio_state.index / bps;
-                console.log("Adding last word from utterance end", last_word, " Audio cursor: ", audio_cursor)
+            if (last_word !== null) {
                 endpointingLatency.add((audio_cursor - last_word) * 1000);
             }
-        }
-
-
-        if (dg_results.type == "Metadata") {
-            received_metadata = true;
         }
     };
-    ws.onclose = (data) => {
-        // console.log('Closing connection')
+    ws.onclose = () => {
         clearInterval(interval_id);
-        if (!received_metadata) {
-            console.log("No metadata received!!!")
+        if (!received_session_created) {
+            console.log("No session.created received!");
         }
-    }
+    };
     ws.onerror = (data) => {
-        console.log("Websocket error!");
+        console.log("WebSocket error!");
         console.log(data);
         clearInterval(interval_id);
-    }
+    };
 }
