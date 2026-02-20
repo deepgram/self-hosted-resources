@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+- Removed the `[half_precision]` section from `engine.toml` files
+
 ## [0.30.0] - 2026-02-12
 
 ### Added
