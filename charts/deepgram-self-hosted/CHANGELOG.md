@@ -7,6 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ## Unreleased
 
 - Removed the `[half_precision]` section from `engine.toml` files
+  - Deepgram sets this automatically and does not require customers to manually configure it
 
 ## [0.30.0] - 2026-02-12
 
