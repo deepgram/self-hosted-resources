@@ -11,6 +11,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated default container tags to March 2026 release (`release-260305`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-march-2026-release-260305) for additional details.
+- Removed the `[half_precision]` section from `engine.toml` files
+  - Deepgram sets this automatically and does not require customers to manually configure it
 
 ## [0.30.0] - 2026-02-12
 

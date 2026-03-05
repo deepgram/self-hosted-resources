@@ -82,12 +82,6 @@ enabled = false # or true
 [preload_models]
 blocking = false
 
-### Engine will automatically enable half precision operations if your GPU supports
-### them. You can explicitly enable or disable this behavior with the state parameter
-### which supports enabled, disabled, and auto (the default).
-[half_precision]
-# state = "disabled" # or "enabled" or "auto"
-
 [health]
 ### Controls whether Engine fails on startup if no GPU is detected
 ### Default: false
