@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.31.0] - 2026-03-05
+
+### Changed
+
+- Updated default container tags to March 2026 release (`release-260305`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-march-2026-release-260305) for additional details.
 - Removed the `[half_precision]` section from `engine.toml` files
   - Deepgram sets this automatically and does not require customers to manually configure it
 
@@ -368,7 +373,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.30.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.31.0...HEAD
+[0.31.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.30.0...deepgram-self-hosted-0.31.0
 [0.30.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.1...deepgram-self-hosted-0.30.0
 [0.29.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.0...deepgram-self-hosted-0.29.1
 [0.29.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.28.0...deepgram-self-hosted-0.29.0
