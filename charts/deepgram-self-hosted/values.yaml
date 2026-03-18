@@ -573,6 +573,12 @@ engine:
   # to apply to Engine pods.
   nodeSelector: {}
 
+  # -- (string) [Runtime class](https://kubernetes.io/docs/concepts/containers/runtime-class/)
+  # to use for Engine pods. Set to "nvidia" when using KOPS-managed NVIDIA drivers
+  # or other environments where the NVIDIA runtime is not the default containerd runtime
+  # and the GPU Operator is not installed.
+  runtimeClassName:
+
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods.
   securityContext: {}
 

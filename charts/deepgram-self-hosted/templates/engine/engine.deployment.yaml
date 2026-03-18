@@ -52,6 +52,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- with $.Values.engine.runtimeClassName }}
+      runtimeClassName: {{ . }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ $.Values.global.outstandingRequestGracePeriod }}
       {{- if $.Values.global.pullSecretRef }}
       imagePullSecrets:
