@@ -18,4 +18,5 @@ data:
       host = "{{ .Values.billing.server.host }}"
       port = {{ .Values.billing.server.port }}
       base_url = "{{ .Values.billing.server.baseUrl }}"
+      certificates_port = {{ .Values.billing.server.certificatesPort }}
 {{- end -}}
