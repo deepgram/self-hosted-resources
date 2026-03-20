@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
+
 ## [0.32.0] - 2026-03-19
 
 ### Added
