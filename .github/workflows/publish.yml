@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   release:
@@ -15,7 +16,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          token: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
+          token: "${{ github.token }}"
 
       # `chart-releaser-action` only performs a `git diff` on Chart files. If we have a workflow where we want to
       # merge something without bumping the Chart version yet to create a release, the chart-releaser-action will
@@ -25,15 +26,23 @@ jobs:
       #
       # This relies on PRs being squashed when merged (as it compares the head commit to its parent).
       # This is currently enforced in the repositories PR settings.
+      #
+      # If triggered by a manual workflow run, it always releases a new chart version.
       - name: Check if Chart version was bumped
         id: check-chart-version
         run: |
           CHART_DIR="charts/deepgram-self-hosted"
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "Manual trigger, attempting release..."
+            echo "SHOULD_RELEASE_CHART=true" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
           if git diff --name-only HEAD^..HEAD | grep "^$CHART_DIR"; then
             if [ ! -f "$CHART_DIR/Chart.yaml" ]; then
               echo "Error: Chart.yaml not found in $CHART_DIR"
               EXIT_CODE=1
-              continue
             fi
 
             OLD_VERSION=$(git show HEAD^:$CHART_DIR/Chart.yaml | grep '^version:' | awk '{print $2}')
@@ -41,32 +50,32 @@ jobs:
 
             if [ "$OLD_VERSION" = "$NEW_VERSION" ]; then
               echo "$CHART_DIR has been changed, but version has not been bumped, so not performing release."
-              echo "IS_CHART_VERSION_BUMPED=false" >> $GITHUB_OUTPUT
+              echo "SHOULD_RELEASE_CHART=false" >> $GITHUB_OUTPUT
             else
               echo "$CHART_DIR has been updated, and version has been bumped from $OLD_VERSION to $NEW_VERSION."
               echo "Proceeding with release..."
-              echo "IS_CHART_VERSION_BUMPED=true" >> $GITHUB_OUTPUT
+              echo "SHOULD_RELEASE_CHART=true" >> $GITHUB_OUTPUT
             fi
           else
             echo "deepgram-self-hosted chart was not modified."
-            echo "IS_CHART_VERSION_BUMPED=false" >> $GITHUB_OUTPUT
+            echo "SHOULD_RELEASE_CHART=false" >> $GITHUB_OUTPUT
           fi
 
       - name: Configure Git
-        if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
+        if: steps.check-chart-version.outputs.SHOULD_RELEASE_CHART == 'true'
         run: |
           # Give CI a git identity for its commit message
           git config --global user.email "robot@deepgram.com"
           git config --global user.name "Deepgram CI"
 
       - name: Install Helm
-        if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
+        if: steps.check-chart-version.outputs.SHOULD_RELEASE_CHART == 'true'
         uses: azure/setup-helm@v4
         env:
-          GITHUB_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
+          GITHUB_TOKEN: "${{ github.token }}"
 
       - name: Add Helm chart repositories for chart dependencies
-        if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
+        if: steps.check-chart-version.outputs.SHOULD_RELEASE_CHART == 'true'
         run: |
           helm repo add nvidia https://helm.ngc.nvidia.com/nvidia
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
@@ -74,7 +83,7 @@ jobs:
           helm repo update
 
       - name: Run chart-releaser
-        if: steps.check-chart-version.outputs.IS_CHART_VERSION_BUMPED == 'true'
+        if: steps.check-chart-version.outputs.SHOULD_RELEASE_CHART == 'true'
         uses: helm/chart-releaser-action@v1.6.0
         env:
           CR_TOKEN: "${{ secrets.GH_SELFHOSTEDRESOURCES_RW }}"
