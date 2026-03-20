@@ -9,7 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
-- Added a 15-minute Time-to-Live (TTL) to the model download pod
+- Added a 15-minute Time-to-Live (TTL) to the model download pod, configurable via `ttlSecondsAfterFinished`
   - This helps to fix an issue where a lock is held on the PersistentVolume resource, when attempting to delete the Deepgram Kubernetes namespace
 
 ## [0.32.0] - 2026-03-19
