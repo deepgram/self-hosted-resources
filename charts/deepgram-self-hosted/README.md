@@ -343,6 +343,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods. |
 | billing.server | object | `` | Configure how the Billing container will listen for licensing requests. |
 | billing.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
+| billing.server.certificatesPort | int | `8080` | certificatesPort is the port for the HTTP certificates endpoint (/v1/certificates). Must be set explicitly for the certificates endpoint to be reachable. |
 | billing.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | billing.server.port | int | `8443` | port to listen on. |
 | billing.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Billing Deployment. |
