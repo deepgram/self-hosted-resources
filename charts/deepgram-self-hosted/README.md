@@ -407,6 +407,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
 | engine.resources.requests.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
+| engine.runtimeClassName | string | `nil` | [Runtime class](https://kubernetes.io/docs/concepts/containers/runtime-class/) to use for Engine pods. Set to "nvidia" when using KOPS-managed NVIDIA drivers or other environments where the NVIDIA runtime is not the default containerd runtime and the GPU Operator is not installed. |
 | engine.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods. |
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
