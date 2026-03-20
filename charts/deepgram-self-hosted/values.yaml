@@ -690,7 +690,7 @@ engine:
           storageClass:
             # -- Specifies whether a StorageClass should be created
             create: true
-            # -- The name of the StorageClass to use.
+            # -- The name of the StorageClass to use. If not set and create is true, a name is generated using `<namePrefix>-aws-efs-sc`. Required when create is false.
             name:
       gcp:
         gpd:
