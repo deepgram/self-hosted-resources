@@ -23,7 +23,7 @@ rules:
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["services"]
-    resourceNames: [{{- if .Values.licenseProxy.enabled -}}"{{ .Values.licenseProxy.namePrefix }}-internal"{{- end -}}]
+    resourceNames: [{{- if .Values.billing.enabled -}}"{{ .Values.billing.namePrefix }}-internal"{{- if .Values.licenseProxy.enabled -}}, {{- end -}}{{- end -}}{{- if .Values.licenseProxy.enabled -}}"{{ .Values.licenseProxy.namePrefix }}-internal"{{- end -}}]
     verbs: ["get"]
   - apiGroups: [""]
     resources: ["persistentvolumeclaims"]

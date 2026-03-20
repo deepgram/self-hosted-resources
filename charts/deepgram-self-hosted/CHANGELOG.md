@@ -6,9 +6,90 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
+- Added a 15-minute Time-to-Live (TTL) to the model download pod, configurable via `ttlSecondsAfterFinished`
+  - This helps to fix an issue where a lock is held on the PersistentVolume resource, when attempting to delete the Deepgram Kubernetes namespace
+
+## [0.32.0] - 2026-03-19
+
+### Added
+
+- Added `billing.server.certificatesPort` to expose the `/v1/certificates` endpoint on the Billing container
+
 ### Changed
 
+- Updated default container tags to March 2026 release (`release-260319`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-march-2026-release-260319) for additional details.
+
+## [0.31.0] - 2026-03-05
+
+### Changed
+
+- Updated default container tags to March 2026 release (`release-260305`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-march-2026-release-260305) for additional details.
+- Removed the `[half_precision]` section from `engine.toml` files
+  - Deepgram sets this automatically and does not require customers to manually configure it
+
+## [0.30.0] - 2026-02-12
+
+### Added
+
+- Added `extraEnv` support to API, Engine, License Proxy, and Billing containers for passing custom environment variables via values.yaml.
+
+### Changed
+
+- Updated default container tags to February 2026 release (`release-260212`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-february-2026-release-260212) for additional details.
+
+## [0.29.1] - 2026-02-02
+
+### Changed
+
+- Updated the default value for `flux.max_streams` to be a placeholder value of `0`. This parameter must be set for production workloads based on the GPU type used in the deployment.
+
+## [0.29.0] - 2026-01-29
+
+### Changed
+
+- Updated default container tags to January 2026 release (`release-260129`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-january-2026-release-260129) for additional details.
+
+## [0.28.0] - 2026-01-27
+
+### Added
+
+- Added Flux `max_streams` setting to Engine configuration
+
+## [0.27.1] - 2026-01-21
+
+### Added
+
+- Added Billing container support for airgapped deployments
+
+## [0.27.0] - 2026-01-15
+
+### Added
+
+- Added `engine.health.gpuRequired` to indicate whether GPU availability is required to be considered healthy. Defaults to `false`.
+- Added support for Aura-2 Polyglot TTS (Dutch, German, French, Italian, Japanese)
+
+### Changed
+
+- Updated default container tags to January 2026 release (`release-260115`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-january-2026-release-260115) for additional details. The changelog describes the details of a TTS breaking change for which we recommend using a blue-green deployment strategy.
+
+## [0.26.0] - 2025-12-29
+
+### Changed
+
+- Updated default container tags to December 2025 release (`release-251229`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-december-2025-release-251229) for additional details.
+
+## [0.25.0] - 2025-12-10
+
+### Added
+
 - Added an optional `engine.lifecycle.postStart.command` hook to run custom commands after Engine container startup.
+
+### Changed
+
+- Updated default container tags to December 2025 release (`release-251210`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-december-2025-release-251210) for additional details.
 
 ## [0.24.0] - 2025-11-18
 
@@ -309,8 +390,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.32.0...HEAD
+[0.32.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.31.0...deepgram-self-hosted-0.32.0
+[0.31.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.30.0...deepgram-self-hosted-0.31.0
+[0.30.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.1...deepgram-self-hosted-0.30.0
+[0.29.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.29.0...deepgram-self-hosted-0.29.1
+[0.29.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.28.0...deepgram-self-hosted-0.29.0
+[0.28.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.1...deepgram-self-hosted-0.28.0
+[0.27.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.27.0...deepgram-self-hosted-0.27.1
+[0.27.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.26.0...deepgram-self-hosted-0.27.0
+[0.26.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.25.0...deepgram-self-hosted-0.26.0
+[0.25.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.24.0...deepgram-self-hosted-0.25.0
+[0.24.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.1...deepgram-self-hosted-0.24.0
+[0.23.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.23.0...deepgram-self-hosted-0.23.1
 [0.23.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.22.0...deepgram-self-hosted-0.23.0
 [0.22.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.21.0...deepgram-self-hosted-0.22.0
 [0.21.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.20.0...deepgram-self-hosted-0.21.0
@@ -341,5 +433,3 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 [0.2.0-beta]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.1-alpha...deepgram-self-hosted-0.2.0-beta
 [0.1.1-alpha]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.1.0-alpha...deepgram-self-hosted-0.1.1-alpha
 [0.1.0-alpha]: https://github.com/deepgram/self-hosted-resources/releases/tag/deepgram-self-hosted-0.1.0-alpha
-
-
