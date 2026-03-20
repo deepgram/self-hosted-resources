@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.28.0](https://img.shields.io/badge/Version-0.28.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260115](https://img.shields.io/badge/AppVersion-release--260115-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.32.0](https://img.shields.io/badge/Version-0.32.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260319](https://img.shields.io/badge/AppVersion-release--260319-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -271,6 +271,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.driverPool.standard.retryBackoff | float | `1.6` | retryBackoff is the factor to increase the retrySleep by for each additional retry (for exponential backoff). |
 | api.driverPool.standard.retrySleep | string | `"2s"` | retrySleep defines the initial sleep period (in humantime duration) before attempting a retry. |
 | api.driverPool.standard.timeoutBackoff | float | `1.2` | timeoutBackoff is the factor to increase the timeout by for each additional retry (for exponential backoff). |
+| api.extraEnv | list | `[]` | Extra environment variables for the API container. |
 | api.features | object | `` | Enable ancillary features |
 | api.features.diskBufferPath | string | `nil` | If API is receiving requests faster than Engine can process them, a request queue will form. By default, this queue is stored in memory. Under high load, the queue may grow too large and cause Out-Of-Memory errors. To avoid this, set a diskBufferPath to buffer the overflow on the request queue to disk.  WARN: This is only to temporarily buffer requests during high load. If there is not enough Engine capacity to process the queued requests over time, the queue (and response time) will grow indefinitely. |
 | api.features.entityDetection | bool | `false` | Enables entity detection on pre-recorded audio *if* a valid entity detection model is available. |
@@ -280,7 +281,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-260319"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
@@ -319,9 +320,10 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Billing pods. |
 | billing.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Billing containers. |
 | billing.enabled | bool | `false` | Enable the Billing container for airgapped deployments. When enabled, API and Engine will connect to the Billing container instead of license.deepgram.com. |
+| billing.extraEnv | list | `[]` | Extra environment variables for the Billing container. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-260319"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
 | billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
 | billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
@@ -341,6 +343,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods. |
 | billing.server | object | `` | Configure how the Billing container will listen for licensing requests. |
 | billing.server.baseUrl | string | `"/"` | baseUrl is the prefix for incoming license verification requests. |
+| billing.server.certificatesPort | int | `8080` | certificatesPort is the port for the HTTP certificates endpoint (/v1/certificates). Must be set explicitly for the certificates endpoint to be reachable. |
 | billing.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | billing.server.port | int | `8443` | port to listen on. |
 | billing.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Billing Deployment. |
@@ -366,15 +369,16 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.concurrencyLimit.activeRequests | int | `nil` | activeRequests limits the number of active requests handled by a single Engine container. If additional requests beyond the limit are sent, the API container forming the request will try a different Engine pod. If no Engine pods are able to accept the request, the API will return a 429 HTTP response to the client. The `nil` default means no limit will be set. |
 | engine.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for Engine containers. |
 | engine.customToml | string | `nil` | Custom TOML sections can be added to extend engine.toml |
+| engine.extraEnv | list | `[]` | Extra environment variables for the Engine container. |
 | engine.features.streamingNer | bool | `true` | Enables format entity tags on streaming audio *if* a valid NER model is available. |
 | engine.features.useV2LanguageDetection | bool | `false` | Enables use of 36-language detection model. |
 | engine.flux.enabled | bool | `false` | Enables Flux turn-based streaming STT |
-| engine.flux.max_streams | string | `nil` | Specify the maximum number of streams for the Flux model in the Engine process |
+| engine.flux.max_streams | string | `nil` | Specify the maximum number of streams for the Flux model in the Engine process. This must be set for production workloads based on the GPU type used in the deployment. |
 | engine.halfPrecision.state | string | `"auto"` | Engine will automatically enable half precision operations if your GPU supports them. You can explicitly enable or disable this behavior with the state parameter which supports `"enable"`, `"disabled"`, and `"auto"`. |
 | engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-260319"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -403,6 +407,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.limits.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
 | engine.resources.requests.gpu | int | `1` | gpu maps to the nvidia.com/gpu resource parameter |
+| engine.runtimeClassName | string | `nil` | [Runtime class](https://kubernetes.io/docs/concepts/containers/runtime-class/) to use for Engine pods. Set to "nvidia" when using KOPS-managed NVIDIA drivers or other environments where the NVIDIA runtime is not the default containerd runtime and the GPU Operator is not installed. |
 | engine.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Engine pods. |
 | engine.server | object | `` | Configure Engine containers to listen for requests from API containers. |
 | engine.server.host | string | `"0.0.0.0"` | host is the IP address to listen on for inference requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
@@ -447,9 +452,10 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.containerSecurityContext | object | `{}` | [Container-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-container) for License Proxy containers. |
 | licenseProxy.deploySecondReplica | bool | `false` | If the License Proxy is deployed, one replica should be sufficient to support many API/Engine pods. Highly available environments may wish to deploy a second replica to ensure uptime, which can be toggled with this option. |
 | licenseProxy.enabled | bool | `false` | The License Proxy is optional, but highly recommended to be deployed in production to enable highly available environments. |
+| licenseProxy.extraEnv | list | `[]` | Extra environment variables for the License Proxy container. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-260115"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-260319"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |

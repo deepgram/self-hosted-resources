@@ -89,6 +89,9 @@ spec:
             fieldRef:
               fieldPath: metadata.name
         {{- end }}
+        {{- with .Values.billing.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         args: ["serve", "--config", "/etc/config/billing.toml"]
         resources:
           requests:

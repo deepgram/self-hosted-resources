@@ -159,6 +159,9 @@ spec:
           {{- else }}
           value: ""
           {{- end }}
+        {{- with .Values.api.extraEnv }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
         command: [ "stem" ]
         args: ["-v", "serve", "/etc/config/api.toml"]
         resources:

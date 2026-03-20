@@ -52,6 +52,9 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
     spec:
+      {{- with $.Values.engine.runtimeClassName }}
+      runtimeClassName: {{ . }}
+      {{- end }}
       terminationGracePeriodSeconds: {{ $.Values.global.outstandingRequestGracePeriod }}
       {{- if $.Values.global.pullSecretRef }}
       imagePullSecrets:
@@ -155,6 +158,9 @@ spec:
         - name: CUDA_VISIBLE_DEVICES
           value: "{{ $.Values.aura2.polyglot.cudaVisibleDevices }}"
         {{- end }}
+        {{- end }}
+        {{- with $.Values.engine.extraEnv }}
+        {{- toYaml . | nindent 8 }}
         {{- end }}
         command: [ "impeller" ]
         args: ["-v", "serve", "/etc/config/engine.toml"]
