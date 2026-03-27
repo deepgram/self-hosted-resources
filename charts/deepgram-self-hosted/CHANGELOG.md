@@ -13,6 +13,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
   - This helps to fix an issue where a lock is held on the PersistentVolume resource, when attempting to delete the Deepgram Kubernetes namespace
 - Added `engine.resources.gpuResourceName` to make the GPU resource name configurable for MIG support
 
+### Fixed
+
+- Standardized sample values files to fix drift from the reference configuration (missing resource limits, null `features:` overrides, inconsistent global section, incorrect model list format)
+
 ## [0.32.0] - 2026-03-19
 
 ### Added

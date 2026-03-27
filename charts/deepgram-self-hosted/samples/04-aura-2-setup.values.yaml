@@ -5,18 +5,38 @@
 #   helm install deepgram ./charts/deepgram-self-hosted -f samples/04-aura-2-setup.yaml
 
 global:
-  # Set your Deepgram secret containing API key
-  deepgramSecretRef: "deepgram-secret"
-  
-  # Set your image pull secret if using private registry
-  # pullSecretRef: "quay-secret"
+  # pullSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
+  # ```bash
+  # docker login quay.io
+  # kubectl create secret docker-registry dg-regcred \
+  #   --docker-server=quay.io \
+  #   --docker-username='QUAY_DG_USER' \
+  #   --docker-password='QUAY_DG_PASSWORD'
+  # ```
+  pullSecretRef: "dg-regcred"
+
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key"
 
 # Configure scaling for multi-language deployment
 scaling:
   replicas:
     # Deploy separate API instances for each language
     api: 2
-    # Deploy separate Engine instances for each language  
+    # Deploy separate Engine instances for each language
     engine: 2
 
 # API configuration for English Aura-2
@@ -24,9 +44,6 @@ api:
   image:
     tag: release-260319
   
-  # Enable Aura-2 specific features
-  features:
-
   # Configure driver pool to connect to both language engines
   driverPool:
     standard:
@@ -46,19 +63,26 @@ engine:
       memory: "32Gi"
       cpu: "4000m"
       gpu: 2
-
-  # Aura-2 specific features
-  features:
+    limits:
+      memory: "40Gi"
+      cpu: "8000m"
+      gpu: 2
 
   # Enable automatic model management for Aura-2 models
   modelManager:
     models:
       # Add your Aura-2 model links here
       # Replace with actual model links provided by Deepgram
-      add: []
+      add:
         # Example (replace with your actual model links):
-        # - "https://path.to/aura-2-en-model"
-        # - "https://path.to/aura-2-es-model"
+        # - https://path.to/aura-2-en-model
+        # - https://path.to/aura-2-es-model
+        # - ...
+      remove:
+        # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
+        # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
+        # - name-of-old-model-3.dg #   this will likely be empty.
+        # - ...
 
     # Configure volume storage for models
     volumes:
@@ -113,8 +137,9 @@ gpu-operator:
 # Auto-scaling configuration for Aura-2 workloads
 scaling:
   auto:
-    enabled: false  # Set to true to enable autoscaling
-    
+    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
+    enabled: false
+
     engine:
       minReplicas: 1
       maxReplicas: 4
@@ -122,12 +147,12 @@ scaling:
         requestCapacityRatio: 0.8
         speechToText:
           batch:
-            requestsPerPod: 10
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
           streaming:
-            requestsPerPod: 20
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
         textToSpeech:
           batch:
-            requestsPerPod: 15
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
 
 # Additional environment variables for Aura-2 Engine containers
 # These will be added via configmap in the templates

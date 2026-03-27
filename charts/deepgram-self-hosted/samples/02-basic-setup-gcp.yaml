@@ -45,7 +45,7 @@ scaling:
         textToSpeech:
           batch:
             requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-        # Discuss a reasoanble value with your Deepgram Account Representative
+        # Discuss a reasonable value with your Deepgram Account Representative
         # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
         requestCapacityRatio:
 
