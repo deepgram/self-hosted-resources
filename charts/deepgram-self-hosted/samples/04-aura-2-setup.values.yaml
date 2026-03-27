@@ -139,8 +139,12 @@ scaling:
   auto:
     # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
     enabled: false
+
     engine:
+      minReplicas: 1
+      maxReplicas: 4
       metrics:
+        requestCapacityRatio: 0.8
         speechToText:
           batch:
             requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
@@ -149,9 +153,6 @@ scaling:
         textToSpeech:
           batch:
             requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-        # Discuss a reasoanble value with your Deepgram Account Representative
-        # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
-        requestCapacityRatio:
 
 # Additional environment variables for Aura-2 Engine containers
 # These will be added via configmap in the templates
