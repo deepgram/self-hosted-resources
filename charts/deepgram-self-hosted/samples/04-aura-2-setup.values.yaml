@@ -38,22 +38,6 @@ scaling:
     api: 2
     # Deploy separate Engine instances for each language
     engine: 2
-  auto:
-    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
-    enabled: false
-    engine:
-      metrics:
-        speechToText:
-          batch:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-          streaming:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-        textToSpeech:
-          batch:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-        # Discuss a reasoanble value with your Deepgram Account Representative
-        # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
-        requestCapacityRatio:
 
 # API configuration for English Aura-2
 api:
@@ -149,6 +133,25 @@ gpu-operator:
   toolkit:
     enabled: true
     version: v1.15.0-ubi8
+
+# Auto-scaling configuration for Aura-2 workloads
+scaling:
+  auto:
+    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
+    enabled: false
+    engine:
+      metrics:
+        speechToText:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+          streaming:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+        textToSpeech:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
+        # Discuss a reasoanble value with your Deepgram Account Representative
+        # Must also set engine.concurrencyLimit.activeRequests if using request ratio for autoscaling
+        requestCapacityRatio:
 
 # Additional environment variables for Aura-2 Engine containers
 # These will be added via configmap in the templates
