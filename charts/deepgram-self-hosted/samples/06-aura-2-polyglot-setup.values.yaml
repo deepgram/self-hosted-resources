@@ -42,7 +42,7 @@ scaling:
 # API configuration for English and Polyglot Aura-2
 api:
   image:
-    tag: release-260319
+    tag: release-260402
 
   # Configure driver pool to connect to both language engines
   driverPool:
@@ -55,7 +55,7 @@ api:
 # Engine configuration for Aura-2
 engine:
   image:
-    tag: release-260319
+    tag: release-260402
 
   # Aura-2 requires more resources than standard models
   resources:
@@ -113,7 +113,7 @@ licenseProxy:
   keepUpstreamServerAsBackup: true
 
   image:
-    tag: release-260319
+    tag: release-260402
 
 # Monitoring configuration for Aura-2
 # Enable Prometheus stack for metrics collection
