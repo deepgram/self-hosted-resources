@@ -10,6 +10,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
 
+## [0.33.0] - 2026-04-02
+
+### Changed
+
+- Updated default container tags to April 2026 release (`release-260402`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-april-2026-release-260402) for additional details.
+
 ## [0.32.0] - 2026-03-19
 
 ### Added
