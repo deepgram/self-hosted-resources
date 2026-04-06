@@ -96,42 +96,34 @@ spec:
         {{- end }}
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" . }}
+        {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.openAiSecretRef }}
         - name: OPENAI_API_KEY
-          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.openAiSecretRef }}
           valueFrom:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.openAiSecretRef }}
               key: OPENAI_API_KEY
-          {{- else }}
-          value: ""
-          {{- end }}
+        {{- end }}
+        {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.xaiSecretRef }}
         - name: XAI_API_KEY
-          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.xaiSecretRef }}
           valueFrom:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.xaiSecretRef }}
               key: XAI_API_KEY
-          {{- else }}
-          value: ""
-          {{- end }}
+        {{- end }}
+        {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.anthropicSecretRef }}
         - name: ANTHROPIC_API_KEY
-          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.anthropicSecretRef }}
           valueFrom:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.anthropicSecretRef }}
               key: ANTHROPIC_API_KEY
-          {{- else }}
-          value: ""
-          {{- end }}
+        {{- end }}
+        {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.groqSecretRef }}
         - name: GROQ_API_KEY
-          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.groqSecretRef }}
           valueFrom:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.groqSecretRef }}
               key: GROQ_API_KEY
-          {{- else }}
-          value: ""
-          {{- end }}
+        {{- end }}
         - name: ELEVENLABS_API_KEY
           {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.elevenLabsSecretRef }}
           valueFrom:
@@ -150,15 +142,20 @@ spec:
           {{- else }}
           value: ""
           {{- end }}
+        {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.googleSecretRef }}
         - name: GOOGLE_API_KEY
-          {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.googleSecretRef }}
           valueFrom:
             secretKeyRef:
               name: {{ .Values.global.thirdPartyCredentials.googleSecretRef }}
               key: GOOGLE_API_KEY
-          {{- else }}
-          value: ""
-          {{- end }}
+        {{- end }}
+        {{- if and .Values.global.thirdPartyCredentials .Values.global.thirdPartyCredentials.nvidiaSecretRef }}
+        - name: NVIDIA_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.global.thirdPartyCredentials.nvidiaSecretRef }}
+              key: NVIDIA_API_KEY
+        {{- end }}
         {{- with .Values.api.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

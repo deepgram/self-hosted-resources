@@ -28,17 +28,26 @@ global:
   # ```
   deepgramSecretRef: "dg-self-hosted-api-key"
 
-  # Third-party providers for Voice Agent.
-  # For each provider you'd like to configure, uncomment its line and insert your API key.
+  # Voice Agent LLM/TTS provider credentials.
+  #
+  # By default, Deepgram-managed providers (OpenAI, Anthropic, Google, NVIDIA) are
+  # available without any API keys. Deepgram routes LLM requests and bills you directly.
+  # See https://developers.deepgram.com/docs/voice-agent-llm-models for supported models.
+  #
+  # To use your own API key (BYO mode) for a provider, you must do BOTH of the following:
+  #   1. Uncomment and set the provider's secret ref below
+  #   2. Add the provider to `agent.llmProviders` in your values
+  #
   # Make sure to preserve the indentation under the `thirdPartyCredentials` header.
-  thirdPartyCredentials:
-    # openAiSecretRef: "openai-api-key"
-    # anthropicSecretRef: "anthropic-api-key"
-    # groqSecretRef: "groq-api-key"
-    # elevenLabsSecretRef: "elevenlabs-api-key"
-    # cartesiaSecretRef: "cartesia-api-key"
-    # xaiSecretRef: "xai-secret-ref"
-    # googleSecretRef: "google-api-key"
+  # thirdPartyCredentials:
+  #   openAiSecretRef: "openai-api-key"
+  #   anthropicSecretRef: "anthropic-api-key"
+  #   groqSecretRef: "groq-api-key"
+  #   elevenLabsSecretRef: "elevenlabs-api-key"
+  #   cartesiaSecretRef: "cartesia-api-key"
+  #   xaiSecretRef: "xai-secret-ref"
+  #   googleSecretRef: "google-api-key"
+  #   nvidiaSecretRef: "nvidia-api-key"
 
 scaling:
   replicas:
