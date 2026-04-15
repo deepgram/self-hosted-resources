@@ -2,8 +2,8 @@ apiVersion: eksctl.io/v1alpha5
 kind: ClusterConfig
 
 metadata:
-  name: deepgram-self-hosted-voice-agent-cluster
-  region: us-west-2
+  name: deepgram-self-hosted-voice-agent-cluster # Change to your desired name
+  region: us-west-2 # Change to your desired host region
   version: "1.33"
 
 iam:
@@ -30,7 +30,7 @@ managedNodeGroups:
     desiredCapacity: 1
     maxSize: 3
     instanceType: t3.large
-    amiFamily: Ubuntu2204
+    amiFamily: AmazonLinux2023
     iam:
       withAddonPolicies:
         autoScaler: true
@@ -39,7 +39,9 @@ managedNodeGroups:
     minSize: 3
     desiredCapacity: 3
     maxSize: 8
-    instanceType: g6.2xlarge
+    # Uncomment (1) instanceType line below based on TTS model requirements
+    # instanceType: g6.2xlarge # For non-Aura-2 TTS
+    # instanceType: g6.12xlarge # For Aura-2 TTS
     amiFamily: AmazonLinux2023
     labels:
       k8s.deepgram.com/node-type: engine
