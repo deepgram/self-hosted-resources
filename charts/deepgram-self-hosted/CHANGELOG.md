@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added `engine.agentOverrides` to support per-engine-type resource overrides when `agent.enabled: true`. Defaults to `gpu: 2` for the `agent-text-to-speech` engine, which is required for Aura-2 TTS. Other engine types continue to use the global `engine.resources` values.
+  - **Breaking change for existing Voice Agent deployments:** Upgrading will cause the `agent-text-to-speech` pod to request 2 GPUs by default. If you are not using Aura-2 and want to keep 1 GPU, add the following to your values:
+    ```yaml
+    engine:
+      agentOverrides:
+        agent-text-to-speech:
+          resources:
+            requests:
+              gpu: 1
+            limits:
+              gpu: 1
+    ```
 - Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
 - Added a 15-minute Time-to-Live (TTL) to the model download pod, configurable via `ttlSecondsAfterFinished`
   - This helps to fix an issue where a lock is held on the PersistentVolume resource, when attempting to delete the Deepgram Kubernetes namespace
@@ -15,6 +27,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- Fixed Voice Agent engine deployments where all three engine types (`agent-speech-to-text`, `agent-text-to-speech`, `agent-end-of-turn`) were stuck in `ContainerCreating` due to missing per-type ConfigMaps. Each engine type now gets its own ConfigMap.
+- Fixed RBAC role for Voice Agent engine pods to grant access to the per-type ConfigMap names created when `agent.enabled: true`.
+- Fixed Aura-2 environment variables (`IMPELLER_AURA2_*`, `CUDA_VISIBLE_DEVICES`) being incorrectly applied to all three engine types when `agent.enabled: true` and `aura2.enabled: true`. These vars are now only applied to the `agent-text-to-speech` deployment.
 - Standardized sample values files to fix drift from the reference configuration (missing resource limits, null `features:` overrides, inconsistent global section, incorrect model list format)
 
 ## [0.33.0] - 2026-04-02

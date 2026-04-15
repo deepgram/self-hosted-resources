@@ -15,7 +15,7 @@ metadata:
 rules:
   - apiGroups: [""]
     resources: ["configmaps"]
-    resourceNames: ["{{ .Values.engine.namePrefix }}-config"]
+    resourceNames: [{{- if .Values.agent.enabled }}"{{ .Values.engine.namePrefix }}-agent-speech-to-text-config", "{{ .Values.engine.namePrefix }}-agent-text-to-speech-config", "{{ .Values.engine.namePrefix }}-agent-end-of-turn-config"{{- else }}"{{ .Values.engine.namePrefix }}-config"{{- end }}]
     verbs: ["get", "list", "watch"]
   - apiGroups: [""]
     resources: ["secrets"]

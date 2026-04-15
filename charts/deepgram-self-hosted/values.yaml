@@ -536,6 +536,20 @@ engine:
   # -- Per-engine-type resource overrides. Only applied when agent.enabled: true.
   # Allows setting different GPU counts per engine type without affecting other resources.
   # Supported keys: agent-speech-to-text, agent-text-to-speech, agent-end-of-turn
+  #
+  # The agent-text-to-speech engine defaults to gpu: 2 because Aura-2 TTS requires
+  # a minimum of 2 GPUs to serve traffic. STT and EOT engines are unaffected and
+  # continue to use the global engine.resources values (gpu: 1 by default).
+  #
+  # If you are not using Aura-2 and want to keep the TTS engine at 1 GPU, override:
+  #   engine:
+  #     agentOverrides:
+  #       agent-text-to-speech:
+  #         resources:
+  #           requests:
+  #             gpu: 1
+  #           limits:
+  #             gpu: 1
   # @default -- ``
   agentOverrides:
     agent-text-to-speech:
