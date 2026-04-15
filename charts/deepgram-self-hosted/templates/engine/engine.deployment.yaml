@@ -125,7 +125,20 @@ spec:
         {{- end }}
         - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
           value: helm-{{ include "deepgram-self-hosted.chart" $ }}
-        {{- if le (int $.Values.engine.resources.requests.gpu) 0 }}
+        {{- $gpuRequest := int $.Values.engine.resources.requests.gpu }}
+        {{- $gpuLimit := int $.Values.engine.resources.limits.gpu }}
+        {{- if and $type $.Values.engine.agentOverrides }}
+        {{- $typeOverrides := index $.Values.engine.agentOverrides $type | default dict }}
+        {{- if $typeOverrides.resources }}
+        {{- if and $typeOverrides.resources.requests (hasKey $typeOverrides.resources.requests "gpu") }}
+        {{- $gpuRequest = int $typeOverrides.resources.requests.gpu }}
+        {{- end }}
+        {{- if and $typeOverrides.resources.limits (hasKey $typeOverrides.resources.limits "gpu") }}
+        {{- $gpuLimit = int $typeOverrides.resources.limits.gpu }}
+        {{- end }}
+        {{- end }}
+        {{- end }}
+        {{- if le $gpuRequest 0 }}
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
         {{- end }}
@@ -168,8 +181,8 @@ spec:
           requests:
             memory: "{{ $.Values.engine.resources.requests.memory }}"
             cpu: "{{ $.Values.engine.resources.requests.cpu }}"
-            {{- if gt (int $.Values.engine.resources.requests.gpu) 0 }}
-            {{ $.Values.engine.resources.gpuResourceName }}: {{ $.Values.engine.resources.requests.gpu }}
+            {{- if gt $gpuRequest 0 }}
+            {{ $.Values.engine.resources.gpuResourceName }}: {{ $gpuRequest }}
             {{- end }}
           limits:
             {{- if $.Values.engine.resources.limits.memory }}
@@ -178,8 +191,8 @@ spec:
             {{- if $.Values.engine.resources.limits.cpu }}
             cpu: "{{ $.Values.engine.resources.limits.cpu }}"
             {{- end }}
-            {{- if gt (int $.Values.engine.resources.limits.gpu) 0 }}
-            {{ $.Values.engine.resources.gpuResourceName }}: {{ $.Values.engine.resources.limits.gpu }}
+            {{- if gt $gpuLimit 0 }}
+            {{ $.Values.engine.resources.gpuResourceName }}: {{ $gpuLimit }}
             {{- end }}
         volumeMounts:
         - name: "{{ if $.Values.billing.enabled }}working-config{{ else }}configmap-volume{{ end }}"

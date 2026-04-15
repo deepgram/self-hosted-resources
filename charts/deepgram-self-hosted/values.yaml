@@ -533,6 +533,20 @@ engine:
       # -- Number of GPUs to limit
       gpu: 1
 
+  # -- Per-engine-type resource overrides. Only applied when agent.enabled: true.
+  # Allows setting different GPU counts per engine type without affecting other resources.
+  # Supported keys: agent-speech-to-text, agent-text-to-speech, agent-end-of-turn
+  # @default -- ``
+  agentOverrides:
+    agent-text-to-speech:
+      resources:
+        requests:
+          # -- Number of GPUs to request for the TTS engine. Aura-2 requires 2.
+          gpu: 2
+        limits:
+          # -- Number of GPUs to limit for the TTS engine. Aura-2 requires 2.
+          gpu: 2
+
   # -- The startupProbe combination of `periodSeconds` and `failureThreshold` allows
   # time for the container to load all models and start listening for incoming requests.
   #
