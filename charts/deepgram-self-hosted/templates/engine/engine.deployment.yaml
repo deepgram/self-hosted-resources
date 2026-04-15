@@ -129,7 +129,7 @@ spec:
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
         {{- end }}
-        {{- if $.Values.aura2.enabled }}
+        {{- if and $.Values.aura2.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
         {{- if $.Values.aura2.english.enabled }}
         - name: IMPELLER_AURA2_MAX_BATCH_SIZE
           value: "{{ $.Values.aura2.english.maxBatchSize }}"
