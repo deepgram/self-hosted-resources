@@ -11,7 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added Flux STT configuration variants for English (`engine.flux-en.toml`) and Multilingual (`engine.flux-multi.toml`), plus a shared `api.flux.toml`
-  - Flux Multilingual requires `model_name = "flux-general-multi"` in the `[flux]` section of `engine.toml`. Without this, Engine defaults to loading the English model.
+  - `engine.flux-multi.toml` sets `model_name = "flux-general-multi"` explicitly to load Multilingual Flux instead of English Flux.
 - Added `engine.flux.model_name` value to select which Flux model to load. Defaults to `flux-general-en`; set to `flux-general-multi` for the Multilingual model.
 - Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
 - Added a 15-minute Time-to-Live (TTL) to the model download pod, configurable via `ttlSecondsAfterFinished`
@@ -21,7 +21,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated default container tags to April 2026 release (`release-260416`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-april-2026-release-260416) for additional details.
-- Added commented-out `model_name` option to base `engine.toml` files under the `[flux]` section
 
 ### Fixed
 
