@@ -12,6 +12,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added Flux STT configuration variants for English (`engine.flux-en.toml`) and Multilingual (`engine.flux-multi.toml`), plus a shared `api.flux.toml`
   - Flux Multilingual requires `model_name = "flux-general-multi"` in the `[flux]` section of `engine.toml`. Without this, Engine defaults to loading the English model.
+- Added `engine.flux.model_name` value to select which Flux model to load. Defaults to `flux-general-en`; set to `flux-general-multi` for the Multilingual model.
 - Added `engine.runtimeClassName` value to configure a Kubernetes RuntimeClass on Engine pods
 - Added a 15-minute Time-to-Live (TTL) to the model download pod, configurable via `ttlSecondsAfterFinished`
   - This helps to fix an issue where a lock is held on the PersistentVolume resource, when attempting to delete the Deepgram Kubernetes namespace

@@ -58,6 +58,7 @@ data:
       {{- if .Values.engine.flux.max_streams }}
       max_streams = {{ .Values.engine.flux.max_streams }}
       {{- end }}
+      model_name = "{{ .Values.engine.flux.model_name }}"
 
     [chunking.batch]
       {{- if .Values.engine.chunking.speechToText.batch.minDuration }}

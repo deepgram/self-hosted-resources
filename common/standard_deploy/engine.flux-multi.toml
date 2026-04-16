@@ -57,9 +57,8 @@ streaming_ner = true # or false
 [flux]
 enabled = true
 ### Specify the maximum number of concurrent streams to the Flux model in the Engine process
-max_streams = 10
-### Specify which Flux model to load. Options: "flux-general-en", "flux-general-multi"
-### If not present, defaults to "flux-general-en".
+# max_streams = 0 # Placeholder; required for production. Set explicitly based on GPU type.
+### Specify which Flux model to load. Options: "flux-general-en" (default), "flux-general-multi"
 model_name = "flux-general-multi"
 
 ### Size of audio chunks to process in seconds.
