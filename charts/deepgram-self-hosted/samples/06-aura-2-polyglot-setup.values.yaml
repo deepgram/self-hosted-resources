@@ -164,7 +164,7 @@ aura2:
   english:
     enabled: true
     maxBatchSize: 8
-    t2cUuid: "15ef8614-52cb-4cd3-a641-d68249c15d53"
+    t2cUuid: "0ec06c9b-0aa0-44d0-a001-3ec57d32229e"
     c2aUuid: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
     cudaVisibleDevices: "0,1"
 

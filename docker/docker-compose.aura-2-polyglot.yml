@@ -77,7 +77,7 @@ services:
     environment:
       <<: *env
       IMPELLER_AURA2_MAX_BATCH_SIZE: 8
-      IMPELLER_AURA2_T2C_UUID: "15ef8614-52cb-4cd3-a641-d68249c15d53"
+      IMPELLER_AURA2_T2C_UUID: "0ec06c9b-0aa0-44d0-a001-3ec57d32229e"
       IMPELLER_AURA2_C2A_UUID: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
       CUDA_VISIBLE_DEVICES: 0,1
 

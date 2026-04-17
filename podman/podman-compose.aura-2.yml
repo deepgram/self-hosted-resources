@@ -78,7 +78,7 @@ services:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
       DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
       IMPELLER_AURA2_MAX_BATCH_SIZE: 8
-      IMPELLER_AURA2_T2C_UUID: "15ef8614-52cb-4cd3-a641-d68249c15d53"
+      IMPELLER_AURA2_T2C_UUID: "0ec06c9b-0aa0-44d0-a001-3ec57d32229e"
       IMPELLER_AURA2_C2A_UUID: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
       CUDA_VISIBLE_DEVICES: 0,1
 
@@ -114,8 +114,8 @@ services:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
       DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
       IMPELLER_AURA2_MAX_BATCH_SIZE: 8
-      IMPELLER_AURA2_T2C_UUID: "5d53d105-c6a4-47f5-b670-61adb6e8a880"
-      IMPELLER_AURA2_C2A_UUID: "4d5c93ad-9e20-4ebf-a1f0-0fb88ac73ef5"
+      IMPELLER_AURA2_T2C_UUID: "c053c7a8-7317-4de8-8a50-7e01c54e7ba9"
+      IMPELLER_AURA2_C2A_UUID: "04355c1e-8148-478d-9f6c-6a6c54ec3591"
       CUDA_VISIBLE_DEVICES: 2,3
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
