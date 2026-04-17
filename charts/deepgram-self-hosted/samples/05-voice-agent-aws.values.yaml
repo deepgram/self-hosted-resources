@@ -144,17 +144,17 @@ aura2:
   enabled: true
 
   # English Aura-2 TTS configuration.
-  # UUIDs must be retrieved from the TTS engine startup logs after the models are loaded.
+  # If receiving error that model is not found:
   # Run the following command once the agent-text-to-speech pod is Running,
   # replacing <namespace> with the namespace you installed the chart into:
-  #   kubectl logs -l engine-type=agent-text-to-speech -n <namespace> | grep -E "TtsKey|Codes2AudioKey"
+  #   kubectl logs -l engine-type=agent-text-to-speech -n <namespace> | head -100
   # t2cUuid -> line containing "Inserting model key=TtsKey { ... uuid: ... }"
   # c2aUuid -> line containing "Inserting model key=Codes2AudioKey { ... uuid: ... }"
   english:
     enabled: true
     maxBatchSize: 8
-    t2cUuid: "" # Replace with UUID from TTS engine startup logs
-    c2aUuid: "" # Replace with UUID from TTS engine startup logs
+    t2cUuid: "0ec06c9b-0aa0-44d0-a001-3ec57d32229e"
+    c2aUuid: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
     cudaVisibleDevices: "0,1"
 
   # Uncomment to enable Spanish Aura-2 TTS.
@@ -163,8 +163,8 @@ aura2:
   # spanish:
   #   enabled: true
   #   maxBatchSize: 8
-  #   t2cUuid: "" # Replace with UUID from TTS engine startup logs
-  #   c2aUuid: "" # Replace with UUID from TTS engine startup logs
+  #   t2cUuid: "c053c7a8-7317-4de8-8a50-7e01c54e7ba9"
+  #   c2aUuid: "04355c1e-8148-478d-9f6c-6a6c54ec3591"
   #   cudaVisibleDevices: "2,3"
 
   # Uncomment to enable Polyglot Aura-2 TTS (Dutch, German, French, Italian, Japanese).
@@ -173,8 +173,8 @@ aura2:
   # polyglot:
   #   enabled: true
   #   maxBatchSize: 8
-  #   t2cUuid: "" # Replace with UUID from TTS engine startup logs
-  #   c2aUuid: "" # Replace with UUID from TTS engine startup logs
+  #   t2cUuid: "04975889-c601-4f80-a02f-0f2f9c22deaf"
+  #   c2aUuid: "9e94567e-11e7-4619-adbc-d28212194367"
   #   cudaVisibleDevices: "2,3"
 
 cluster-autoscaler:
