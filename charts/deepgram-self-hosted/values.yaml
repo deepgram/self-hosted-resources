@@ -556,6 +556,10 @@ engine:
     initialDelaySeconds: 5
     periodSeconds: 10
     failureThreshold: 1
+    # -- (object) Set to use an HTTP GET probe instead of the default TCP socket probe.
+    # Example: { path: "/v1/status/engine" }
+    # httpGet:
+    #   path: /v1/status/engine
   # -- Liveness probe customization for Engine pods.
   # @default -- ``
   livenessProbe:

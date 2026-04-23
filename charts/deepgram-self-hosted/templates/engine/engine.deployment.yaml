@@ -203,8 +203,14 @@ spec:
           periodSeconds: {{ $.Values.engine.livenessProbe.periodSeconds }}
           failureThreshold: {{ $.Values.engine.livenessProbe.failureThreshold }}
         readinessProbe:
+          {{- if $.Values.engine.readinessProbe.httpGet }}
+          httpGet:
+            path: {{ $.Values.engine.readinessProbe.httpGet.path }}
+            port: {{ $.Values.engine.server.port }}
+          {{- else }}
           tcpSocket:
             port: {{ $.Values.engine.server.port }}
+          {{- end }}
           initialDelaySeconds: {{ $.Values.engine.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ $.Values.engine.readinessProbe.periodSeconds }}
           failureThreshold: {{ $.Values.engine.readinessProbe.failureThreshold }}
