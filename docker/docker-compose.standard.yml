@@ -5,6 +5,8 @@ x-env: &env
     # Make sure you `export` your self-hosted API key secret in your local environment
     DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
     DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "docker-compose"
+    NVIDIA_VISIBLE_DEVICES: all
+    NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
 services:
   # The speech API service.
