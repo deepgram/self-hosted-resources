@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+- Modified t2c & c2a UUIDs throughout repo to be consistent with latest models.
+
 ## [0.34.0] - 2026-04-16
 
 ### Added
@@ -24,7 +26,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- Modified t2c & c2a UUIDs throughout repo to be consistent with latest models.
 - Standardized sample values files to fix drift from the reference configuration (missing resource limits, null `features:` overrides, inconsistent global section, incorrect model list format)
 
 ## [0.33.0] - 2026-04-02
