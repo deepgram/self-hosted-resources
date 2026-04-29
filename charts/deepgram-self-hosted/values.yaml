@@ -253,7 +253,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-260402
+    tag: release-260416
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -474,7 +474,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-260402
+    tag: release-260416
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -774,6 +774,8 @@ engine:
     enabled: false
     # -- Specify the maximum number of streams for the Flux model in the Engine process. This must be set for production workloads based on the GPU type used in the deployment.
     max_streams:
+    # -- Specify which Flux model to load. Options: `flux-general-en` (default), `flux-general-multi`.
+    model_name: flux-general-en
 
   # -- chunking defines the size of audio chunks to process in seconds.
   # Adjusting these values will affect both inference performance and accuracy
@@ -848,7 +850,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-260402
+    tag: release-260416
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -1001,7 +1003,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-260402
+    tag: release-260416
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent

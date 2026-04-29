@@ -12,9 +12,7 @@
 ### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
 ### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
 [license]
-### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
-### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
-server_url = ["https://license-proxy:8443", "https://license.deepgram.com"]
+server_url = ["https://license.deepgram.com"]
 
 
 ### Configure the server to listen for requests from the API.
@@ -54,16 +52,14 @@ multichannel = true # or false
 language_detection = true # or false
 ### Enables streaming entity formatting *if* a valid NER model is available
 streaming_ner = true # or false
-### Enables use of 36-language detection model
-use_v2_language_detection = false
 
 ### Enable Flux turn-based streaming STT
 [flux]
-enabled = false
+enabled = true
 ### Specify the maximum number of concurrent streams to the Flux model in the Engine process
 # max_streams = 0 # Placeholder; required for production. Set explicitly based on GPU type.
 ### Specify which Flux model to load. Options: "flux-general-en" (default), "flux-general-multi"
-# model_name = "flux-general-en"
+model_name = "flux-general-en"
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]
