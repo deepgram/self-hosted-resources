@@ -6,12 +6,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
-### Fixed
-
-- Modified t2c & c2a Aura-2 TTS UUIDs throughout repo to be consistent with latest models.
-
-## [0.34.0] - 2026-04-16
-
 ### Added
 
 - Added `engine.agentOverrides` to support per-engine-type resource overrides when `agent.enabled: true`. Defaults to `gpu: 2` for the `agent-text-to-speech` engine, which is required for Aura-2 TTS. Other engine types continue to use the global `engine.resources` values.
@@ -26,6 +20,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
             limits:
               gpu: 1
     ```
+
+### Fixed
+
+- Modified t2c & c2a Aura-2 TTS UUIDs throughout repo to be consistent with latest models.
+- Fixed Voice Agent engine deployments where all three engine types (`agent-speech-to-text`, `agent-text-to-speech`, `agent-end-of-turn`) were stuck in `ContainerCreating` due to missing per-type ConfigMaps. Each engine type now gets its own ConfigMap.
+- Fixed RBAC role for Voice Agent engine pods to grant access to the per-type ConfigMap names created when `agent.enabled: true`.
+
+## [0.34.0] - 2026-04-16
+
+### Added
+
 - Added Flux STT configuration variants for English (`engine.flux-en.toml`) and Multilingual (`engine.flux-multi.toml`), plus a shared `api.flux.toml`
   - `engine.flux-multi.toml` sets `model_name = "flux-general-multi"` explicitly to load Multilingual Flux instead of English Flux.
 - Added `engine.flux.model_name` value to select which Flux model to load. Defaults to `flux-general-en`; set to `flux-general-multi` for the Multilingual model.
@@ -40,8 +45,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
-- Fixed Voice Agent engine deployments where all three engine types (`agent-speech-to-text`, `agent-text-to-speech`, `agent-end-of-turn`) were stuck in `ContainerCreating` due to missing per-type ConfigMaps. Each engine type now gets its own ConfigMap.
-- Fixed RBAC role for Voice Agent engine pods to grant access to the per-type ConfigMap names created when `agent.enabled: true`.
 - Standardized sample values files to fix drift from the reference configuration (missing resource limits, null `features:` overrides, inconsistent global section, incorrect model list format)
 
 ## [0.33.0] - 2026-04-02
