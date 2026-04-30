@@ -141,6 +141,14 @@ spec:
         {{- if le $gpuRequest 0 }}
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
+        {{- else }}
+        # Required for the Engine container to access the GPU. The nvidia-container-runtime
+        # only injects CUDA libraries when these are set; without them the Engine container
+        # will fail to start with `libcuda.so.1: cannot open shared object file`.
+        - name: NVIDIA_VISIBLE_DEVICES
+          value: "all"
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: "compute,utility"
         {{- end }}
         {{- if and $.Values.aura2.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
         {{- if $.Values.aura2.english.enabled }}

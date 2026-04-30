@@ -10,6 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Set `NVIDIA_VISIBLE_DEVICES=all` and `NVIDIA_DRIVER_CAPABILITIES=compute,utility` on Engine pods when GPUs are requested. **Required for `release-260430` and later** — the Engine image no longer bakes these env vars in, and without them the container will fail to start with `libcuda.so.1: cannot open shared object file`. The same env vars were added to all Docker and Podman compose files.
 - Added `engine.agentOverrides` to support per-engine-type resource overrides when `agent.enabled: true`. Defaults to `gpu: 2` for the `agent-text-to-speech` engine, which is required for Aura-2 TTS. Other engine types continue to use the global `engine.resources` values.
   - **Breaking change for existing Voice Agent deployments:** Upgrading will cause the `agent-text-to-speech` pod to request 2 GPUs by default. If you are not using Aura-2 and want to keep 1 GPU, add the following to your values:
     ```yaml
