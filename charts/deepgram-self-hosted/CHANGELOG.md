@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.35.0] - 2026-04-30
+
 ### Added
 
 - Added `engine.agentOverrides` to support per-engine-type resource overrides when `agent.enabled: true`. Defaults to `gpu: 2` for the `agent-text-to-speech` engine, which is required for Aura-2 TTS. Other engine types continue to use the global `engine.resources` values.
@@ -20,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
             limits:
               gpu: 1
     ```
+
+### Changed
+
+- Updated default container tags to April 2026 release (`release-260430`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-april-2026-release-260430) for additional details.
 
 ### Fixed
 
@@ -431,7 +437,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.34.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.0...HEAD
+[0.35.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.34.0...deepgram-self-hosted-0.35.0
 [0.34.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.33.0...deepgram-self-hosted-0.34.0
 [0.33.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.32.0...deepgram-self-hosted-0.33.0
 [0.32.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.31.0...deepgram-self-hosted-0.32.0
