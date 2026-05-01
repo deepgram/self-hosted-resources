@@ -16,11 +16,6 @@ services:
     environment:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
       DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
-      # Required for the Engine container to access the GPU. The nvidia-container-runtime
-      # only injects CUDA libraries when these are set; without them the Engine container
-      # will fail to start with `libcuda.so.1: cannot open shared object file`.
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path
@@ -47,11 +42,6 @@ services:
     environment:
       DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
       DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
-      # Required for the Engine container to access the GPU. The nvidia-container-runtime
-      # only injects CUDA libraries when these are set; without them the Engine container
-      # will fail to start with `libcuda.so.1: cannot open shared object file`.
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.
