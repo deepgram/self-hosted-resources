@@ -3,6 +3,52 @@ entries:
   deepgram-self-hosted:
   - apiVersion: v2
     appVersion: release-260430
+    created: "2026-05-01T15:23:03.910452316Z"
+    dependencies:
+    - condition: gpu-operator.enabled
+      name: gpu-operator
+      repository: https://helm.ngc.nvidia.com/nvidia
+      version: ^24.3.0
+    - condition: cluster-autoscaler.enabled
+      name: cluster-autoscaler
+      repository: https://kubernetes.github.io/autoscaler
+      version: ^9.37.0
+    - condition: kube-prometheus-stack.includeDependency,scaling.auto.enabled
+      name: kube-prometheus-stack
+      repository: https://prometheus-community.github.io/helm-charts
+      version: ^60.2.0
+    - condition: prometheus-adapter.includeDependency,scaling.auto.enabled
+      name: prometheus-adapter
+      repository: https://prometheus-community.github.io/helm-charts
+      version: ^4.10.0
+    description: A Helm chart for running Deepgram services in a self-hosted environment
+    digest: f07f22f0456340a3e0090df76a23204551454c22d8f6e6cb1a508914814321c9
+    home: https://developers.deepgram.com/docs/self-hosted-introduction
+    icon: https://www.dropbox.com/scl/fi/v4jtfbsrx881pbevcga3j/D-icon-black-square-250x250.png?rlkey=barv5jeuhd7t2lczz0m3nane7&dl=1
+    keywords:
+    - voice ai
+    - text-to-speech
+    - tts
+    - aura
+    - speech-to-text
+    - stt
+    - asr
+    - nova
+    - voice agent
+    - self-hosted
+    kubeVersion: '>=1.28.0-0'
+    maintainers:
+    - email: self.hosted@deepgram.com
+      name: Deepgram Self-Hosted
+    name: deepgram-self-hosted
+    sources:
+    - https://github.com/deepgram/self-hosted-resources
+    type: application
+    urls:
+    - https://github.com/deepgram/self-hosted-resources/releases/download/deepgram-self-hosted-0.35.1/deepgram-self-hosted-0.35.1.tgz
+    version: 0.35.1
+  - apiVersion: v2
+    appVersion: release-260430
     created: "2026-04-30T21:33:19.154766123Z"
     dependencies:
     - condition: gpu-operator.enabled
@@ -1944,4 +1990,4 @@ entries:
     urls:
     - https://github.com/deepgram/self-hosted-resources/releases/download/deepgram-self-hosted-0.1.0-alpha/deepgram-self-hosted-0.1.0-alpha.tgz
     version: 0.1.0-alpha
-generated: "2026-04-30T21:33:19.155079325Z"
+generated: "2026-05-01T15:23:03.910744095Z"
