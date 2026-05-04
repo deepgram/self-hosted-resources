@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Changed
+
+- Updated sample cluster configuration files to use Kubernetes 1.35 (previously 1.33)
+
 ## [0.35.1] - 2026-05-01
 
 ### Changed
