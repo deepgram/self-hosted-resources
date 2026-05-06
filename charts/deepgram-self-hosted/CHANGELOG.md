@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Fixed
+
+- Fixed a cold-start deadlock for Engine deployments using Flux STT under ArgoCD. The model-management Job carries a `helm.sh/hook: post-install,post-upgrade` annotation, which ArgoCD maps to `PostSync` — only running after the main Sync wave reports Healthy. Nova-2 and Nova-3 deployments are unaffected because Engine auto-loads those architectures on demand; Flux pre-allocates GPU resources at startup and requires its model file to be present in `/models`, so on a fresh AWS EFS PVC the Engine pod panics on startup, the Deployment never goes Healthy, Sync never finishes, and the model download Job never fires. The Engine deployment now adds a `model-bootstrap` initContainer that downloads any model links listed in `engine.modelManager.models.add`/`links` into `/models` before Engine starts. The container only renders when AWS EFS is enabled and at least one model link is configured. Existing files are skipped; downloads use atomic temp+rename so concurrent replicas don't corrupt files. The post-install Job is unchanged and continues to handle ongoing model add/remove operations.
+
 ## [0.35.1] - 2026-05-01
 
 ### Changed
