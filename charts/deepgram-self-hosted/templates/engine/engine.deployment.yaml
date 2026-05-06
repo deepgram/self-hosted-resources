@@ -76,8 +76,11 @@ spec:
       serviceAccountName: {{ default (printf "%s-sa" $.Values.engine.namePrefix) $.Values.engine.serviceAccount.name }}
       {{- end }}
 
-      {{- if $.Values.billing.enabled }}
+      {{- $hasModelLinks := or $.Values.engine.modelManager.models.add $.Values.engine.modelManager.models.links }}
+      {{- $bootstrapModels := and $.Values.engine.modelManager.volumes.aws.efs.enabled $hasModelLinks }}
+      {{- if or $.Values.billing.enabled $bootstrapModels }}
       initContainers:
+        {{- if $.Values.billing.enabled }}
         - name: config-render
           image: {{ $.Values.global.initContainer.image.registry }}/{{ $.Values.global.initContainer.image.repository }}:{{ $.Values.global.initContainer.image.tag }}
           imagePullPolicy: {{ $.Values.global.initContainer.image.pullPolicy }}
@@ -93,6 +96,60 @@ spec:
               mountPath: /config
             - name: working-config
               mountPath: /work
+        {{- end }}
+        {{- if $bootstrapModels }}
+        # Bootstrap missing model files into /models before Engine starts.
+        # This guarantees Flux (and any other component with a strict startup
+        # check on /models) can come up Healthy on a fresh PVC, including
+        # under ArgoCD where the post-install model-management Job is gated
+        # on Sync becoming Healthy. Existing files are skipped; downloads use
+        # an atomic temp+rename so concurrent replicas don't corrupt files.
+        - name: model-bootstrap
+          image: alpine
+          imagePullPolicy: IfNotPresent
+          {{- with $.Values.engine.containerSecurityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /bin/sh
+            - -c
+            - |
+              set -eu
+              TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
+
+              ADD_LINKS=$(cat <<'EOF'
+              {{- range $.Values.engine.modelManager.models.add }}
+              {{ . }}
+              {{- end }}
+              {{- range $.Values.engine.modelManager.models.links }}
+              {{ . }}
+              {{- end }}
+              EOF
+              )
+
+              echo "$ADD_LINKS" | while IFS= read -r link; do
+                [ -z "$link" ] && continue
+                FILE_NAME=$(basename "$link")
+                if [ "{{ $.Values.engine.modelManager.volumes.aws.efs.forceDownload }}" = "true" ] || [ ! -f "/models/$FILE_NAME" ]; then
+                  printf "[%s] [INFO] Downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                  TMP=$(mktemp "/models/.${FILE_NAME}.XXXXXX")
+                  if wget -q -O "$TMP" "$link"; then
+                    mv -f "$TMP" "/models/$FILE_NAME"
+                    printf "[%s] [INFO] Downloaded model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                  else
+                    rm -f "$TMP"
+                    printf "[%s] [ERROR] Failed to download model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                    exit 1
+                  fi
+                else
+                  printf "[%s] [INFO] Model file already present: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
+                fi
+              done
+          volumeMounts:
+            - name: models-volume
+              mountPath: /models
+        {{- end }}
       {{- end }}
 
       containers:

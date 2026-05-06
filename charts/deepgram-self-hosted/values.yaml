@@ -754,6 +754,17 @@ engine:
       # **Automatic model management is currently supported for AWS EFS volumes only.**
       # Insert each model link provided to you by your Deepgram
       # Account Representative.
+      #
+      # Cold-start behavior: when AWS EFS is enabled and at least one link is
+      # provided here (or in `links`), the chart adds a `model-bootstrap`
+      # initContainer to the Engine deployment that downloads any missing
+      # files into `/models` before Engine starts. This guarantees Engine
+      # comes up Healthy on a fresh PVC, including under ArgoCD where the
+      # post-install model-management Job runs as PostSync and would
+      # otherwise be gated on Sync becoming Healthy. For deployments with
+      # many Engine replicas, prefer pre-populating the PVC out-of-band:
+      # the bootstrap is safe under concurrent replicas (atomic temp+rename)
+      # but each replica still issues its own existence check.
       add: []
       # -- If desiring to remove a model from storage (to reduce number of models loaded by
       # Engine on startup), move a link from the `engine.modelManager.models.add` section
