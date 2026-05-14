@@ -46,6 +46,9 @@ spec:
         {{- toYaml .Values.billing.topologySpreadConstraints | nindent 8 }}
       nodeSelector:
         {{- toYaml .Values.billing.nodeSelector | nindent 8 }}
+      {{- with .Values.billing.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.billing.securityContext | nindent 8 }}
       {{- if or .Values.billing.serviceAccount.create .Values.billing.serviceAccount.name }}
