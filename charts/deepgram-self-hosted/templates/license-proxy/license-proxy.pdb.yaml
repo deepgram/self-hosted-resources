@@ -1,0 +1,29 @@
+{{- if and .Values.licenseProxy.enabled .Values.licenseProxy.pdb.enabled }}
+{{- if and (kindIs "invalid" .Values.licenseProxy.pdb.minAvailable) (kindIs "invalid" .Values.licenseProxy.pdb.maxUnavailable) }}
+{{- fail "licenseProxy.pdb.enabled is true but neither licenseProxy.pdb.minAvailable nor licenseProxy.pdb.maxUnavailable is set" }}
+{{- end }}
+{{- if and (not (kindIs "invalid" .Values.licenseProxy.pdb.minAvailable)) (not (kindIs "invalid" .Values.licenseProxy.pdb.maxUnavailable)) }}
+{{- fail "licenseProxy.pdb.minAvailable and licenseProxy.pdb.maxUnavailable are mutually exclusive" }}
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.licenseProxy.namePrefix }}
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4 }}
+    app: {{ .Values.licenseProxy.namePrefix }}
+    {{- range $key, $val := .Values.licenseProxy.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+spec:
+  {{- with .Values.licenseProxy.pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.licenseProxy.pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.licenseProxy.namePrefix }}
+      {{ include "deepgram-self-hosted.selectorLabels" . }}
+{{- end }}

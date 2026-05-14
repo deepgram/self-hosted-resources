@@ -1,0 +1,44 @@
+{{- if .Values.engine.pdb.enabled }}
+{{- if and (kindIs "invalid" .Values.engine.pdb.minAvailable) (kindIs "invalid" .Values.engine.pdb.maxUnavailable) }}
+{{- fail "engine.pdb.enabled is true but neither engine.pdb.minAvailable nor engine.pdb.maxUnavailable is set" }}
+{{- end }}
+{{- if and (not (kindIs "invalid" .Values.engine.pdb.minAvailable)) (not (kindIs "invalid" .Values.engine.pdb.maxUnavailable)) }}
+{{- fail "engine.pdb.minAvailable and engine.pdb.maxUnavailable are mutually exclusive" }}
+{{- end }}
+{{- $engineTypes := list }}
+{{- if .Values.agent.enabled }}
+{{- $engineTypes = list "agent-speech-to-text" "agent-text-to-speech" "agent-end-of-turn" }}
+{{- else }}
+{{- $engineTypes = list "" }}
+{{- end }}
+{{- range $type := $engineTypes }}
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}
+  labels:
+{{ include "deepgram-self-hosted.labels" $ | indent 4 }}
+    app: {{ $.Values.engine.namePrefix }}
+    {{- if $type }}
+    engine-type: {{ $type }}
+    {{- end }}
+    {{- range $key, $val := $.Values.engine.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+spec:
+  {{- with $.Values.engine.pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with $.Values.engine.pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ $.Values.engine.namePrefix }}
+      {{- if $type }}
+      engine-type: {{ $type }}
+      {{- end }}
+      {{ include "deepgram-self-hosted.selectorLabels" $ }}
+{{- end }}
+{{- end }}
