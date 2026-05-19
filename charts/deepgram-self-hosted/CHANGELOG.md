@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Re-added `NVIDIA_VISIBLE_DEVICES=all` and `NVIDIA_DRIVER_CAPABILITIES=compute,utility` on Engine pods when GPUs are requested, and on all Docker and Podman compose files. **Required for `release-260430` and later** — the Engine image no longer bakes these env vars in, and without them the container will fail to start with `libcuda.so.1: cannot open shared object file`.
+
 ## [0.36.0] - 2026-05-14
 
 ### Changed
