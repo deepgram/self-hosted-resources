@@ -1,0 +1,6 @@
+# Minimum viable install. Files mode, open mode, no TLS, no ingress.
+license:
+  apiKey: "11111111-1111-1111-1111-111111111111"
+selfHosted:
+  apiKey: "test-api-key-padding-to-forty-chars-AAAA"
+  bootstrapSubject: "00000000-0000-0000-0000-0000000000a1"
