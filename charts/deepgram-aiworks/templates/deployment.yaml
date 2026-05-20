@@ -1,0 +1,142 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "deepgram-aiworks.fullname" . }}
+  labels:
+    {{- include "deepgram-aiworks.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.scaling.auto.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  strategy:
+    type: {{ .Values.updateStrategy.type }}
+    {{- if eq .Values.updateStrategy.type "RollingUpdate" }}
+    rollingUpdate:
+      maxUnavailable: {{ .Values.updateStrategy.rollingUpdate.maxUnavailable }}
+      maxSurge: {{ .Values.updateStrategy.rollingUpdate.maxSurge }}
+    {{- end }}
+  selector:
+    matchLabels:
+      {{- include "deepgram-aiworks.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "deepgram-aiworks.selectorLabels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+      annotations:
+        # Force a pod restart when the config.toml changes — without this,
+        # config changes don't propagate until a manual restart.
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+          {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      terminationGracePeriodSeconds: {{ .Values.terminationGracePeriodSeconds }}
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.podSecurityContext }}
+      securityContext:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: voiceworks
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- with .Values.securityContext }}
+          securityContext:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          args: ["run", "-c", "/etc/voiceworks/config.toml"]
+          ports:
+            - name: http
+              containerPort: {{ .Values.server.port }}
+              protocol: TCP
+          env:
+            - name: DEEPGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "deepgram-aiworks.credentialsSecretName" . }}
+                  key: {{ .Values.license.apiKeyExistingSecretKey }}
+            {{- if .Values.selfHosted.enabled }}
+            - name: VW_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ include "deepgram-aiworks.credentialsSecretName" . }}
+                  key: {{ .Values.selfHosted.apiKeyExistingSecretKey }}
+            {{- end }}
+            {{- if eq .Values.storage.mode "postgres" }}
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: {{ if .Values.storage.postgres.dsnExistingSecret }}{{ .Values.storage.postgres.dsnExistingSecret }}{{ else }}{{ include "deepgram-aiworks.credentialsSecretName" . }}{{ end }}
+                  key: {{ .Values.storage.postgres.dsnExistingSecretKey }}
+            {{- end }}
+          volumeMounts:
+            - name: config
+              mountPath: /etc/voiceworks
+              readOnly: true
+            {{- if .Values.server.tls.enabled }}
+            - name: tls
+              mountPath: /etc/voiceworks/tls
+              readOnly: true
+            {{- end }}
+            {{- if and (eq .Values.storage.mode "files") .Values.storage.files.persistence.enabled }}
+            - name: flows
+              mountPath: {{ .Values.storage.files.flowsDir }}
+            {{- end }}
+          readinessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+              scheme: {{ if .Values.server.tls.enabled }}HTTPS{{ else }}HTTP{{ end }}
+            initialDelaySeconds: {{ .Values.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /api/health
+              port: http
+              scheme: {{ if .Values.server.tls.enabled }}HTTPS{{ else }}HTTP{{ end }}
+            initialDelaySeconds: {{ .Values.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          startupProbe:
+            httpGet:
+              path: /api/health
+              port: http
+              scheme: {{ if .Values.server.tls.enabled }}HTTPS{{ else }}HTTP{{ end }}
+            initialDelaySeconds: {{ .Values.probes.startup.initialDelaySeconds }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: config
+          configMap:
+            name: {{ include "deepgram-aiworks.fullname" . }}-config
+        {{- if .Values.server.tls.enabled }}
+        - name: tls
+          secret:
+            secretName: {{ include "deepgram-aiworks.tlsSecretName" . }}
+        {{- end }}
+        {{- if and (eq .Values.storage.mode "files") .Values.storage.files.persistence.enabled }}
+        - name: flows
+          persistentVolumeClaim:
+            claimName: {{ if .Values.storage.files.persistence.existingClaim }}{{ .Values.storage.files.persistence.existingClaim }}{{ else }}{{ include "deepgram-aiworks.fullname" . }}-flows{{ end }}
+        {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
