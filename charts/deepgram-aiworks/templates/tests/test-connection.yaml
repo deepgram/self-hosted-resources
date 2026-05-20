@@ -16,9 +16,20 @@ spec:
       args:
         - |
           set -e
-          echo "Waiting for {{ include "deepgram-aiworks.fullname" . }}:{{ .Values.service.port }} to accept connections..."
+          {{- if .Values.server.tls.enabled }}
+          # TLS is enabled in voiceworks. We curl https:// with -k since the
+          # in-process cert may be self-signed or otherwise not in the curl
+          # image's trust store. helm-test verifies the listener is up and
+          # responding; cert validation is out of scope for a smoke test.
+          URL="https://{{ include "deepgram-aiworks.fullname" . }}:{{ .Values.service.port }}/api/health"
+          CURL_FLAGS="-fsS -k --max-time 2"
+          {{- else }}
+          URL="http://{{ include "deepgram-aiworks.fullname" . }}:{{ .Values.service.port }}/api/health"
+          CURL_FLAGS="-fsS --max-time 2"
+          {{- end }}
+          echo "Waiting for $URL to accept connections..."
           for i in $(seq 1 30); do
-            if curl -fsS --max-time 2 http://{{ include "deepgram-aiworks.fullname" . }}:{{ .Values.service.port }}/api/health > /tmp/out 2>&1; then
+            if curl $CURL_FLAGS "$URL" > /tmp/out 2>&1; then
               echo "health endpoint responded:"
               cat /tmp/out
               exit 0
