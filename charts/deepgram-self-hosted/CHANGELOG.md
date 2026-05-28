@@ -6,9 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.37.0] - 2026-05-28
+
 ### Added
 
-- Re-added `NVIDIA_VISIBLE_DEVICES=all` and `NVIDIA_DRIVER_CAPABILITIES=compute,utility` on Engine pods when GPUs are requested, and on all Docker and Podman compose files. **Required for `release-260528` and later** — the Engine image no longer bakes these env vars in, and without them the container will fail to start with `libcuda.so.1: cannot open shared object file`.
+- Re-added `NVIDIA_VISIBLE_DEVICES=all` and `NVIDIA_DRIVER_CAPABILITIES=compute,utility` on Engine pods when GPUs are requested, and on all Docker and Podman compose files. These env vars are no-ops with the `release-260528` Engine image but are required for an upcoming Engine container refactor; setting them now means no configuration change will be required when that refactor ships.
+
+### Changed
+
+- Updated default container tags to May 2026 release (`release-260528`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-may-2026-release-260528) for additional details.
 
 ## [0.36.0] - 2026-05-14
 
@@ -455,7 +461,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.36.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.37.0...HEAD
+[0.37.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.36.0...deepgram-self-hosted-0.37.0
 [0.36.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.1...deepgram-self-hosted-0.36.0
 [0.35.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.0...deepgram-self-hosted-0.35.1
 [0.35.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.34.0...deepgram-self-hosted-0.35.0
