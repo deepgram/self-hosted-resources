@@ -239,6 +239,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| agent.allowInsecureEndpoints | bool | `false` | Whether to allow insecure URL schemes (`http` and `ws`) in custom endpoints. Disabled by default. Required when the Voice Agent must reach a plain-HTTP in-cluster service (e.g. a self-hosted NIM LLM). |
 | agent.allowNonpublicEndpoints | bool | `false` | Whether to allow non-public URLs (such as `localhost`) in custom endpoints. Disabled by default |
 | agent.enabled | bool | `false` | Whether to enable voice agent. Disabled by default |
 | agent.eotTimeoutMs | int | `3500` | Timeout in milliseconds for end-of-turn detection |

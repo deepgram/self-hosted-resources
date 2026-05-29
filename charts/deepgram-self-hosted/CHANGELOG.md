@@ -6,6 +6,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `agent.allowInsecureEndpoints` (default `false`) to allow insecure URL schemes (`http`/`ws`) in Voice Agent custom endpoints. Required when the agent must reach a plain-HTTP in-cluster service, such as a self-hosted NIM LLM.
+- Added a `voice-agent/aws/self-hosted-llm/` sample demonstrating a Voice Agent on AWS EKS routed to a self-hosted LLM (NVIDIA NIM serving a Nemotron model) running in-cluster, with a companion README walkthrough.
+
 ## [0.35.1] - 2026-05-01
 
 ### Changed
