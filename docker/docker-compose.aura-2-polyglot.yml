@@ -5,12 +5,17 @@ x-env-vars: &env
   # Be sure to use the &env anchor inside an 'environment' mapping for a given service
   DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
   DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "docker-compose"
+  # Required for the Engine container to access the GPU. The nvidia-container-runtime
+  # only injects CUDA libraries when these are set; without them the Engine container
+  # will fail to start with `libcuda.so.1: cannot open shared object file`.
+  NVIDIA_VISIBLE_DEVICES: all
+  NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
 services:
   # The speech API service.
   # English Language Aura-2
   api-en:
-    image: quay.io/deepgram/self-hosted-api:release-260430
+    image: quay.io/deepgram/self-hosted-api:release-260528
     restart: always
 
     # Here we expose the API port to the host machine. The container port
@@ -37,7 +42,7 @@ services:
 
   # Polyglot Aura-2 (Dutch, German, French, Italian, Japanese)
   api-polyglot:
-    image: quay.io/deepgram/self-hosted-api:release-260430
+    image: quay.io/deepgram/self-hosted-api:release-260528
     restart: always
 
     # Here we expose the API port to the host machine. The container port
@@ -65,7 +70,7 @@ services:
   # The speech engine service.
   # English Language Aura-2 Driver
   engine-en:
-    image: quay.io/deepgram/self-hosted-engine:release-260430
+    image: quay.io/deepgram/self-hosted-engine:release-260528
     restart: always
 
     # Utilize a GPU, if available.
@@ -98,7 +103,7 @@ services:
 
   # Polyglot (Dutch, German, French, Italian, Japanese) Aura-2 Driver
   engine-polyglot:
-    image: quay.io/deepgram/self-hosted-engine:release-260430
+    image: quay.io/deepgram/self-hosted-engine:release-260528
     restart: always
 
     # Utilize a GPU, if available.
@@ -131,7 +136,7 @@ services:
 
   # The service to validate your Deepgram license
   license-proxy:
-    image: quay.io/deepgram/self-hosted-license-proxy:release-260430
+    image: quay.io/deepgram/self-hosted-license-proxy:release-260528
     restart: always
 
     # Here we expose the License Proxy status port to the host machine. The container port
