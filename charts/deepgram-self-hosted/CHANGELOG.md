@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Support for configuring custom annotations on Kubernetes `ServiceAccount` resources for API, Engine, License Proxy, and Billing deployments (`api.serviceAccount.annotations`, `engine.serviceAccount.annotations`, `licenseProxy.serviceAccount.annotations`, and `billing.serviceAccount.annotations`). This allows integrating IAM Roles for Service Accounts (IRSA).
+
 ## [0.37.0] - 2026-05-28
 
 ### Added
