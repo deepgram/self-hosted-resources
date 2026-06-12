@@ -253,7 +253,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-260430
+    tag: release-260611
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -338,6 +338,10 @@ api:
     minAvailable:
     # -- (int|string) Maximum unavailable API pods. Integer or percentage string (e.g. "50%").
     maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to API pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
   # to apply to API pods.
@@ -485,7 +489,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-260430
+    tag: release-260611
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -628,6 +632,10 @@ engine:
     minAvailable:
     # -- (int|string) Maximum unavailable Engine pods. Integer or percentage string (e.g. "50%").
     maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to Engine pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- (string) [Runtime class](https://kubernetes.io/docs/concepts/containers/runtime-class/)
   # to use for Engine pods. Set to "nvidia" when using KOPS-managed NVIDIA drivers
@@ -874,7 +882,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-260430
+    tag: release-260611
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -965,6 +973,10 @@ licenseProxy:
     # -- (int|string) Maximum unavailable License Proxy pods. Integer or percentage string (e.g. "50%").
     maxUnavailable:
 
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to License Proxy pods. Leave empty to omit the field.
+  priorityClassName: ""
+
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods.
   securityContext: {}
 
@@ -1038,7 +1050,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-260430
+    tag: release-260611
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent
@@ -1154,6 +1166,10 @@ billing:
     minAvailable:
     # -- (int|string) Maximum unavailable Billing pods. Integer or percentage string (e.g. "50%").
     maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to Billing pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods.
   securityContext: {}

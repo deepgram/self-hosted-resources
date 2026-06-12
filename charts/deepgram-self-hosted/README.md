@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.35.1](https://img.shields.io/badge/Version-0.35.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260430](https://img.shields.io/badge/AppVersion-release--260430-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.38.0](https://img.shields.io/badge/Version-0.38.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260611](https://img.shields.io/badge/AppVersion-release--260611-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -281,7 +281,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-260430"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-260611"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
@@ -289,6 +289,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for API pods. |
 | api.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable API pods. Integer or percentage string (e.g. "50%"). |
 | api.pdb.minAvailable | int|string | `nil` | Minimum available API pods. Integer or percentage string (e.g. "50%"). |
+| api.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to API pods. Leave empty to omit the field. |
 | api.readinessProbe | object | `` | Readiness probe customization for API pods. |
 | api.resolver | object | `` | Specify custom DNS resolution options. |
 | api.resolver.maxTTL | int | `nil` | maxTTL sets the DNS TTL value if specifying a custom DNS nameserver. |
@@ -327,7 +328,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.extraEnv | list | `[]` | Extra environment variables for the Billing container. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-260430"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-260611"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
 | billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
 | billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
@@ -345,6 +346,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for Billing pods. |
 | billing.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable Billing pods. Integer or percentage string (e.g. "50%"). |
 | billing.pdb.minAvailable | int|string | `nil` | Minimum available Billing pods. Integer or percentage string (e.g. "50%"). |
+| billing.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to Billing pods. Leave empty to omit the field. |
 | billing.readinessProbe | object | `` | Readiness probe customization for Billing pods. |
 | billing.replicas | int | `1` | Number of Billing replicas. Default is 1 (singleton). Can be increased for high availability. Each replica maintains its own journal file. |
 | billing.resources | object | `` | Configure resource limits per Billing container. |
@@ -390,7 +392,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-260430"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-260611"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -422,6 +424,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for Engine pods. |
 | engine.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable Engine pods. Integer or percentage string (e.g. "50%"). |
 | engine.pdb.minAvailable | int|string | `nil` | Minimum available Engine pods. Integer or percentage string (e.g. "50%"). |
+| engine.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to Engine pods. Leave empty to omit the field. |
 | engine.readinessProbe | object | `` | Readiness probe customization for Engine pods. |
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.gpuResourceName | string | `"nvidia.com/gpu"` | Name of the GPU resource to use (e.g., nvidia.com/gpu for standard GPUs, or nvidia.com/mig-4g.40gb for MIG slices). This allows using different GPU resource naming conventions as configured by the NVIDIA GPU Operator. |
@@ -475,7 +478,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.extraEnv | list | `[]` | Extra environment variables for the License Proxy container. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-260430"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-260611"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
@@ -484,6 +487,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for License Proxy pods. |
 | licenseProxy.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable License Proxy pods. Integer or percentage string (e.g. "50%"). |
 | licenseProxy.pdb.minAvailable | int|string | `nil` | Minimum available License Proxy pods. Integer or percentage string (e.g. "50%"). |
+| licenseProxy.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to License Proxy pods. Leave empty to omit the field. |
 | licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
 | licenseProxy.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods. |
