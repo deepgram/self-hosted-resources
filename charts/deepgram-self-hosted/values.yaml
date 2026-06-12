@@ -328,6 +328,10 @@ api:
   # to apply to API pods.
   nodeSelector: {}
 
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to API pods. Leave empty to omit the field.
+  priorityClassName: ""
+
   # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
   # to apply to API pods.
   topologySpreadConstraints: []
@@ -604,6 +608,10 @@ engine:
   # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   # to apply to Engine pods.
   nodeSelector: {}
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to Engine pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- (string) [Runtime class](https://kubernetes.io/docs/concepts/containers/runtime-class/)
   # to use for Engine pods. Set to "nvidia" when using KOPS-managed NVIDIA drivers
@@ -930,6 +938,10 @@ licenseProxy:
   # to apply to License Proxy pods.
   nodeSelector: {}
 
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to License Proxy pods. Leave empty to omit the field.
+  priorityClassName: ""
+
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods.
   securityContext: {}
 
@@ -1108,6 +1120,10 @@ billing:
   # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   # to apply to Billing pods.
   nodeSelector: {}
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to Billing pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods.
   securityContext: {}
