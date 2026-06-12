@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.38.0] - 2026-06-11
+
+### Changed
+
+- Updated default container tags to June 2026 release (`release-260611`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-june-2026-release-260611) for additional details.
+
+## [0.37.0] - 2026-05-28
+
+### Added
+
+- Re-added `NVIDIA_VISIBLE_DEVICES=all` and `NVIDIA_DRIVER_CAPABILITIES=compute,utility` on Engine pods when GPUs are requested, and on all Docker and Podman compose files. These env vars are no-ops with the `release-260528` Engine image but are required for an upcoming Engine container refactor; setting them now means no configuration change will be required when that refactor ships.
+
+### Changed
+
+- Updated default container tags to May 2026 release (`release-260528`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-may-2026-release-260528) for additional details.
+
+## [0.36.0] - 2026-05-14
+
+### Changed
+
+- Updated default container tags to May 2026 release (`release-260514`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-may-2026-release-260514) for additional details.
+
 ## [0.35.1] - 2026-05-01
 
 ### Changed
@@ -445,7 +467,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.1...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.38.0...HEAD
+[0.38.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.37.0...deepgram-self-hosted-0.38.0
+[0.37.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.36.0...deepgram-self-hosted-0.37.0
+[0.36.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.1...deepgram-self-hosted-0.36.0
 [0.35.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.0...deepgram-self-hosted-0.35.1
 [0.35.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.34.0...deepgram-self-hosted-0.35.0
 [0.34.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.33.0...deepgram-self-hosted-0.34.0
