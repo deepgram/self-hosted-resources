@@ -1,0 +1,76 @@
+# Values for a separate NVIDIA NIM Helm release that runs a Nemotron model
+# alongside the Deepgram self-hosted Voice Agent in the same EKS cluster.
+#
+# This file does NOT belong to the deepgram-self-hosted chart — it is consumed
+# by the NVIDIA NIM Helm chart (https://helm.ngc.nvidia.com/nim) and installed
+# as its own release into the same namespace as Deepgram (e.g. dg-self-hosted).
+# See README.md in this directory for the full install walkthrough (NGC secrets,
+# fetching the nim-llm chart, and the helm install command).
+#
+# Once installed, NIM is reachable in-cluster at:
+#   http://nemotron-nim.dg-self-hosted.svc.cluster.local:8000/v1
+# That URL is what the Voice Agent client app passes in think.endpoint.url at
+# session start. agent.allowNonpublicEndpoints must be true in the Deepgram
+# values for this private DNS name to pass validation.
+
+# ----- Model image -----
+# Default below is the Nano-8B variant (sized for 1x L40S 48GB by default).
+# For the Super-49B variant, swap the repository and bump resources/GPUs:
+#   repository: nvcr.io/nim/nvidia/llama-3.3-nemotron-super-49b-v1
+#   resources.limits.nvidia.com/gpu: 4   # on a g6e.12xlarge (4x L40S)
+#
+# `tag: latest` pulls whatever NGC currently tags as latest at install time.
+# This is convenient for dev/staging but NOT reproducible — restarted pods may
+# pick up a newer image. For production, pin a specific tag once tested
+# (consult the model's NGC catalog page for the current version list).
+image:
+  repository: nvcr.io/nim/nvidia/llama-3.1-nemotron-nano-8b-v1
+  tag: "latest"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets:
+  - name: ngc-secret
+
+model:
+  name: nvidia/llama-3.1-nemotron-nano-8b-v1
+  ngcAPISecret: ngc-api
+
+# ----- Compute -----
+# 1x L40S (48GB) gives FP16 Nano-8B headroom for weights + KV cache under
+# realistic voice-agent concurrency. If you switch to a g6.2xlarge (1x L4, 24GB)
+# host for cost, run NIM with an INT8/FP8/AWQ profile to fit — set the
+# appropriate NIM profile env var (see the model's NGC card for available
+# quantizations).
+resources:
+  limits:
+    nvidia.com/gpu: 1
+
+# Pin NIM pods to the dedicated LLM node group provisioned by
+# 08-voice-agent-with-llm-aws.cluster-config.yaml.
+nodeSelector:
+  k8s.deepgram.com/node-type: llm
+
+# ----- Model cache -----
+# Persists the downloaded model so restarts don't re-pull from NGC.
+#
+# `gp2` is the storage class every fresh EKS cluster ships with by default
+# (backed by the in-tree kubernetes.io/aws-ebs provisioner). It works
+# without installing the EBS CSI driver, which is what makes it the
+# zero-extra-setup choice for this sample.
+#
+# For better price/perf, install the AWS EBS CSI driver as a managed addon
+# (`eksctl create addon --cluster $CLUSTER_NAME --name aws-ebs-csi-driver --force`)
+# and create a `gp3` StorageClass, then switch to `storageClass: gp3` here.
+persistence:
+  enabled: true
+  size: 50Gi
+  storageClass: gp2
+
+# ----- Service exposure -----
+# ClusterIP is sufficient — the Deepgram Voice Agent reaches NIM over the
+# in-cluster network. Do NOT expose NIM to the public internet without auth.
+# The nim-llm chart uses `openaiPort` (not `port`) for the OpenAI-compatible API.
+service:
+  type: ClusterIP
+  name: nemotron-nim
+  openaiPort: 8000

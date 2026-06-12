@@ -126,6 +126,9 @@ agent:
   maxConversationChars: 15000
   # -- (bool) Whether to allow non-public URLs (such as `localhost`) in custom endpoints. Disabled by default
   allowNonpublicEndpoints: false
+  # -- (bool) Whether to allow insecure URL schemes (`http` and `ws`) in custom endpoints. Disabled by default.
+  # Required when the Voice Agent must reach a plain-HTTP in-cluster service (e.g. a self-hosted NIM LLM).
+  allowInsecureEndpoints: false
   # -- Configuration for LLM providers and their available models
   # @default -- ``
   llmProviders:

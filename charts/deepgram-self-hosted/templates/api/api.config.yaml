@@ -106,6 +106,7 @@ data:
     eot_timeout_ms = {{ .Values.agent.eotTimeoutMs }}
     max_conversation_chars_sent_to_llm = {{ .Values.agent.maxConversationChars }}
     allow_nonpublic_endpoints = {{ .Values.agent.allowNonpublicEndpoints }}
+    allow_insecure_endpoints = {{ .Values.agent.allowInsecureEndpoints | default false }}
     {{- range $provider, $config := .Values.agent.llmProviders }}
     [voice_agent.llm_providers.{{ $provider }}]
       name = {{ $config.name | quote }}

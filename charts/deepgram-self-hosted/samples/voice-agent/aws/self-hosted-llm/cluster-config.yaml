@@ -1,0 +1,122 @@
+# EKS cluster for Voice Agent on AWS with an in-cluster self-hosted LLM
+# (NVIDIA NIM serving a Nemotron model).
+#
+# Adds a dedicated `llm-node-group` to host NIM. The Deepgram chart itself
+# does not deploy the LLM; install NVIDIA's NIM Helm chart as a separate
+# release into this node group (see nim-values.yaml).
+
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: deepgram-voice-agent-llm-cluster # Change to your desired name
+  region: us-west-2 # Change to your desired host region
+  version: "1.33"
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+    - metadata:
+        name: cluster-autoscaler-sa
+        namespace: dg-self-hosted
+      wellKnownPolicies:
+        autoScaler: true
+      roleName: cluster-autoscaler-role
+      roleOnly: true
+    - metadata:
+        name: efs-csi-controller-sa
+        namespace: kube-system
+      wellKnownPolicies:
+        efsCSIController: true
+      roleName: efs-csi-driver-role
+      roleOnly: true
+    # EBS CSI driver — required because EKS 1.23+ enables CSI migration, so
+    # any EBS-backed PVC (incl. the in-tree `gp2` StorageClass) is provisioned
+    # via the ebs.csi.aws.com CSI driver. The NIM model-cache PVC needs this.
+    - metadata:
+        name: ebs-csi-controller-sa
+        namespace: kube-system
+      wellKnownPolicies:
+        ebsCSIController: true
+      roleName: ebs-csi-driver-role
+      roleOnly: true
+
+managedNodeGroups:
+  - name: control-plane-node-group
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 3
+    instanceType: t3.large
+    amiFamily: AmazonLinux2023
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    propagateASGTags: true
+  - name: engine-node-group
+    minSize: 3
+    desiredCapacity: 3
+    maxSize: 8
+    # Uncomment (1) instanceType line below based on TTS model requirements
+    # instanceType: g6.2xlarge # For non-Aura-2 TTS
+    instanceType: g6.12xlarge # For Aura-2 TTS
+    amiFamily: AmazonLinux2023
+    labels:
+      k8s.deepgram.com/node-type: engine
+      k8s.amazonaws.com/accelerator: nvidia-l4
+    iam:
+      withAddonPolicies:
+        efs: true
+        autoScaler: true
+    taints:
+      - key: efs.csi.aws.com/agent-not-ready
+        value: "true"
+        effect: NoExecute
+    propagateASGTags: true
+  - name: api-node-group
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 2
+    instanceType: c5n.xlarge
+    amiFamily: AmazonLinux2023
+    labels:
+      k8s.deepgram.com/node-type: api
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    propagateASGTags: true
+  - name: license-proxy-node-group
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 2
+    instanceType: t3.large
+    amiFamily: AmazonLinux2023
+    labels:
+      k8s.deepgram.com/node-type: license-proxy
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    propagateASGTags: true
+  # Hosts a self-hosted LLM (e.g. NVIDIA NIM serving a Nemotron model)
+  # that the Voice Agent talks to over the cluster network. Install NIM as a
+  # separate Helm release into this node group; see
+  # 08-voice-agent-with-llm-aws.nim-values.yaml.
+  - name: llm-node-group
+    minSize: 1
+    desiredCapacity: 1
+    maxSize: 2
+    # Pick the instance type for your chosen Nemotron variant:
+    #   Nano-8B   -> g6e.xlarge   (1x L40S, 48GB)  ~$1.86/hr us-west-2 (default)
+    #     L40S gives enough VRAM headroom for FP16 weights + KV cache
+    #     under realistic voice-agent concurrency. If you instead run an
+    #     INT8/FP8/AWQ NIM profile, you can downsize to g6.2xlarge (1x L4, 24GB).
+    #   Super-49B -> g6e.12xlarge (4x L40S, 192GB) ~$10.49/hr us-west-2
+    instanceType: g6e.xlarge
+    amiFamily: AmazonLinux2023
+    labels:
+      k8s.deepgram.com/node-type: llm
+      # Change to nvidia-l4 if downsizing to a g6.* instance for a quantized profile.
+      k8s.amazonaws.com/accelerator: nvidia-l40s
+    iam:
+      withAddonPolicies:
+        autoScaler: true
+    propagateASGTags: true

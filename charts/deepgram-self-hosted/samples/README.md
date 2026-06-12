@@ -11,6 +11,7 @@ This directory contains examples of how to use the Deepgram Helm chart in variou
 - **05-voice-agent-aws.values.yaml** - AWS EKS Voice Agent deployment configuration
 - **06-aura-2-polyglot-setup.values.yaml** - Aura-2 model deployment with English and Polyglot language support (Dutch, German, French, Italian, Japanese)
 - **07-basic-setup-aws-airgapped.values.yaml** - AWS EKS airgapped deployment ([see airgapped.md](./airgapped.md) for full guide)
+- **[voice-agent/aws/self-hosted-llm/](./voice-agent/aws/self-hosted-llm/)** - AWS EKS Voice Agent routed to a self-hosted LLM (NVIDIA NIM serving Nemotron) running in-cluster ([see its README](./voice-agent/aws/self-hosted-llm/README.md) for the full guide)
 
 ## AWS EKS Samples
 See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in AWS.
