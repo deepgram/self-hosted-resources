@@ -9,6 +9,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Support for configuring custom annotations on Kubernetes `ServiceAccount` resources for API, Engine, License Proxy, and Billing deployments (`api.serviceAccount.annotations`, `engine.serviceAccount.annotations`, `licenseProxy.serviceAccount.annotations`, and `billing.serviceAccount.annotations`). This allows integrating IAM Roles for Service Accounts (IRSA).
+## [0.38.0] - 2026-06-11
+
+### Changed
+
+- Updated default container tags to June 2026 release (`release-260611`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-june-2026-release-260611) for additional details.
 
 ## [0.37.0] - 2026-05-28
 
@@ -465,7 +470,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.37.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.38.0...HEAD
+[0.38.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.37.0...deepgram-self-hosted-0.38.0
 [0.37.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.36.0...deepgram-self-hosted-0.37.0
 [0.36.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.1...deepgram-self-hosted-0.36.0
 [0.35.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.0...deepgram-self-hosted-0.35.1
