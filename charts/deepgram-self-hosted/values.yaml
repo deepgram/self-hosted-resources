@@ -365,6 +365,8 @@ api:
     # If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account
     # you wish to attach to the API deployment.
     name:
+    # -- (object) Annotations to add to the API service account.
+    annotations: {}
 
   # -- Configure how the API will listen for your requests
   # @default -- ``
@@ -669,6 +671,8 @@ engine:
     # If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account
     # you wish to attach to the Engine deployment.
     name:
+    # -- (object) Annotations to add to the Engine service account.
+    annotations: {}
 
   concurrencyLimit:
     # -- (int) activeRequests limits the number of active requests handled by
@@ -995,6 +999,8 @@ licenseProxy:
     # If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account
     # you wish to attach to the License Proxy deployment.
     name:
+    # -- (object) Annotations to add to the License Proxy service account.
+    annotations: {}
 
   # -- Configure how the license proxy will listen for licensing requests.
   # @default -- ``
@@ -1189,6 +1195,8 @@ billing:
     # If specified, and `billing.serviceAccount.create = false`, this provides the name of a preconfigured service account
     # you wish to attach to the Billing deployment.
     name:
+    # -- (object) Annotations to add to the Billing service account.
+    annotations: {}
 
   # -- Configure how the Billing container will listen for licensing requests.
   # @default -- ``
