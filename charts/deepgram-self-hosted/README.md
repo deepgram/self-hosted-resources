@@ -239,6 +239,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| agent.allowInsecureEndpoints | bool | `false` | Whether to allow insecure URL schemes (`http` and `ws`) in custom endpoints. Disabled by default. Required when the Voice Agent must reach a plain-HTTP in-cluster service (e.g. a self-hosted NIM LLM). |
 | agent.allowNonpublicEndpoints | bool | `false` | Whether to allow non-public URLs (such as `localhost`) in custom endpoints. Disabled by default |
 | agent.enabled | bool | `false` | Whether to enable voice agent. Disabled by default |
 | agent.eotTimeoutMs | int | `3500` | Timeout in milliseconds for end-of-turn detection |
@@ -285,6 +286,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
+| api.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for API pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. |
+| api.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for API pods. |
+| api.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable API pods. Integer or percentage string (e.g. "50%"). |
+| api.pdb.minAvailable | int|string | `nil` | Minimum available API pods. Integer or percentage string (e.g. "50%"). |
+| api.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to API pods. Leave empty to omit the field. |
 | api.readinessProbe | object | `` | Readiness probe customization for API pods. |
 | api.resolver | object | `` | Specify custom DNS resolution options. |
 | api.resolver.maxTTL | int | `nil` | maxTTL sets the DNS TTL value if specifying a custom DNS nameserver. |
@@ -338,6 +344,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.livenessProbe | object | `` | Liveness probe customization for Billing pods. |
 | billing.namePrefix | string | `"deepgram-billing"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Billing containers. |
 | billing.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to Billing pods. |
+| billing.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for Billing pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. |
+| billing.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for Billing pods. |
+| billing.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable Billing pods. Integer or percentage string (e.g. "50%"). |
+| billing.pdb.minAvailable | int|string | `nil` | Minimum available Billing pods. Integer or percentage string (e.g. "50%"). |
+| billing.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to Billing pods. Leave empty to omit the field. |
 | billing.readinessProbe | object | `` | Readiness probe customization for Billing pods. |
 | billing.replicas | int | `1` | Number of Billing replicas. Default is 1 (singleton). Can be increased for high availability. Each replica maintains its own journal file. |
 | billing.resources | object | `` | Configure resource limits per Billing container. |
@@ -412,6 +423,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.modelManager.volumes.gcp.gpd.volumeHandle | string | `""` | The identifier of your pre-existing persistent disk. The format is projects/{project_id}/zones/{zone_name}/disks/{disk_name} for Zonal persistent disks, or projects/{project_id}/regions/{region_name}/disks/{disk_name} for Regional persistent disks. |
 | engine.namePrefix | string | `"deepgram-engine"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Engine containers. |
 | engine.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to Engine pods. |
+| engine.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for Engine pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. When `agent.enabled` is true, one PDB is created per engine-type (speech-to-text, text-to-speech, end-of-turn), each with the same budget values. |
+| engine.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for Engine pods. |
+| engine.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable Engine pods. Integer or percentage string (e.g. "50%"). |
+| engine.pdb.minAvailable | int|string | `nil` | Minimum available Engine pods. Integer or percentage string (e.g. "50%"). |
+| engine.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to Engine pods. Leave empty to omit the field. |
 | engine.readinessProbe | object | `` | Readiness probe customization for Engine pods. |
 | engine.resources | object | `` | Configure resource limits per Engine container. See [Deepgram's documentation](https://developers.deepgram.com/docs/self-hosted-deployment-environments#engine) for more details. |
 | engine.resources.gpuResourceName | string | `"nvidia.com/gpu"` | Name of the GPU resource to use (e.g., nvidia.com/gpu for standard GPUs, or nvidia.com/mig-4g.40gb for MIG slices). This allows using different GPU resource naming conventions as configured by the NVIDIA GPU Operator. |
@@ -471,6 +487,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
 | licenseProxy.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to License Proxy pods. |
+| licenseProxy.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for License Proxy pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. |
+| licenseProxy.pdb.enabled | bool | `false` | Whether to create a PodDisruptionBudget for License Proxy pods. |
+| licenseProxy.pdb.maxUnavailable | int|string | `nil` | Maximum unavailable License Proxy pods. Integer or percentage string (e.g. "50%"). |
+| licenseProxy.pdb.minAvailable | int|string | `nil` | Minimum available License Proxy pods. Integer or percentage string (e.g. "50%"). |
+| licenseProxy.priorityClassName | string | `""` | [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) name to apply to License Proxy pods. Leave empty to omit the field. |
 | licenseProxy.readinessProbe | object | `` | Readiness probe customization for License Proxy pods. |
 | licenseProxy.resources | object | `` | Configure resource limits per License Proxy container. See [Deepgram's documentation](https://developers.deepgram.com/docs/license-proxy#system-requirements) for more details. |
 | licenseProxy.securityContext | object | `{}` | [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods. |

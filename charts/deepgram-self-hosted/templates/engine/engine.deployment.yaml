@@ -68,6 +68,9 @@ spec:
         {{- toYaml $.Values.engine.topologySpreadConstraints | nindent 8 }}
       nodeSelector:
         {{- toYaml $.Values.engine.nodeSelector | nindent 8 }}
+      {{- with $.Values.engine.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       {{- with $.Values.engine.securityContext }}
       securityContext:
         {{- toYaml . | nindent 8 }}

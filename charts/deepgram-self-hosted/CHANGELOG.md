@@ -8,7 +8,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Support for configuring custom annotations on Kubernetes `ServiceAccount` resources for API, Engine, License Proxy, and Billing deployments (`api.serviceAccount.annotations`, `engine.serviceAccount.annotations`, `licenseProxy.serviceAccount.annotations`, and `billing.serviceAccount.annotations`). This allows integrating IAM Roles for Service Accounts (IRSA).
+- Added `agent.allowInsecureEndpoints` (default `false`) to allow insecure URL schemes (`http`/`ws`) in Voice Agent custom endpoints. Required when the agent must reach a plain-HTTP in-cluster service, such as a self-hosted NIM LLM.
+- Added a `voice-agent/aws/self-hosted-llm/` sample demonstrating a Voice Agent on AWS EKS routed to a self-hosted LLM (NVIDIA NIM serving a Nemotron model) running in-cluster, with a companion README walkthrough.
+- Added `priorityClassName` to the API, Engine, License Proxy, and Billing components, allowing a Kubernetes [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) to be assigned to each component's pods. Defaults to `""` (empty), which omits the field and preserves existing scheduling behavior.
+- Added `pdb` support to the API, Engine, License Proxy, and Billing components, allowing a [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) to be created for each component's pods. Set `<component>.pdb.enabled: true` along with exactly one of `minAvailable` or `maxUnavailable`. Defaults to `enabled: false`, so no PodDisruptionBudgets are created unless explicitly opted in. When `agent.enabled` is true, one PodDisruptionBudget is created per Engine type (speech-to-text, text-to-speech, end-of-turn).
+- Added support for configuring custom annotations on the API, Engine, License Proxy, and Billing `ServiceAccount` resources (`<component>.serviceAccount.annotations`). Defaults to `{}` (no annotations). Enables integrations such as IAM Roles for Service Accounts (IRSA).
+
 ## [0.38.0] - 2026-06-11
 
 ### Changed
