@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `priorityClassName` to the API, Engine, License Proxy, and Billing components, allowing a Kubernetes [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) to be assigned to each component's pods. Defaults to `""` (empty), which omits the field and preserves existing scheduling behavior.
+
 ## [0.38.0] - 2026-06-11
 
 ### Changed
