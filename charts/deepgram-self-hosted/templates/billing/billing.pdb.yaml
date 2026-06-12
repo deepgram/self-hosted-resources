@@ -1,0 +1,29 @@
+{{- if and .Values.billing.enabled .Values.billing.pdb.enabled }}
+{{- if and (kindIs "invalid" .Values.billing.pdb.minAvailable) (kindIs "invalid" .Values.billing.pdb.maxUnavailable) }}
+{{- fail "billing.pdb.enabled is true but neither billing.pdb.minAvailable nor billing.pdb.maxUnavailable is set" }}
+{{- end }}
+{{- if and (not (kindIs "invalid" .Values.billing.pdb.minAvailable)) (not (kindIs "invalid" .Values.billing.pdb.maxUnavailable)) }}
+{{- fail "billing.pdb.minAvailable and billing.pdb.maxUnavailable are mutually exclusive" }}
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.billing.namePrefix }}
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4 }}
+    app: deepgram-billing
+    {{- range $key, $val := .Values.billing.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+spec:
+  {{- with .Values.billing.pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.billing.pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: deepgram-billing
+      {{ include "deepgram-self-hosted.selectorLabels" . }}
+{{- end }}

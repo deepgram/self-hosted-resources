@@ -45,6 +45,9 @@ spec:
         {{- toYaml .Values.licenseProxy.topologySpreadConstraints | nindent 8 }}
       nodeSelector:
         {{- toYaml .Values.licenseProxy.nodeSelector | nindent 8 }}
+      {{- with .Values.licenseProxy.priorityClassName }}
+      priorityClassName: {{ . }}
+      {{- end }}
       securityContext:
         {{- toYaml .Values.licenseProxy.securityContext | nindent 8 }}
       {{- if or .Values.licenseProxy.serviceAccount.create .Values.licenseProxy.serviceAccount.name }}

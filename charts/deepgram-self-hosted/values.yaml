@@ -331,6 +331,21 @@ api:
   # to apply to API pods.
   nodeSelector: {}
 
+  # -- [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets)
+  # for API pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled.
+  # @default -- ``
+  pdb:
+    # -- Whether to create a PodDisruptionBudget for API pods.
+    enabled: false
+    # -- (int|string) Minimum available API pods. Integer or percentage string (e.g. "50%").
+    minAvailable:
+    # -- (int|string) Maximum unavailable API pods. Integer or percentage string (e.g. "50%").
+    maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to API pods. Leave empty to omit the field.
+  priorityClassName: ""
+
   # -- [Topology spread constraints](https://kubernetes.io/docs/concepts/scheduling-eviction/topology-spread-constraints/#topologyspreadconstraints-field)
   # to apply to API pods.
   topologySpreadConstraints: []
@@ -607,6 +622,23 @@ engine:
   # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   # to apply to Engine pods.
   nodeSelector: {}
+
+  # -- [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets)
+  # for Engine pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled.
+  # When `agent.enabled` is true, one PDB is created per engine-type (speech-to-text, text-to-speech, end-of-turn),
+  # each with the same budget values.
+  # @default -- ``
+  pdb:
+    # -- Whether to create a PodDisruptionBudget for Engine pods.
+    enabled: false
+    # -- (int|string) Minimum available Engine pods. Integer or percentage string (e.g. "50%").
+    minAvailable:
+    # -- (int|string) Maximum unavailable Engine pods. Integer or percentage string (e.g. "50%").
+    maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to Engine pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- (string) [Runtime class](https://kubernetes.io/docs/concepts/containers/runtime-class/)
   # to use for Engine pods. Set to "nvidia" when using KOPS-managed NVIDIA drivers
@@ -933,6 +965,21 @@ licenseProxy:
   # to apply to License Proxy pods.
   nodeSelector: {}
 
+  # -- [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets)
+  # for License Proxy pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled.
+  # @default -- ``
+  pdb:
+    # -- Whether to create a PodDisruptionBudget for License Proxy pods.
+    enabled: false
+    # -- (int|string) Minimum available License Proxy pods. Integer or percentage string (e.g. "50%").
+    minAvailable:
+    # -- (int|string) Maximum unavailable License Proxy pods. Integer or percentage string (e.g. "50%").
+    maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to License Proxy pods. Leave empty to omit the field.
+  priorityClassName: ""
+
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for License Proxy pods.
   securityContext: {}
 
@@ -1111,6 +1158,21 @@ billing:
   # -- [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector)
   # to apply to Billing pods.
   nodeSelector: {}
+
+  # -- [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets)
+  # for Billing pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled.
+  # @default -- ``
+  pdb:
+    # -- Whether to create a PodDisruptionBudget for Billing pods.
+    enabled: false
+    # -- (int|string) Minimum available Billing pods. Integer or percentage string (e.g. "50%").
+    minAvailable:
+    # -- (int|string) Maximum unavailable Billing pods. Integer or percentage string (e.g. "50%").
+    maxUnavailable:
+
+  # -- (string) [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/)
+  # name to apply to Billing pods. Leave empty to omit the field.
+  priorityClassName: ""
 
   # -- [Pod-level security context](https://kubernetes.io/docs/tasks/configure-pod-container/security-context/#set-the-security-context-for-a-pod) for Billing pods.
   securityContext: {}
