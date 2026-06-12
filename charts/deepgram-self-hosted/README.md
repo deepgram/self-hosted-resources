@@ -239,6 +239,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 | Key | Type | Default | Description |
 |-----|------|---------|-------------|
+| agent.allowInsecureEndpoints | bool | `false` | Whether to allow insecure URL schemes (`http` and `ws`) in custom endpoints. Disabled by default. Required when the Voice Agent must reach a plain-HTTP in-cluster service (e.g. a self-hosted NIM LLM). |
 | agent.allowNonpublicEndpoints | bool | `false` | Whether to allow non-public URLs (such as `localhost`) in custom endpoints. Disabled by default |
 | agent.enabled | bool | `false` | Whether to enable voice agent. Disabled by default |
 | agent.eotTimeoutMs | int | `3500` | Timeout in milliseconds for end-of-turn detection |
@@ -308,6 +309,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
 | api.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
 | api.service.type | string | `ClusterIP` | Service type for the API external service. Options: ClusterIP, NodePort, LoadBalancer |
+| api.serviceAccount.annotations | object | `{}` | Annotations to add to the API service account. |
 | api.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram API Deployment. |
 | api.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the API component. If left empty, the default service account name will be used. If specified, and `api.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `api.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the API deployment. |
 | api.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to API pods. |
@@ -356,6 +358,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.server.certificatesPort | int | `8080` | certificatesPort is the port for the HTTP certificates endpoint (/v1/certificates). Must be set explicitly for the certificates endpoint to be reachable. |
 | billing.server.host | string | `"0.0.0.0"` | host is the IP address to listen on. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | billing.server.port | int | `8443` | port to listen on. |
+| billing.serviceAccount.annotations | object | `{}` | Annotations to add to the Billing service account. |
 | billing.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Billing Deployment. |
 | billing.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the Billing component. If left empty, the default service account name will be used. If specified, and `billing.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `billing.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the Billing deployment. |
 | billing.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to Billing pods. |
@@ -440,6 +443,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
 | engine.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
 | engine.service.type | string | `ClusterIP` | Service type for the Engine metrics service. Options: ClusterIP, NodePort, LoadBalancer |
+| engine.serviceAccount.annotations | object | `{}` | Annotations to add to the Engine service account. |
 | engine.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram Engine Deployment. |
 | engine.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the Engine component. If left empty, the default service account name will be used. If specified, and `engine.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `engine.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the Engine deployment. |
 | engine.startupProbe | object | `` | The startupProbe combination of `periodSeconds` and `failureThreshold` allows time for the container to load all models and start listening for incoming requests.  Model load time can be affected by hardware I/O speeds, as well as network speeds if you are using a network volume mount for the models.  If you are hitting the failure threshold before models are finished loading, you may want to extend the startup probe. However, this will also extend the time it takes to detect a pod that can't establish a network connection to validate its license. |
@@ -501,6 +505,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.service.externalTrafficPolicy | string | `` | External traffic policy for LoadBalancer service. Options: Cluster, Local Only applies when service type is LoadBalancer |
 | licenseProxy.service.loadBalancerSourceRanges | list | `` | List of IP CIDR ranges allowed to access the LoadBalancer service Only applies when service type is LoadBalancer |
 | licenseProxy.service.type | string | `ClusterIP` | Service type for the License Proxy status service. Options: ClusterIP, NodePort, LoadBalancer |
+| licenseProxy.serviceAccount.annotations | object | `{}` | Annotations to add to the License Proxy service account. |
 | licenseProxy.serviceAccount.create | bool | `true` | Specifies whether to create a default service account for the Deepgram License Proxy Deployment. |
 | licenseProxy.serviceAccount.name | string | `nil` | Allows providing a custom service account name for the LicenseProxy component. If left empty, the default service account name will be used. If specified, and `licenseProxy.serviceAccount.create = true`, this defines the name of the default service account. If specified, and `licenseProxy.serviceAccount.create = false`, this provides the name of a preconfigured service account you wish to attach to the License Proxy deployment. |
 | licenseProxy.tolerations | list | `[]` | [Tolerations](https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/) to apply to License Proxy pods. |

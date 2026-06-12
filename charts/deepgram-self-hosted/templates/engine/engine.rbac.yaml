@@ -3,6 +3,10 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: {{ default (printf "%s-sa" .Values.engine.namePrefix) .Values.engine.serviceAccount.name }}
+  {{- with .Values.engine.serviceAccount.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
 ---
