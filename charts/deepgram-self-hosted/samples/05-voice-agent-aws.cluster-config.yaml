@@ -4,7 +4,7 @@ kind: ClusterConfig
 metadata:
   name: deepgram-self-hosted-voice-agent-cluster # Change to your desired name
   region: us-west-2 # Change to your desired host region
-  version: "1.33"
+  version: "1.35"
 
 iam:
   withOIDC: true

@@ -14,6 +14,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Added `pdb` support to the API, Engine, License Proxy, and Billing components, allowing a [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) to be created for each component's pods. Set `<component>.pdb.enabled: true` along with exactly one of `minAvailable` or `maxUnavailable`. Defaults to `enabled: false`, so no PodDisruptionBudgets are created unless explicitly opted in. When `agent.enabled` is true, one PodDisruptionBudget is created per Engine type (speech-to-text, text-to-speech, end-of-turn).
 - Added support for configuring custom annotations on the API, Engine, License Proxy, and Billing `ServiceAccount` resources (`<component>.serviceAccount.annotations`). Defaults to `{}` (no annotations). Enables integrations such as IAM Roles for Service Accounts (IRSA).
 
+### Changed
+
+- Updated sample cluster configuration files to use Kubernetes 1.35 (previously 1.33)
+
 ## [0.38.0] - 2026-06-11
 
 ### Changed
