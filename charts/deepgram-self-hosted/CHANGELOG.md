@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added `priorityClassName` to the API, Engine, License Proxy, and Billing components, allowing a Kubernetes [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) to be assigned to each component's pods. Defaults to `""` (empty), which omits the field and preserves existing scheduling behavior.
+- Added `pdb` support to the API, Engine, License Proxy, and Billing components, allowing a [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) to be created for each component's pods. Set `<component>.pdb.enabled: true` along with exactly one of `minAvailable` or `maxUnavailable`. Defaults to `enabled: false`, so no PodDisruptionBudgets are created unless explicitly opted in. When `agent.enabled` is true, one PodDisruptionBudget is created per Engine type (speech-to-text, text-to-speech, end-of-turn).
 
 ## [0.38.0] - 2026-06-11
 

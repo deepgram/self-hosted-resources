@@ -1,0 +1,29 @@
+{{- if .Values.api.pdb.enabled }}
+{{- if and (kindIs "invalid" .Values.api.pdb.minAvailable) (kindIs "invalid" .Values.api.pdb.maxUnavailable) }}
+{{- fail "api.pdb.enabled is true but neither api.pdb.minAvailable nor api.pdb.maxUnavailable is set" }}
+{{- end }}
+{{- if and (not (kindIs "invalid" .Values.api.pdb.minAvailable)) (not (kindIs "invalid" .Values.api.pdb.maxUnavailable)) }}
+{{- fail "api.pdb.minAvailable and api.pdb.maxUnavailable are mutually exclusive" }}
+{{- end }}
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: {{ .Values.api.namePrefix }}
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4 }}
+    app: {{ .Values.api.namePrefix }}
+    {{- range $key, $val := .Values.api.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end }}
+spec:
+  {{- with .Values.api.pdb.minAvailable }}
+  minAvailable: {{ . }}
+  {{- end }}
+  {{- with .Values.api.pdb.maxUnavailable }}
+  maxUnavailable: {{ . }}
+  {{- end }}
+  selector:
+    matchLabels:
+      app: {{ .Values.api.namePrefix }}
+      {{ include "deepgram-self-hosted.selectorLabels" . }}
+{{- end }}
