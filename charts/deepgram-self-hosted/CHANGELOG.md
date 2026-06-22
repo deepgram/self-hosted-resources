@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
+- Added the `aws-apn-id` tag (`pc: ajk5xy316takzneuu4ykhhj8c`) to all AWS EKS sample `cluster-config.yaml` files, at both the cluster level (`metadata.tags`) and on every managed node group (`managedNodeGroups[].tags`). This metadata tag identifies the deployment to AWS for [Partner Relationship Management (PRM)](https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html) and is highly recommended to leave in place. It applies to AWS deployments only and has no effect on Kubernetes, GCP, on-premises, Docker, or Podman deployments.
 - Added `agent.allowInsecureEndpoints` (default `false`) to allow insecure URL schemes (`http`/`ws`) in Voice Agent custom endpoints. Required when the agent must reach a plain-HTTP in-cluster service, such as a self-hosted NIM LLM.
 - Added a `voice-agent/aws/self-hosted-llm/` sample demonstrating a Voice Agent on AWS EKS routed to a self-hosted LLM (NVIDIA NIM serving a Nemotron model) running in-cluster, with a companion README walkthrough.
 - Added `priorityClassName` to the API, Engine, License Proxy, and Billing components, allowing a Kubernetes [PriorityClass](https://kubernetes.io/docs/concepts/scheduling-eviction/pod-priority-preemption/) to be assigned to each component's pods. Defaults to `""` (empty), which omits the field and preserves existing scheduling behavior.

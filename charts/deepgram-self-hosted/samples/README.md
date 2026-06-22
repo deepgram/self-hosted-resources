@@ -16,6 +16,8 @@ This directory contains examples of how to use the Deepgram Helm chart in variou
 ## AWS EKS Samples
 See the [Deepgram AWS EKS guide](https://developers.deepgram.com/docs/aws-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in AWS.
 
+The AWS `cluster-config.yaml` samples set an `aws-apn-id` tag (at the cluster level and on every node group). This metadata-only tag identifies the deployment to AWS for [Partner Relationship Management (PRM)](https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html), helping AWS and Deepgram coordinate a better self-hosted experience. It has no cost or runtime effect and is highly recommended to leave in place. The tag is specific to AWS deployments and does not appear in the GCP or on-premises samples.
+
 ## GCP GKE Samples
 See the [Deepgram GCP GKE guide](https://developers.deepgram.com/docs/gcp-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in GCP.
 
