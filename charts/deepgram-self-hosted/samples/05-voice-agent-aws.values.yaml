@@ -72,6 +72,21 @@ api:
       memory: "8Gi"
       cpu: "4000m"
 
+  # -- Service configuration for the API external service
+  # Uncomment and modify the service type as needed to expose the API/Agent externally.
+  # service:
+  #   # Options: ClusterIP (default), NodePort, LoadBalancer
+  #   type: LoadBalancer
+  #   # Add annotations when using LoadBalancer type (e.g., for AWS ELB configuration)
+  #   annotations:
+  #     service.beta.kubernetes.io/aws-load-balancer-type: "nlb"
+  #     service.beta.kubernetes.io/aws-load-balancer-scheme: "internet-facing"
+  #     # AWS PRM attribution tag, applied to the provisioned NLB/ALB. Identifies the
+  #     # deployment to AWS Partner Relationship Management (PRM); AWS-only, no cost,
+  #     # highly recommended to keep. The value is a comma-separated list of key=value tags.
+  #     # See https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html
+  #     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "aws-apn-id=pc: ajk5xy316takzneuu4ykhhj8c"
+
 engine:
   affinity:
     nodeAffinity:
