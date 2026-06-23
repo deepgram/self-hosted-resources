@@ -5,6 +5,14 @@ metadata:
   name: deepgram-self-hosted-voice-agent-cluster # Change to your desired name
   region: us-west-2 # Change to your desired host region
   version: "1.35"
+  # The `aws-apn-id` tag identifies this deployment to AWS through the AWS
+  # Partner Network for Partner Relationship Management (PRM), so AWS and
+  # Deepgram can coordinate a better self-hosted experience. It is a metadata
+  # tag only (no cost, no runtime effect) and is applied to AWS resources only.
+  # We highly recommend leaving it in place.
+  # See: https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html
+  tags:
+    aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
 
 iam:
   withOIDC: true
@@ -35,6 +43,9 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     propagateASGTags: true
+    # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
+    tags:
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: engine-node-group
     minSize: 3
     desiredCapacity: 3
@@ -55,6 +66,9 @@ managedNodeGroups:
         value: "true"
         effect: NoExecute
     propagateASGTags: true
+    # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
+    tags:
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: api-node-group
     minSize: 1
     desiredCapacity: 1
@@ -67,6 +81,9 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     propagateASGTags: true
+    # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
+    tags:
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: license-proxy-node-group
     minSize: 1
     desiredCapacity: 1
@@ -79,3 +96,6 @@ managedNodeGroups:
       withAddonPolicies:
         autoScaler: true
     propagateASGTags: true
+    # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
+    tags:
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
