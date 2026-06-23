@@ -12,7 +12,7 @@ metadata:
   # We highly recommend leaving it in place.
   # See: https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html
   tags:
-    aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+    aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
 
 iam:
   withOIDC: true
@@ -45,7 +45,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: engine-node-group
     minSize: 3
     desiredCapacity: 3
@@ -68,7 +68,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: api-node-group
     minSize: 1
     desiredCapacity: 1
@@ -83,7 +83,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: license-proxy-node-group
     minSize: 1
     desiredCapacity: 1
@@ -98,4 +98,4 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"

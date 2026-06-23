@@ -19,7 +19,7 @@ metadata:
   # We highly recommend leaving it in place.
   # See: https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html
   tags:
-    aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+    aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
 
 iam:
   withOIDC: true
@@ -62,7 +62,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: engine-node-group
     minSize: 3
     desiredCapacity: 3
@@ -85,7 +85,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: api-node-group
     minSize: 1
     desiredCapacity: 1
@@ -100,7 +100,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   - name: license-proxy-node-group
     minSize: 1
     desiredCapacity: 1
@@ -115,7 +115,7 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"
   # Hosts a self-hosted LLM (e.g. NVIDIA NIM serving a Nemotron model)
   # that the Voice Agent talks to over the cluster network. Install NIM as a
   # separate Helm release into this node group; see
@@ -142,4 +142,4 @@ managedNodeGroups:
     propagateASGTags: true
     # AWS PRM attribution tag (see the note on metadata.tags); recommended to keep.
     tags:
-      aws-apn-id: "pc: ajk5xy316takzneuu4ykhhj8c"
+      aws-apn-id: "pc:ajk5xy316takzneuu4ykhhj8c"

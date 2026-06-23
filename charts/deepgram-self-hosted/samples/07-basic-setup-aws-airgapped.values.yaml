@@ -89,7 +89,7 @@ api:
   #     # deployment to AWS Partner Relationship Management (PRM); AWS-only, no cost,
   #     # highly recommended to keep. The value is a comma-separated list of key=value tags.
   #     # See https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html
-  #     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "aws-apn-id=pc: ajk5xy316takzneuu4ykhhj8c"
+  #     service.beta.kubernetes.io/aws-load-balancer-additional-resource-tags: "aws-apn-id=pc:ajk5xy316takzneuu4ykhhj8c"
   #   # Restrict access to specific IP ranges (optional)
   #   loadBalancerSourceRanges:
   #     - "10.0.0.0/8"      # Allow access from private networks
