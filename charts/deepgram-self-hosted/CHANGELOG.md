@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.39.0] - 2026-06-30
+
 ### Added
 
 - Added the `aws-apn-id` tag (`pc:ajk5xy316takzneuu4ykhhj8c`) across the AWS EKS samples for [AWS Partner Relationship Management (PRM)](https://docs.aws.amazon.com/PRM/latest/aws-prm-onboarding-guide/what-is-service.html) attribution, highly recommended to leave in place. It is applied to the EKS cluster and EC2 nodes via every `*.cluster-config.yaml` (`metadata.tags` and `managedNodeGroups[].tags`); the AWS `*.values.yaml` samples include a commented `service.annotations` example (`aws-load-balancer-additional-resource-tags`) to tag any provisioned load balancer; and `samples/README.md` documents tagging EBS/EFS volumes. All additions are scoped to the AWS sample files (cluster configs and AWS values samples) and the chart's default `values.yaml` and templates are unchanged, so there is no effect on Kubernetes, GCP, on-premises, Docker, or Podman deployments.
@@ -17,6 +19,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Changed
 
+- Updated default container tags to June 2026 release (`release-260630`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-june-2026-release-260630) for additional details.
 - Updated sample cluster configuration files to use Kubernetes 1.35 (previously 1.33)
 
 ## [0.38.0] - 2026-06-11
@@ -480,7 +483,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.38.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.39.0...HEAD
+[0.39.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.38.0...deepgram-self-hosted-0.39.0
 [0.38.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.37.0...deepgram-self-hosted-0.38.0
 [0.37.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.36.0...deepgram-self-hosted-0.37.0
 [0.36.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.35.1...deepgram-self-hosted-0.36.0
