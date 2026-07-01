@@ -1,0 +1,99 @@
+### Deepgram API configuration for Google Cloud Run — Aura TTS (dedicated)
+### This file is a template. The deploy.sh script substitutes TTS_ENGINE_SERVICE_URL
+### before uploading to Secret Manager.
+###
+### This API instance routes requests exclusively to the TTS Engine (Aura/Aura-2).
+### It must NOT be pointed at an STT or Flux engine.
+###
+### STT (nova) and Flux requests each require their own API instance:
+###   config/api.toml.tmpl       — routes to deepgram-engine (nova STT)
+###   config/api-flux.toml.tmpl  — routes to deepgram-engine-flux (Flux)
+###
+### Keep in mind that all paths are in-container paths, and do not need to exist
+### on the host machine.
+
+
+### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable.
+### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
+[license]
+server_url = ["https://license.deepgram.com"]
+
+
+### Configure how the API will listen for your requests
+[server]
+### The base URL (prefix) for requests to the API.
+base_url = "/v1"
+### Listen on all interfaces inside the container.
+host = "0.0.0.0"
+### Cloud Run expects the container to listen on port 8080.
+port = 8080
+
+### How long to wait for a connection to a callback URL.
+callback_conn_timeout = "1s"
+### How long to wait for a response to a callback URL.
+callback_timeout = "10s"
+
+### How long to wait for a connection to a fetch URL.
+fetch_conn_timeout = "1s"
+### How long to wait for a response to a fetch URL.
+fetch_timeout = "60s"
+
+
+### By default, the API listens over HTTP. Cloud Run terminates TLS at the load
+### balancer, so no certificate configuration is needed here.
+[server.https]
+# cert_file = "/path/to/cert.pem"
+# key_file = "/path/to/key.pem"
+
+
+### Specify custom DNS resolution options.
+[resolver]
+### Specify custom domain name server(s).
+### Format is "{IP} {PORT} {PROTOCOL (tcp or udp)}"
+# nameservers = ["127.0.0.1 53 udp"]
+
+### If specifying a custom DNS nameserver, set the DNS TTL value.
+# max_ttl = 10
+
+
+### Limit the number of active requests handled by a single API container.
+### If additional requests beyond the limit are sent, API will return
+### a 429 HTTP status code. Default is no limit.
+[concurrency_limit]
+# active_requests =
+
+
+### Enable ancillary features
+[features]
+### STT audio intelligence features are not applicable to TTS workloads.
+topic_detection = false
+summarization = false
+entity_detection = false
+entity_redaction = false
+format_entity_tags = false
+
+### Enables streaming TTS via WebSocket (/v1/speak endpoint).
+speak_streaming = true
+
+### Toggles usage data redaction; set to false to disable redaction of usage data; defaults to true if not present
+# redact_usage = true # or false
+
+### Flux is not served by this API instance.
+listen_v2 = false
+
+
+### Configure the backend pool of speech engines.
+### TTS_ENGINE_SERVICE_URL is substituted at deploy time with the TTS Engine URL.
+[[driver_pool.standard]]
+### Cloud Run services are always served over HTTPS.
+url = "TTS_ENGINE_SERVICE_URL"
+### Factor to increase the timeout by for each additional retry (exponential backoff).
+timeout_backoff = 1.2
+
+### Before attempting a retry, sleep for this long.
+retry_sleep = "2s"
+### Factor to increase the retry sleep by for each additional retry (exponential backoff).
+retry_backoff = 1.6
+
+### Maximum response to deserialize from Driver (in bytes).
+max_response_size = 1073741824 # 1GB
