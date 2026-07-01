@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "deepgram-aiworks.fullname" . }}-test-connection"
+  labels:
+    {{- include "deepgram-aiworks.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.10.1
+      command: ["sh", "-c"]
+      args:
+        - |
+          set -e
+          {{- if .Values.server.tls.enabled }}
+          # TLS is enabled in voiceworks. We curl https:// with -k since the
+          # in-process cert may be self-signed or otherwise not in the curl
+          # image's trust store. helm-test verifies the listener is up and
+          # responding; cert validation is out of scope for a smoke test.
+          URL="https://{{ include "deepgram-aiworks.fullname" . }}:{{ .Values.service.port }}/api/health"
+          CURL_FLAGS="-fsS -k --max-time 2"
+          {{- else }}
+          URL="http://{{ include "deepgram-aiworks.fullname" . }}:{{ .Values.service.port }}/api/health"
+          CURL_FLAGS="-fsS --max-time 2"
+          {{- end }}
+          echo "Waiting for $URL to accept connections..."
+          for i in $(seq 1 30); do
+            if curl $CURL_FLAGS "$URL" > /tmp/out 2>&1; then
+              echo "health endpoint responded:"
+              cat /tmp/out
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "timed out waiting for health endpoint"
+          exit 1

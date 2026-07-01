@@ -1,0 +1,200 @@
+# -- Override the chart name for resource naming.
+nameOverride: ""
+
+# Image
+image:
+  # -- Container image repository for the AIWorks self-hosted backend.
+  repository: quay.io/deepgram/voiceworks-self-hosted
+  # -- Image tag. Defaults to .Chart.appVersion if empty.
+  tag: ""
+  # -- imagePullPolicy passed to the container spec.
+  pullPolicy: IfNotPresent
+
+# -- imagePullSecrets passed to the pod spec. List of {name: <secret>}.
+imagePullSecrets: []
+
+# -- Static replica count when scaling.auto.enabled is false.
+replicaCount: 1
+
+# License check-in. Required when the image is built with --features self-hosted.
+license:
+  # -- License ID (UUID). Stored in the credentials Secret as DEEPGRAM_API_KEY.
+  # Required unless apiKeyExistingSecret is set.
+  apiKey: ""
+  # -- Alternative: reference an existing Secret rather than letting the chart create one.
+  apiKeyExistingSecret: ""
+  # -- Key inside apiKeyExistingSecret that holds the license UUID.
+  apiKeyExistingSecretKey: "DEEPGRAM_API_KEY"
+  # -- License server URLs. Priority order; first is primary, others fall back.
+  serverUrl:
+    - "http://license-proxy.deepgram.svc.cluster.local:8080"
+    - "https://license.deepgram.com"
+  # -- Optional hermes health gate at startup. Backend refuses to start
+  # unless this endpoint reports Connected or TrustBased.
+  proxyStatusUrl: ""
+
+# Storage mode. "files" loads exported flow JSONs from disk; "postgres" keeps
+# the cloud-shape DB-backed flow store.
+storage:
+  # -- "files" or "postgres".
+  mode: files
+  files:
+    # -- Mount path for the flows directory inside the container.
+    flowsDir: /flows
+    persistence:
+      # -- Provision a PVC for flowsDir.
+      enabled: true
+      # -- PVC size.
+      size: 1Gi
+      # -- StorageClass. Empty string uses cluster default.
+      storageClassName: ""
+      # -- Reuse an existing PVC instead of letting the chart create one.
+      existingClaim: ""
+  postgres:
+    # -- Postgres DSN. Required when mode=postgres unless dsnExistingSecret is set.
+    dsn: ""
+    # -- Alternative: existing Secret holding the DSN.
+    dsnExistingSecret: ""
+    dsnExistingSecretKey: "DATABASE_URL"
+
+# Open-mode auth bypass. When enabled, the backend skips the Console auth round-trip
+# and uses a shared-secret token in constant-time compare.
+selfHosted:
+  # -- Enable open mode.
+  enabled: true
+  # -- Shared-secret token clients present as `Authorization: Token <api_key>`.
+  # Stored in the credentials Secret as VW_API_KEY.
+  apiKey: ""
+  apiKeyExistingSecret: ""
+  apiKeyExistingSecretKey: "VW_API_KEY"
+  # -- UUID for the synthetic single-tenant subject. Generate a fresh one per
+  # deployment — DO NOT reuse a UUID that already has data attached.
+  bootstrapSubject: ""
+
+# Deepgram speech endpoints. Override to point at your self-hosted Deepgram
+# distribution.
+deepgram:
+  streamingListenUrl: "ws://api.deepgram.svc.cluster.local:8080/v1/listen"
+  batchListenUrl: "http://api.deepgram.svc.cluster.local:8080/v1/listen"
+
+# Server config — listener + TLS.
+server:
+  host: "0.0.0.0"
+  port: 8080
+  prefix: "/"
+  wsIdleTimeout: "5m"
+  tls:
+    # -- Terminate TLS in voiceworks itself. When false, an ingress in front
+    # is expected to handle TLS termination.
+    enabled: false
+    # -- Inline cert (PEM) — passed through to the chart-created TLS Secret.
+    cert: ""
+    # -- Inline key (PEM).
+    key: ""
+    # -- Alternative: reference an existing kubernetes.io/tls Secret.
+    existingSecret: ""
+    # -- Optional client CA bundle (PEM) for mTLS. When set, the server
+    # requires incoming clients to present a cert signed by one of these CAs.
+    clientCaBundle: ""
+    clientCaBundleExistingSecret: ""
+
+# Service.
+service:
+  type: ClusterIP
+  port: 8080
+  # -- Additional Service annotations.
+  annotations: {}
+
+# Ingress.
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts: []
+  tls: []
+
+# Autoscaling.
+scaling:
+  auto:
+    enabled: false
+    minReplicas: 1
+    maxReplicas: 5
+    targetCPUUtilizationPercentage: 70
+
+# Observability.
+serviceMonitor:
+  enabled: false
+  interval: 30s
+  scrapeTimeout: 10s
+  namespace: ""
+  additionalLabels: {}
+
+# NetworkPolicy. Default-deny is opinionated — enable only if your cluster
+# already enforces NetworkPolicy.
+networkPolicy:
+  enabled: false
+  # -- Pods/namespaces allowed to talk to the AIWorks Service.
+  ingressFrom: []
+  # -- Egress allowlist. Empty = allow all (k8s default).
+  egressTo: []
+
+# Pod security.
+podSecurityContext: {}
+securityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  capabilities:
+    drop: ["ALL"]
+
+# Resources.
+resources:
+  requests:
+    cpu: "100m"
+    memory: "256Mi"
+  limits:
+    cpu: "1000m"
+    memory: "1Gi"
+
+# Scheduling.
+nodeSelector: {}
+tolerations: []
+affinity: {}
+podAnnotations: {}
+podLabels: {}
+
+# Probes.
+probes:
+  readiness:
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    failureThreshold: 3
+  liveness:
+    initialDelaySeconds: 30
+    periodSeconds: 30
+    failureThreshold: 3
+  # Startup probe gives the initial license check-in + flow load enough time.
+  startup:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+    failureThreshold: 60   # 5 minutes total
+
+# Termination grace — long enough for in-flight WS sessions to drain.
+terminationGracePeriodSeconds: 60
+
+# Update strategy. maxUnavailable=0 keeps existing pods serving during a roll.
+updateStrategy:
+  type: RollingUpdate
+  rollingUpdate:
+    maxUnavailable: 0
+    maxSurge: 1
+
+# Existing Secret reference (alternative to license.apiKey + selfHosted.apiKey).
+secrets:
+  # -- If set, the chart will not create a credentials Secret. Both the
+  # license API key and the open-mode API key must live in this Secret under
+  # the keys specified by license.apiKeyExistingSecretKey and
+  # selfHosted.apiKeyExistingSecretKey.
+  existingSecret: ""
