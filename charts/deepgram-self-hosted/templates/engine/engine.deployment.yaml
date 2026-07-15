@@ -141,13 +141,18 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
+        # Note: The nvidia-container-runtime requires NVIDIA_VISIBLE_DEVICES and
+        # NVIDIA_DRIVER_CAPABILITIES to inject CUDA libraries. Running without
+        # these variables fails with `libcuda.so.1: cannot open shared object file`.
         {{- if le $gpuRequest 0 }}
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
+        {{- else if $.Values.engine.resources.nvidiaDevicePluginMounting }}
+        # When using NVIDIA device plugin mounting, the device plugin handles GPU visibility
+        # and allocation. NVIDIA_VISIBLE_DEVICES should not be explicitly configured in this case.
+        - name: NVIDIA_DRIVER_CAPABILITIES
+          value: "compute,utility"
         {{- else }}
-        # Required for the Engine container to access the GPU. The nvidia-container-runtime
-        # only injects CUDA libraries when these are set; without them the Engine container
-        # will fail to start with `libcuda.so.1: cannot open shared object file`.
         - name: NVIDIA_VISIBLE_DEVICES
           value: "all"
         - name: NVIDIA_DRIVER_CAPABILITIES
