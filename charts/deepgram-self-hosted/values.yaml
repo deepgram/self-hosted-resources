@@ -547,8 +547,8 @@ engine:
     # Engine pods share a node, this ensures isolated utilization of GPUs.
     # Note: with this enabled, each pod sees only its allocated GPUs (re-indexed
     # from 0), so any `aura2.*.cudaVisibleDevices` values are interpreted relative
-    # to that set — leave them at defaults and size the GPU request to match
-    # (e.g. Aura-2 needs 2). See: https://github.com/NVIDIA/k8s-device-plugin
+    # to that set. Leave them at defaults and size the GPU request to match
+    # (specifically, Aura-2 needs 2 GPUs). See: https://github.com/NVIDIA/k8s-device-plugin
     useNvidiaDevicePlugin: false
     requests:
       memory: "30Gi"

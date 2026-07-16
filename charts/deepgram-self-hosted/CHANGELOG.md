@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.40.1] - 2026-07-16
+
 ### Added
 
 - Added `engine.resources.useNvidiaDevicePlugin` (default `false`) to let the NVIDIA device plugin handle GPU allocation for Engine pods instead of mounting all GPUs via `NVIDIA_VISIBLE_DEVICES=all`. When enabled, each Engine pod sees only the GPUs the device plugin assigns it, providing isolated GPU utilization when multiple Engine pods share a node. See the [NVIDIA Kubernetes device plugin](https://github.com/NVIDIA/k8s-device-plugin).
@@ -493,7 +495,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...HEAD
+[0.40.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.0...deepgram-self-hosted-0.40.1
 [0.40.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.39.0...deepgram-self-hosted-0.40.0
 [0.39.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.38.0...deepgram-self-hosted-0.39.0
 [0.38.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.37.0...deepgram-self-hosted-0.38.0
