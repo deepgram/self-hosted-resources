@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `engine.resources.useNvidiaDevicePlugin` (default `false`) to let the NVIDIA device plugin handle GPU allocation for Engine pods instead of mounting all GPUs via `NVIDIA_VISIBLE_DEVICES=all`. When enabled, each Engine pod sees only the GPUs the device plugin assigns it, providing isolated GPU utilization when multiple Engine pods share a node. See the [NVIDIA Kubernetes device plugin](https://github.com/NVIDIA/k8s-device-plugin).
+
 ## [0.40.0] - 2026-07-15
 
 ### Changed
