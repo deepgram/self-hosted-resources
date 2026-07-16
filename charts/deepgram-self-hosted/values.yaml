@@ -542,11 +542,11 @@ engine:
     # or nvidia.com/mig-4g.40gb for MIG slices). This allows using different GPU resource
     # naming conventions as configured by the NVIDIA GPU Operator.
     gpuResourceName: "nvidia.com/gpu"
-    # -- When enabled, lets Nvidia device plugin handle GPU mounting,
-    # as opposed to always mounting all GPUs. In cases where engines pods
-    # share nodes, this ensures isolated utilization of GPUs.
-    # See: https://github.com/nvidia/k8s-device-plugin
-    nvidiaDevicePluginMounting: false
+    # -- When enabled, lets the NVIDIA device plugin handle GPU allocation,
+    # as opposed to mounting all GPUs into every Engine pod. When multiple
+    # Engine pods share a node, this ensures isolated utilization of GPUs.
+    # See: https://github.com/NVIDIA/k8s-device-plugin
+    useNvidiaDevicePlugin: false
     requests:
       memory: "30Gi"
       cpu: "4000m"

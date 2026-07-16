@@ -141,15 +141,16 @@ spec:
         {{- end }}
         {{- end }}
         {{- end }}
-        # Note: The nvidia-container-runtime requires NVIDIA_VISIBLE_DEVICES and
-        # NVIDIA_DRIVER_CAPABILITIES to inject CUDA libraries. Running without
-        # these variables fails with `libcuda.so.1: cannot open shared object file`.
+        # Note: the nvidia-container-runtime needs NVIDIA_VISIBLE_DEVICES and
+        # NVIDIA_DRIVER_CAPABILITIES to inject the CUDA libraries; without them the
+        # Engine container fails with `libcuda.so.1: cannot open shared object file`.
+        # NVIDIA_VISIBLE_DEVICES is set explicitly below, unless useNvidiaDevicePlugin
+        # is enabled — then the device plugin injects it (scoped to the GPUs it
+        # allocates the pod) and only NVIDIA_DRIVER_CAPABILITIES is set here.
         {{- if le $gpuRequest 0 }}
         - name: NVIDIA_VISIBLE_DEVICES
           value: "void"
-        {{- else if $.Values.engine.resources.nvidiaDevicePluginMounting }}
-        # When using NVIDIA device plugin mounting, the device plugin handles GPU visibility
-        # and allocation. NVIDIA_VISIBLE_DEVICES should not be explicitly configured in this case.
+        {{- else if $.Values.engine.resources.useNvidiaDevicePlugin }}
         - name: NVIDIA_DRIVER_CAPABILITIES
           value: "compute,utility"
         {{- else }}
