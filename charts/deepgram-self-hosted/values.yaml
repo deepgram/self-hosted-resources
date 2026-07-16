@@ -545,7 +545,10 @@ engine:
     # -- When enabled, lets the NVIDIA device plugin handle GPU allocation,
     # as opposed to mounting all GPUs into every Engine pod. When multiple
     # Engine pods share a node, this ensures isolated utilization of GPUs.
-    # See: https://github.com/NVIDIA/k8s-device-plugin
+    # Note: with this enabled, each pod sees only its allocated GPUs (re-indexed
+    # from 0), so any `aura2.*.cudaVisibleDevices` values are interpreted relative
+    # to that set — leave them at defaults and size the GPU request to match
+    # (e.g. Aura-2 needs 2). See: https://github.com/NVIDIA/k8s-device-plugin
     useNvidiaDevicePlugin: false
     requests:
       memory: "30Gi"
