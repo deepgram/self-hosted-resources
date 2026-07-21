@@ -159,6 +159,20 @@ spec:
         - name: NVIDIA_DRIVER_CAPABILITIES
           value: "compute,utility"
         {{- end }}
+        {{- if gt $gpuRequest 0 }}
+        # GKE with Container-Optimized OS does not use the NVIDIA container toolkit:
+        # its device plugin mounts the host driver at /usr/local/nvidia and expects
+        # workloads to reference it via LD_LIBRARY_PATH
+        # (https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#cuda).
+        # Engine images prior to release-260611 baked these paths into the image;
+        # newer images rely on the container toolkit's ldconfig injection instead, so
+        # without this variable the Engine crashes on GKE with
+        # `libcuda.so.1: cannot open shared object file`. The Engine image registers
+        # its own bundled libraries via ldconfig, and these directories do not exist
+        # in non-GKE environments, so this is a no-op everywhere else.
+        - name: LD_LIBRARY_PATH
+          value: "/usr/local/nvidia/lib64:/usr/local/nvidia/lib"
+        {{- end }}
         {{- if and $.Values.aura2.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
         {{- if $.Values.aura2.english.enabled }}
         - name: IMPELLER_AURA2_MAX_BATCH_SIZE
