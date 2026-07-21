@@ -1,0 +1,41 @@
+name: GKE libcuda smoke test
+
+# Guards against the class of regression where the Engine image + Helm chart
+# combination cannot load the NVIDIA driver on GKE (driver bind-mounted at
+# /usr/local/nvidia/lib64, no NVIDIA container toolkit). See
+# diagnostics/dg_gke_libcuda_smoke.sh for how the check works.
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  gke-libcuda-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4
+
+      - name: Build Engine-image linker model
+        run: docker build -t gke-sim-engine diagnostics/gke_sim_engine_image
+
+      - name: Extract stub driver library
+        run: |
+          mkdir -p /tmp/gke-stub
+          cid=$(docker create gke-sim-engine)
+          docker cp "$cid":/out/libcuda.so.1 /tmp/gke-stub/
+          docker rm "$cid" > /dev/null
+
+      - name: Control - the check must detect a GKE-unsafe image (image alone fails)
+        run: |
+          if STUB_DIR=/tmp/gke-stub ./diagnostics/dg_gke_libcuda_smoke.sh gke-sim-engine; then
+            echo "Control run unexpectedly passed: the check can no longer detect the regression."
+            exit 1
+          fi
+
+      - name: Assert - image plus chart env contract passes
+        run: |
+          STUB_DIR=/tmp/gke-stub ./diagnostics/dg_gke_libcuda_smoke.sh gke-sim-engine --chart charts/deepgram-self-hosted

@@ -32,6 +32,15 @@ kubectl get pods -n <namespace> # Note the name of the Pod containing the releva
 kubectl logs <pod_name> > dg_container.log 2>&1
 ```
 
+### 3. [dg_gke_libcuda_smoke.sh](./dg_gke_libcuda_smoke.sh)
+
+This script tests whether a Deepgram Engine image (or the image plus the Helm chart's environment contract) can load the NVIDIA driver in a GKE-shaped environment, where the driver is bind-mounted at `/usr/local/nvidia/lib64` without the NVIDIA container toolkit. It requires no GPU, Deepgram license, or Kubernetes cluster, because it only verifies dynamic-linker visibility. CI runs it against a linker-level model image ([gke_sim_engine_image](./gke_sim_engine_image/Dockerfile)); it can also be run directly against real Engine images:
+
+```bash
+./dg_gke_libcuda_smoke.sh quay.io/deepgram/self-hosted-engine:release-XXXXXX
+./dg_gke_libcuda_smoke.sh quay.io/deepgram/self-hosted-engine:release-XXXXXX --chart ../charts/deepgram-self-hosted
+```
+
 ## Getting Help
 
 See the [Getting Help section](../README.md#getting-help) of the repo README.
