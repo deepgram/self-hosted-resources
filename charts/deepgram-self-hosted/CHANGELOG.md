@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.40.2] - 2026-07-21
+
+### Fixed
+
+- Engine pods on GKE with Container-Optimized OS crashed on startup with `libcuda.so.1: cannot open shared object file` when using Engine images `release-260611` or newer. GKE's device plugin mounts the host NVIDIA driver at `/usr/local/nvidia` without the NVIDIA container toolkit, and [expects workloads to reference it via `LD_LIBRARY_PATH`](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#cuda) — a path older Engine images baked in but newer images do not. The chart now sets `LD_LIBRARY_PATH=/usr/local/nvidia/lib64:/usr/local/nvidia/lib` on GPU-enabled Engine containers; this is a no-op in environments where the NVIDIA container toolkit injects the driver libraries. See [discussion #1626](https://github.com/orgs/deepgram/discussions/1626).
+
 ## [0.40.1] - 2026-07-17
 
 ### Added
@@ -495,7 +501,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...HEAD
+[0.40.2]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...deepgram-self-hosted-0.40.2
 [0.40.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.0...deepgram-self-hosted-0.40.1
 [0.40.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.39.0...deepgram-self-hosted-0.40.0
 [0.39.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.38.0...deepgram-self-hosted-0.39.0
