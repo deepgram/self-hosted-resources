@@ -234,7 +234,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
            - name: LD_LIBRARY_PATH
              value: "/usr/local/nvidia/lib64:/usr/local/nvidia/lib"
        ```
-   - After the Engine pod starts, confirm GPU inference in its logs: `Using devices: Gpu(0)`.
+   - After the Engine pod starts, confirm GPU inference in its logs: look for GPU startup lines such as `Setting GPU model cache size based on auto lookup table. gpu_id=Gpu(0) gpu_name=...` or `impeller::config: Using devices: Gpu(0)`.
 
 {{ template "chart.valuesSection" . }}
 
