@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.40.2](https://img.shields.io/badge/Version-0.40.2-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260714](https://img.shields.io/badge/AppVersion-release--260714-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.40.3](https://img.shields.io/badge/Version-0.40.3-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260714](https://img.shields.io/badge/AppVersion-release--260714-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -237,12 +237,12 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 
 6. GKE: Engine pods crash on startup with `libcuda.so.1: cannot open shared object file`:
    - GKE with Container-Optimized OS mounts the host NVIDIA driver at `/usr/local/nvidia` without the NVIDIA container toolkit, and [expects workloads to reference it via `LD_LIBRARY_PATH`](https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#cuda). Engine images `release-260611` and newer no longer bake this path into the image.
-   - Chart version `0.40.2` and later set this automatically. On older chart versions, add it manually:
+   - Chart version `0.40.3` and later set this automatically (`0.40.2` set an incomplete value that breaks Engine images older than `release-260611`; see the [chart CHANGELOG](./CHANGELOG.md)). On older chart versions, add it manually:
        ```yaml
        engine:
          extraEnv:
            - name: LD_LIBRARY_PATH
-             value: "/usr/local/nvidia/lib64:/usr/local/nvidia/lib"
+             value: "/openh264/lib64:/gstreamer/lib64:/libtorch/lib:/usr/local/cuda/lib64:/usr/local/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
        ```
    - After the Engine pod starts, confirm GPU inference in its logs: look for GPU startup lines such as `Setting GPU model cache size based on auto lookup table. gpu_id=Gpu(0) gpu_name=...` or `impeller::config: Using devices: Gpu(0)`.
 
