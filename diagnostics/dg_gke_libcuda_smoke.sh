@@ -72,16 +72,23 @@ if [ -n "$CHART" ]; then
 fi
 
 # 3. GKE-shaped run: driver only via bind mount, no toolkit. Trace the dynamic
-#    linker; never execute the binary.
+#    linker; never execute the binary. The FULL trace must resolve: requiring
+#    only libcuda would miss configurations that hide an image's own bundled
+#    libraries (see issue #179, where a chart-set LD_LIBRARY_PATH replaced the
+#    baked-in value that pre-release-260611 images rely on).
 OUT=$(docker run --rm -v "$WORK":/usr/local/nvidia/lib64:ro \
 	${ENV_ARGS[@]+"${ENV_ARGS[@]}"} \
 	--entrypoint /bin/sh "$IMAGE" -c \
-	"LD_TRACE_LOADED_OBJECTS=1 ${IMPELLER_BIN:-/bin/impeller} 2>&1 | grep libcuda" 2>&1)
+	"LD_TRACE_LOADED_OBJECTS=1 ${IMPELLER_BIN:-/bin/impeller} 2>&1" 2>&1)
 
-echo "$OUT"
-if echo "$OUT" | grep -q "libcuda.so.1 => /usr/local/nvidia/lib64/libcuda.so.1"; then
-	echo "PASS: libcuda.so.1 is visible in a GKE-shaped environment"
-	exit 0
+echo "$OUT" | grep -E "libcuda|not found" || true
+if echo "$OUT" | grep -q "not found"; then
+	echo "FAIL: one or more libraries are NOT visible (see 'not found' above); this image/chart combination will CrashLoopBackOff"
+	exit 1
 fi
-echo "FAIL: libcuda.so.1 is NOT visible; this image/chart combination will CrashLoopBackOff on GKE"
-exit 1
+if ! echo "$OUT" | grep -q "libcuda.so.1 => /usr/local/nvidia/lib64/libcuda.so.1"; then
+	echo "FAIL: libcuda.so.1 did not resolve from the GKE driver mount"
+	exit 1
+fi
+echo "PASS: full link trace resolves in a GKE-shaped environment (libcuda + all bundled libraries)"
+exit 0

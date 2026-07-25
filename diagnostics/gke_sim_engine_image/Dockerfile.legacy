@@ -1,0 +1,10 @@
+# Linker-level model of a PRE-release-260611 Engine image (e.g. release-260514):
+# bundled libraries are NOT registered via ldconfig; the image depends entirely
+# on its baked-in LD_LIBRARY_PATH (the real images inherited the trailing
+# /usr/local/nvidia/{lib,lib64} entries from the NVIDIA CUDA base image).
+# Build the modern model first (docker build -t gke-sim-engine .), then:
+#   docker build -t gke-sim-engine-legacy -f Dockerfile.legacy .
+ARG BASE=gke-sim-engine
+FROM ${BASE}
+RUN rm /etc/ld.so.conf.d/impeller.conf && ldconfig
+ENV LD_LIBRARY_PATH=/openh264/lib64:/gstreamer/lib64:/libtorch/lib:/usr/local/cuda/lib64:/usr/local/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64

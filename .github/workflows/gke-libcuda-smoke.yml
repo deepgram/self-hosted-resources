@@ -39,3 +39,10 @@ jobs:
       - name: Assert - image plus chart env contract passes
         run: |
           STUB_DIR=/tmp/gke-stub ./diagnostics/dg_gke_libcuda_smoke.sh gke-sim-engine --chart charts/deepgram-self-hosted
+
+      - name: Build pre-260611 legacy Engine-image model
+        run: docker build -t gke-sim-engine-legacy -f diagnostics/gke_sim_engine_image/Dockerfile.legacy diagnostics/gke_sim_engine_image
+
+      - name: Assert - legacy image plus chart env contract passes (issue 179 guard)
+        run: |
+          STUB_DIR=/tmp/gke-stub ./diagnostics/dg_gke_libcuda_smoke.sh gke-sim-engine-legacy --chart charts/deepgram-self-hosted
