@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.40.3] - 2026-07-25
+
+### Fixed
+
+- Chart `0.40.2` set `LD_LIBRARY_PATH` on GPU Engine containers to only the GKE driver directories. Because a Kubernetes env var replaces the image's `ENV` of the same name, this overrode the baked-in value that Engine images prior to `release-260611` rely on to locate their own bundled libraries, and those images failed to start with errors such as `libicui18n.so.74: cannot open shared object file` ([#179](https://github.com/deepgram/self-hosted-resources/issues/179)). The chart now sets the full historical path list (bundled library directories plus the GKE driver directories), restoring pre-`0.40.2` behavior for older images while keeping the GKE fix for `release-260611`+. Directories that do not exist in a given image or environment are ignored by the dynamic linker.
+
 ## [0.40.2] - 2026-07-21
 
 ### Fixed
@@ -501,7 +507,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.3...HEAD
+[0.40.3]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...deepgram-self-hosted-0.40.3
 [0.40.2]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...deepgram-self-hosted-0.40.2
 [0.40.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.0...deepgram-self-hosted-0.40.1
 [0.40.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.39.0...deepgram-self-hosted-0.40.0
