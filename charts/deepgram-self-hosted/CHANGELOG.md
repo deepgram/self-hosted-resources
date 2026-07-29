@@ -6,11 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
-## [0.40.3] - 2026-07-28
+## [0.41.1] - 2026-07-29
 
 ### Fixed
 
 - Chart `0.40.2` set `LD_LIBRARY_PATH` on GPU Engine containers to only the GKE driver directories. Because a Kubernetes env var replaces the image's `ENV` of the same name, this overrode the baked-in value that Engine images prior to `release-260611` rely on to locate their own bundled libraries, and those images failed to start with errors such as `libicui18n.so.74: cannot open shared object file` ([#179](https://github.com/deepgram/self-hosted-resources/issues/179)). The chart now sets the full historical path list (bundled library directories plus the GKE driver directories), restoring pre-`0.40.2` behavior for older images while keeping the GKE fix for `release-260611`+. Directories that do not exist in a given image or environment are ignored by the dynamic linker.
+
+## [0.41.0] - 2026-07-28
+
+### Changed
+
+- Updated default container tags to July 2026 release (`release-260728`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-july-2026-release-260728) for additional details, including the new FIPS 140-3 images.
 
 ## [0.40.2] - 2026-07-21
 
@@ -507,8 +513,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.3...HEAD
-[0.40.3]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...deepgram-self-hosted-0.40.3
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.1...HEAD
+[0.41.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.0...deepgram-self-hosted-0.41.1
+[0.41.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...deepgram-self-hosted-0.41.0
 [0.40.2]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...deepgram-self-hosted-0.40.2
 [0.40.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.0...deepgram-self-hosted-0.40.1
 [0.40.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.39.0...deepgram-self-hosted-0.40.0
