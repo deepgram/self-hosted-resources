@@ -164,14 +164,17 @@ spec:
         # its device plugin mounts the host driver at /usr/local/nvidia and expects
         # workloads to reference it via LD_LIBRARY_PATH
         # (https://cloud.google.com/kubernetes-engine/docs/how-to/gpus#cuda).
-        # Engine images prior to release-260611 baked these paths into the image;
-        # newer images rely on the container toolkit's ldconfig injection instead, so
-        # without this variable the Engine crashes on GKE with
-        # `libcuda.so.1: cannot open shared object file`. The Engine image registers
-        # its own bundled libraries via ldconfig, and these directories do not exist
-        # in non-GKE environments, so this is a no-op everywhere else.
+        # Without this variable, release-260611+ Engine images crash on GKE with
+        # `libcuda.so.1: cannot open shared object file`.
+        # NOTE: a Kubernetes env var REPLACES the image's ENV of the same name rather
+        # than appending to it, and Engine images prior to release-260611 rely on
+        # their baked-in LD_LIBRARY_PATH to locate their own bundled libraries
+        # (see issue #179), so this must be the full historical path list, not just
+        # the GKE driver directories. Directories that do not exist in a given image
+        # or environment are ignored by the dynamic linker, so this is safe on
+        # non-GKE clusters and on all Engine image generations.
         - name: LD_LIBRARY_PATH
-          value: "/usr/local/nvidia/lib64:/usr/local/nvidia/lib"
+          value: "/openh264/lib64:/gstreamer/lib64:/libtorch/lib:/usr/local/cuda/lib64:/usr/local/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
         {{- end }}
         {{- if and $.Values.aura2.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
         {{- if $.Values.aura2.english.enabled }}
