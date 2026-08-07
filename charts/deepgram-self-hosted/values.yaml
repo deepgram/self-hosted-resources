@@ -256,7 +256,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-260728
+    tag: release-260812
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -502,7 +502,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-260728
+    tag: release-260812
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -905,7 +905,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-260728
+    tag: release-260812
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -1075,7 +1075,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-260728
+    tag: release-260812
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent
@@ -1464,7 +1464,12 @@ fluxTts:
   enabled: false
 
   # -- Maximum number of Flux TTS requests batched together in the Engine process.
-  maxBatchSize: 48
+  # There is no safe default: the correct value differs substantially between GPUs, and a
+  # value tuned for one will perform badly or exhaust memory on another. Engine will not
+  # start until you replace this with a non-zero value. Contact your Deepgram Account
+  # Representative for a recommended value.
+  maxBatchSize: 0
 
-  # -- UUID of the Flux TTS model to load.
+  # -- UUID of the Flux TTS model to load. Confirm the correct UUID for your release
+  # with your Deepgram Account Representative before deploying.
   uuid: ""

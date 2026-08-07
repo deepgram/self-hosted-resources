@@ -14,7 +14,7 @@ x-env-vars: &env
 services:
   # The speech API service.
   api:
-    image: quay.io/deepgram/self-hosted-api:release-260728
+    image: quay.io/deepgram/self-hosted-api:release-260812
     restart: always
 
     # Here we expose the API port to the host machine. The container port
@@ -42,7 +42,7 @@ services:
   # The speech engine service.
   # Flux TTS Driver
   engine:
-    image: quay.io/deepgram/self-hosted-engine:release-260728
+    image: quay.io/deepgram/self-hosted-engine:release-260812
     restart: always
 
     # Utilize a GPU, if available.
@@ -53,8 +53,14 @@ services:
 
     environment:
       <<: *env
-      IMPELLER_AURA3_MAX_BATCH_SIZE: 48
-      IMPELLER_AURA3_UUID: "85c987ca-73ec-492b-9734-72d8889ac364"
+      # There is no safe default: the correct value differs substantially between GPUs,
+      # and a value tuned for one will perform badly or exhaust memory on another.
+      # Engine will not start until you replace this with a non-zero value.
+      # Contact your Deepgram Account Representative for a recommended value.
+      IMPELLER_AURA3_MAX_BATCH_SIZE: 0
+      # Flux TTS model UUID. Confirm the correct UUID for your release with your
+      # Deepgram Account Representative before deploying.
+      IMPELLER_AURA3_UUID: "9fc7903e-7f81-4f9b-9145-1d8e76692dce"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.
@@ -73,7 +79,7 @@ services:
 
   # The service to validate your Deepgram license
   license-proxy:
-    image: quay.io/deepgram/self-hosted-license-proxy:release-260728
+    image: quay.io/deepgram/self-hosted-license-proxy:release-260812
     restart: always
 
     # Here we expose the License Proxy status port to the host machine. The container port

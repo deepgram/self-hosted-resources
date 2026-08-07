@@ -1,8 +1,21 @@
-# Sample Helm values for Aura-2 deployment with English and Spanish language support
-# This configuration supports both English and Spanish Aura-2 models
-# 
+# Sample Helm values for a Flux TTS deployment
+#
+# Flux TTS is Deepgram's streaming-first speech synthesis model, served on the
+# `/v2/speak` endpoint. It requires container images from `release-260812` or later.
+#
 # Usage:
-#   helm install deepgram ./charts/deepgram-self-hosted -f samples/04-aura-2-setup.yaml
+#   helm install deepgram ./charts/deepgram-self-hosted -f samples/08-flux-tts-setup.values.yaml
+#
+# IMPORTANT: Flux TTS and Aura-2 are mutually exclusive on a single Engine. Engine
+# refuses to start if both are configured. Do not add an `aura2:` block to this file.
+# To serve both, install this chart twice into separate releases.
+#
+# IMPORTANT: Flux TTS synthesis workers bind to a single GPU. Requesting more than
+# one GPU for a Flux TTS Engine pod will not increase its capacity. Scale out with
+# additional Engine replicas rather than additional GPUs per pod.
+#
+# NOTE: `fluxTts` below is unrelated to `engine.flux`, which configures Flux
+# turn-based streaming speech-to-text.
 
 global:
   # pullSecretRef should refer to a K8s secret that
@@ -31,20 +44,17 @@ global:
   # ```
   deepgramSecretRef: "dg-self-hosted-api-key"
 
-# Configure scaling for multi-language deployment
-scaling:
-  replicas:
-    # Deploy separate API instances for each language
-    api: 2
-    # Deploy separate Engine instances for each language
-    engine: 2
-
-# API configuration for English Aura-2
 api:
   image:
     tag: release-260812
-  
-  # Configure driver pool to connect to both language engines
+
+  features:
+    # Expose Flux TTS on the `/v2/speak` endpoint.
+    # `speakV2` enables the batch REST transport, `speakV2Streaming` the WebSocket
+    # transport. A voice agent deployment needs both.
+    speakV2: true
+    speakV2Streaming: true
+
   driverPool:
     standard:
       timeoutBackoff: 1.2
@@ -52,37 +62,37 @@ api:
       retryBackoff: 1.6
       maxResponseSize: "1073741824"
 
-# Engine configuration for Aura-2
 engine:
   image:
     tag: release-260812
-  
-  # Aura-2 requires more resources than standard models
+
+  # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
   resources:
     requests:
       memory: "32Gi"
       cpu: "4000m"
-      gpu: 2
+      gpu: 1
     limits:
       memory: "40Gi"
       cpu: "8000m"
-      gpu: 2
+      gpu: 1
 
-  # Enable automatic model management for Aura-2 models
+  # Fail fast if the Engine pod cannot see a GPU, rather than running in a
+  # severely degraded CPU-only state.
+  health:
+    gpuRequired: true
+
   modelManager:
     models:
-      # Add your Aura-2 model links here
-      # Replace with actual model links provided by Deepgram
+      # Add your Flux TTS model link here.
+      # Replace with the actual model link provided by Deepgram.
       add:
-        # Example (replace with your actual model links):
-        # - https://path.to/aura-2-en-model
-        # - https://path.to/aura-2-es-model
-        # - ...
+        # Example (replace with your actual model link):
+        # - https://path.to/flux-tts-model
       remove:
         # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
         # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
         # - name-of-old-model-3.dg #   this will likely be empty.
-        # - ...
 
     # Configure volume storage for models
     volumes:
@@ -92,8 +102,8 @@ engine:
           enabled: false
           # fileSystemId: "fs-xxxxxxxxx"
           forceDownload: false
-          
-      # For GCP GKE deployments  
+
+      # For GCP GKE deployments
       gcp:
         gpd:
           enabled: false
@@ -106,16 +116,30 @@ engine:
         # name: "deepgram-models-pvc"
         modelsDirectory: "/"
 
-# Enable License Proxy for production Aura-2 deployments
+# Flux TTS Engine configuration.
+fluxTts:
+  enabled: true
+
+  # Replace with the Flux TTS model UUID provided by Deepgram. Confirm the correct
+  # UUID for your release with your Deepgram Account Representative before deploying.
+  uuid: ""
+
+  # There is no safe default: the correct value differs substantially between GPUs,
+  # and a value tuned for one will perform badly or exhaust memory on another.
+  # Engine will not start until you replace this with a non-zero value.
+  # Contact your Deepgram Account Representative for a recommended value.
+  maxBatchSize: 0
+
+# Enable License Proxy for production deployments
 licenseProxy:
   enabled: true
   deploySecondReplica: false
   keepUpstreamServerAsBackup: true
-  
+
   image:
     tag: release-260812
 
-# Monitoring configuration for Aura-2
+# Monitoring configuration
 # Enable Prometheus stack for metrics collection
 kube-prometheus-stack:
   enabled: true
@@ -124,7 +148,7 @@ kube-prometheus-stack:
 prometheus-adapter:
   enabled: true
 
-# GPU Operator for NVIDIA GPU support (required for Aura-2)
+# GPU Operator for NVIDIA GPU support
 gpu-operator:
   enabled: true
   driver:
@@ -134,8 +158,11 @@ gpu-operator:
     enabled: true
     version: v1.15.0-ubi8
 
-# Auto-scaling configuration for Aura-2 workloads
 scaling:
+  replicas:
+    api: 1
+    engine: 1
+
   auto:
     # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
     enabled: false
@@ -145,33 +172,6 @@ scaling:
       maxReplicas: 4
       metrics:
         requestCapacityRatio: 0.8
-        speechToText:
-          batch:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-          streaming:
-            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
         textToSpeech:
           batch:
             requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative
-
-# Additional environment variables for Aura-2 Engine containers
-# These will be added via configmap in the templates
-aura2:
-  # Aura-2 specific configuration
-  enabled: true
-  
-  # English language configuration
-  english:
-    enabled: true
-    maxBatchSize: 8
-    t2cUuid: "0ec06c9b-0aa0-44d0-a001-3ec57d32229e"
-    c2aUuid: "2e5096c7-7bf1-435e-bbdd-f673f88d0ebd"
-    cudaVisibleDevices: "0,1"
-    
-  # Spanish language configuration  
-  spanish:
-    enabled: true
-    maxBatchSize: 8
-    t2cUuid: "c053c7a8-7317-4de8-8a50-7e01c54e7ba9"
-    c2aUuid: "04355c1e-8148-478d-9f6c-6a6c54ec3591"
-    cudaVisibleDevices: "2,3"
