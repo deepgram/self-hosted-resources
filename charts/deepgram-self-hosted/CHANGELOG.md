@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added support for Flux TTS, the text-to-speech model served on the `/v2/speak` endpoint. Enable the API endpoint with `api.features.speakV2` (batch) and `api.features.speakV2Streaming` (streaming), both defaulting to `false`. Configure the Engine side with the new `fluxTts` block: set `fluxTts.enabled: true` along with `fluxTts.uuid` to select the model, and optionally `fluxTts.maxBatchSize` (default `48`). When `agent.enabled` is true, the Flux TTS environment variables are applied only to the text-to-speech Engine. Note that `fluxTts` is unrelated to `engine.flux`, which configures Flux turn-based streaming STT.
+
 ## [0.41.1] - 2026-07-29
 
 ### Fixed

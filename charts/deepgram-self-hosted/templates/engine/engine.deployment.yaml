@@ -206,6 +206,12 @@ spec:
           value: "{{ $.Values.aura2.polyglot.cudaVisibleDevices }}"
         {{- end }}
         {{- end }}
+        {{- if and $.Values.fluxTts.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
+        - name: IMPELLER_AURA3_MAX_BATCH_SIZE
+          value: "{{ $.Values.fluxTts.maxBatchSize }}"
+        - name: IMPELLER_AURA3_UUID
+          value: "{{ $.Values.fluxTts.uuid }}"
+        {{- end }}
         {{- with $.Values.engine.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}

@@ -291,6 +291,8 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.formatEntityTags | bool | `true` | Enables format entity tags on pre-recorded audio *if* a valid NER model is available. |
 | api.features.listenV2 | bool | `false` | Enables Flux turn-based streaming STT |
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
+| api.features.speakV2 | bool | `false` | Enables Flux TTS batch synthesis on the `/v2/speak` endpoint. Requires `fluxTts.enabled` to configure the Engine side of the deployment. |
+| api.features.speakV2Streaming | bool | `false` | Enables Flux TTS streaming synthesis on the `/v2/speak` endpoint. Requires `fluxTts.enabled` to configure the Engine side of the deployment. |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
 | api.image.tag | string | `"release-260728"` | tag defines which Deepgram release to use for API containers |
@@ -466,6 +468,10 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.ttlSecondsAfterFinished | int | `900` | This determines the number of seconds that the Pod will be retained, for the Deepgram model manager. As long as this Pod is existing, it will keep a claim on the Kubernetes PersistentVolumeClaim, which can cause the PVC to hang in the "terminating" state, if the Helm chart is deleted (uninstalled). |
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
+| fluxTts | object | `` | Flux TTS specific configuration options. This is the text-to-speech model served on the `/v2/speak` endpoint, and is unrelated to `engine.flux`, which configures Flux turn-based streaming STT. Enable the endpoint itself with `api.features.speakV2` and `api.features.speakV2Streaming`. |
+| fluxTts.enabled | bool | `false` | Enable Flux TTS features and configuration |
+| fluxTts.maxBatchSize | int | `48` | Maximum number of Flux TTS requests batched together in the Engine process. |
+| fluxTts.uuid | string | `""` | UUID of the Flux TTS model to load. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
 | global.deepgramLicenseSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license key for airgapped deployments with Billing container. Only required when billing.enabled is true. |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |

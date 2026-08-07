@@ -430,6 +430,14 @@ api:
     # -- Enables Flux turn-based streaming STT
     listenV2: false
 
+    # -- Enables Flux TTS batch synthesis on the `/v2/speak` endpoint.
+    # Requires `fluxTts.enabled` to configure the Engine side of the deployment.
+    speakV2: false
+
+    # -- Enables Flux TTS streaming synthesis on the `/v2/speak` endpoint.
+    # Requires `fluxTts.enabled` to configure the Engine side of the deployment.
+    speakV2Streaming: false
+
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,
     # the queue may grow too large and cause Out-Of-Memory errors. To avoid this,
@@ -1445,3 +1453,18 @@ aura2:
     t2cUuid: ""
     c2aUuid: ""
     cudaVisibleDevices: "2,3"
+
+# -- Flux TTS specific configuration options. This is the text-to-speech model
+# served on the `/v2/speak` endpoint, and is unrelated to `engine.flux`, which
+# configures Flux turn-based streaming STT. Enable the endpoint itself with
+# `api.features.speakV2` and `api.features.speakV2Streaming`.
+# @default -- ``
+fluxTts:
+  # -- Enable Flux TTS features and configuration
+  enabled: false
+
+  # -- Maximum number of Flux TTS requests batched together in the Engine process.
+  maxBatchSize: 48
+
+  # -- UUID of the Flux TTS model to load.
+  uuid: ""
