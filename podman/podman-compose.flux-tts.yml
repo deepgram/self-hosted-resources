@@ -57,14 +57,6 @@ services:
       # will fail to start with `libcuda.so.1: cannot open shared object file`.
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
-      # There is no safe default: the correct value differs substantially between GPUs,
-      # and a value tuned for one will perform badly or exhaust memory on another.
-      # Engine will not start until you replace this with a non-zero value.
-      # Contact your Deepgram Account Representative for a recommended value.
-      IMPELLER_AURA3_MAX_BATCH_SIZE: 0
-      # Flux TTS model UUID. Confirm the correct UUID for your release with your
-      # Deepgram Account Representative before deploying.
-      IMPELLER_AURA3_UUID: "9fc7903e-7f81-4f9b-9145-1d8e76692dce"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.

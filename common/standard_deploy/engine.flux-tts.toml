@@ -44,11 +44,6 @@ port = 9991
 search_paths = ["/models"]
 
 
-### Flux TTS is turned on in the API configuration (`speak_v2`,
-### `speak_v2_streaming`). Engine-side model selection and batch size are set
-### through the `IMPELLER_AURA3_*` environment variables on the Engine
-### container; see the accompanying Compose template.
-
 
 ### Enable ancillary features
 [features]
@@ -64,6 +59,29 @@ use_v2_language_detection = false
 ### Enable Flux turn-based streaming STT
 [flux]
 enabled = false
+
+### Enable Flux TTS speech synthesis, served on the `/v2/speak` API endpoint.
+###
+### WARN: Flux TTS and Aura-2 are mutually exclusive. Engine will refuse to start
+### if the `IMPELLER_AURA2_*` environment variables are also set on this container.
+### Deploy Aura-2 and Flux TTS on separate Engine instances.
+###
+### NOTE: Flux TTS synthesis workers bind to the first configured GPU only.
+### Exposing additional GPUs to this container will not increase its capacity.
+### To use more GPUs, run one Engine per GPU and pin each with CUDA_VISIBLE_DEVICES.
+[flux_tts]
+enabled = true
+### UUID of the Flux TTS model package. Required when `enabled = true`.
+### Obtain this value from your Deepgram Account Representative.
+uuid = "REPLACE_WITH_FLUX_TTS_MODEL_UUID"
+### The widest batch the Flux TTS workers will assemble.
+### Placeholder; required for production. Set explicitly based on GPU type.
+###
+### There is no safe default: the correct value differs substantially between GPUs,
+### and a value tuned for one will perform badly or exhaust memory on another.
+### Engine will not start until you replace this with a non-zero value.
+### Contact your Deepgram Account Representative for a recommended value.
+max_batch_size = 0
 
 ### Size of audio chunks to process in seconds.
 [chunking.batch]

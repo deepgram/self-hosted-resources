@@ -67,6 +67,13 @@ data:
       max_streams = {{ $.Values.engine.flux.max_streams }}
       {{- end }}
       model_name = "{{ $.Values.engine.flux.model_name }}"
+    {{- if and $.Values.fluxTts.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
+
+    [flux_tts]
+      enabled = true
+      uuid = "{{ $.Values.fluxTts.uuid }}"
+      max_batch_size = {{ $.Values.fluxTts.maxBatchSize }}
+    {{- end }}
 
     [chunking.batch]
       {{- if $.Values.engine.chunking.speechToText.batch.minDuration }}
