@@ -4,7 +4,10 @@
 # `/v2/speak` endpoint. It requires container images from `release-260812` or later.
 #
 # Usage:
-#   helm install deepgram ./charts/deepgram-self-hosted -f samples/08-flux-tts-setup.values.yaml
+#   1. Set `fluxTts.maxBatchSize` below. It ships as 0 and the chart refuses to
+#      install until you change it, because the right value depends on your GPU.
+#      Contact your Deepgram Account Representative for a recommended value.
+#   2. helm install deepgram ./charts/deepgram-self-hosted -f samples/08-flux-tts-setup.values.yaml
 #
 # IMPORTANT: Flux TTS and Aura-2 are mutually exclusive on a single Engine. Engine
 # refuses to start if both are configured. Do not add an `aura2:` block to this file.
