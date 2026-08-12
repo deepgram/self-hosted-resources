@@ -56,8 +56,10 @@ data:
       speak_streaming = true
       redact_usage = {{ .Values.api.features.redactUsage }}
       listen_v2 = {{ .Values.api.features.listenV2 }}
-      speak_v2 = {{ .Values.api.features.speakV2 }}
-      speak_v2_streaming = {{ .Values.api.features.speakV2Streaming }}
+      {{- /* `default false` keeps this valid TOML when the keys are absent,
+      e.g. on a `helm upgrade --reuse-values` from a chart without them. */}}
+      speak_v2 = {{ .Values.api.features.speakV2 | default false }}
+      speak_v2_streaming = {{ .Values.api.features.speakV2Streaming | default false }}
 
       {{- if .Values.api.features.diskBufferPath }}
       disk_buffer_path = "{{ .Values.api.features.diskBufferPath }}"

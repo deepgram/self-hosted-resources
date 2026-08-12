@@ -577,6 +577,10 @@ engine:
   # a minimum of 2 GPUs to serve traffic. STT and EOT engines are unaffected and
   # continue to use the global engine.resources values (gpu: 1 by default).
   #
+  # Flux TTS uses a single GPU: if you enable `fluxTts` on a voice agent
+  # deployment, override the TTS engine to gpu: 1 as shown below, or the pod
+  # will request a second GPU it cannot use.
+  #
   # If you are not using Aura-2 and want to keep the TTS engine at 1 GPU, override:
   #   engine:
   #     agentOverrides:
@@ -1458,10 +1462,19 @@ aura2:
 # served on the `/v2/speak` endpoint, and is unrelated to `engine.flux`, which
 # configures Flux turn-based streaming STT. Enable the endpoint itself with
 # `api.features.speakV2` and `api.features.speakV2Streaming`.
+# When `enabled` is true, the chart requires `uuid`, a non-zero `maxBatchSize`,
+# and at least one of the two `api.features` flags above, and refuses to combine
+# `fluxTts` with `aura2`. Invalid combinations fail at install time.
 # @default -- ``
 fluxTts:
   # -- Enable Flux TTS features and configuration
   enabled: false
+
+  # -- GPUs the Flux TTS Engine may use, as CUDA device indices (e.g. `"0"`).
+  # Flux TTS binds to a single GPU, so on multi-GPU nodes pin each Engine to its
+  # own device. Leave empty to expose all GPUs to the Engine. Not needed when
+  # `engine.resources.useNvidiaDevicePlugin` handles GPU allocation.
+  cudaVisibleDevices: ""
 
   # -- Maximum number of Flux TTS requests batched together in the Engine process.
   # There is no safe default: the correct value differs substantially between GPUs, and a

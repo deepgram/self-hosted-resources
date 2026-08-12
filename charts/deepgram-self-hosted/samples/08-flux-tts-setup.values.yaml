@@ -12,7 +12,13 @@
 #
 # IMPORTANT: Flux TTS synthesis workers bind to a single GPU. Requesting more than
 # one GPU for a Flux TTS Engine pod will not increase its capacity. Scale out with
-# additional Engine replicas rather than additional GPUs per pod.
+# additional Engine replicas rather than additional GPUs per pod. On multi-GPU
+# nodes, pin each Engine to its own device with `fluxTts.cudaVisibleDevices`, or
+# enable `engine.resources.useNvidiaDevicePlugin` to isolate GPU allocation.
+#
+# NOTE: For a voice agent deployment (`agent.enabled: true`), also override
+# `engine.agentOverrides.agent-text-to-speech.resources` to request/limit 1 GPU.
+# The chart defaults that engine to 2 GPUs for Aura-2, but Flux TTS uses one.
 #
 # NOTE: `fluxTts` below is unrelated to `engine.flux`, which configures Flux
 # turn-based streaming speech-to-text.
@@ -67,13 +73,18 @@ engine:
     tag: release-260812
 
   # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
+  #
+  # Memory: the Engine allocates up to 60 GB of system RAM while loading the Flux
+  # TTS model at startup; steady-state usage is much lower. The limit must clear
+  # that startup peak or the pod is OOMKilled before it ever becomes ready.
+  # Provision nodes with at least 64 GB of RAM.
   resources:
     requests:
-      memory: "32Gi"
+      memory: "48Gi"
       cpu: "4000m"
       gpu: 1
     limits:
-      memory: "40Gi"
+      memory: "62Gi"
       cpu: "8000m"
       gpu: 1
 
@@ -171,7 +182,9 @@ scaling:
       minReplicas: 1
       maxReplicas: 4
       metrics:
-        requestCapacityRatio: 0.8
+        # requestCapacityRatio also requires engine.concurrencyLimit.activeRequests
+        # to be set; the chart refuses to install one without the other.
+        # requestCapacityRatio: 0.8
         textToSpeech:
           batch:
             requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative

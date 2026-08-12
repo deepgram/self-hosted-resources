@@ -1,22 +1,39 @@
-{{- $engineTypes := list }}
-{{- if .Values.agent.enabled }}
-{{- $engineTypes = list "agent-speech-to-text" "agent-text-to-speech" "agent-end-of-turn" }}
-{{- else }}
-{{- $engineTypes = list "" }}
+{{- /*
+Flux TTS render-time checks. Catch invalid combinations at install/upgrade
+time instead of letting Engine or API pods crash-loop after rollout.
+*/}}
+{{- $fluxTtsValues := .Values.fluxTts | default dict }}
+{{- $fluxTtsEnabled := eq (toString $fluxTtsValues.enabled) "true" }}
+{{- $apiFeatures := (.Values.api | default dict).features | default dict }}
+{{- $speakV2Enabled := or (eq (toString $apiFeatures.speakV2) "true") (eq (toString $apiFeatures.speakV2Streaming) "true") }}
+{{- if $fluxTtsEnabled }}
+{{- if (.Values.aura2 | default dict).enabled }}
+{{- fail "Error: fluxTts and aura2 cannot both be enabled. Flux TTS and Aura-2 cannot share an Engine, and Engine refuses to start with both configured. Deploy them as separate releases of this chart." }}
 {{- end }}
-{{- range $type := $engineTypes }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
-  labels:
-{{ include "deepgram-self-hosted.labels" $ | indent 4}}
-    {{- range $key, $val := $.Values.engine.additionalLabels }}
-    {{ $key }}: {{ $val | quote }}
-    {{- end}}
-data:
-  engine.toml: |
+{{- if not $fluxTtsValues.uuid }}
+{{- fail "Error: fluxTts.uuid must be set when fluxTts is enabled. Confirm the correct UUID with your Deepgram Account Representative." }}
+{{- end }}
+{{- if not $fluxTtsValues.maxBatchSize }}
+{{- fail "Error: fluxTts.maxBatchSize must be set to a non-zero value when fluxTts is enabled. Contact your Deepgram Account Representative for a recommended value." }}
+{{- end }}
+{{- if and .Values.engine.customToml (contains "[flux_tts]" .Values.engine.customToml) }}
+{{- fail "Error: engine.customToml contains its own [flux_tts] section. The chart renders [flux_tts] from the fluxTts values when fluxTts is enabled; remove the section from engine.customToml." }}
+{{- end }}
+{{- if not $speakV2Enabled }}
+{{- fail "Error: fluxTts is enabled but the /v2/speak endpoint is not. Enable api.features.speakV2 (batch) and/or api.features.speakV2Streaming (streaming)." }}
+{{- end }}
+{{- else if $speakV2Enabled }}
+{{- fail "Error: api.features.speakV2 and api.features.speakV2Streaming serve Flux TTS and require fluxTts.enabled. Enable fluxTts, or disable both features." }}
+{{- end }}
+{{- /*
+The engine.toml body for one Engine type. The ConfigMap below and the
+per-Deployment config checksum in engine.deployment.yaml both render this, so
+a values change only rolls the Engine types whose config it actually changes.
+Invoke with (dict "Values" $.Values "type" $type).
+*/}}
+{{- define "deepgram-self-hosted.engineToml" -}}
+{{- $type := .type -}}
+{{- $fluxTts := $.Values.fluxTts | default dict -}}
     {{- if $.Values.engine.concurrencyLimit.activeRequests }}
     max_active_requests = {{ $.Values.engine.concurrencyLimit.activeRequests }}
     {{- end }}
@@ -67,12 +84,12 @@ data:
       max_streams = {{ $.Values.engine.flux.max_streams }}
       {{- end }}
       model_name = "{{ $.Values.engine.flux.model_name }}"
-    {{- if and $.Values.fluxTts.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
+    {{- if and (eq (toString $fluxTts.enabled) "true") (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
 
     [flux_tts]
       enabled = true
-      uuid = "{{ $.Values.fluxTts.uuid }}"
-      max_batch_size = {{ $.Values.fluxTts.maxBatchSize }}
+      uuid = "{{ $fluxTts.uuid }}"
+      max_batch_size = {{ $fluxTts.maxBatchSize }}
     {{- end }}
 
     [chunking.batch]
@@ -98,4 +115,24 @@ data:
     {{- if $.Values.engine.customToml }}
     {{ $.Values.engine.customToml | nindent 4 }}
     {{- end }}
+{{- end }}
+{{- $engineTypes := list }}
+{{- if .Values.agent.enabled }}
+{{- $engineTypes = list "agent-speech-to-text" "agent-text-to-speech" "agent-end-of-turn" }}
+{{- else }}
+{{- $engineTypes = list "" }}
+{{- end }}
+{{- range $type := $engineTypes }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Values.engine.namePrefix }}{{- if $type }}-{{ $type }}{{- end }}-config
+  labels:
+{{ include "deepgram-self-hosted.labels" $ | indent 4}}
+    {{- range $key, $val := $.Values.engine.additionalLabels }}
+    {{ $key }}: {{ $val | quote }}
+    {{- end}}
+data:
+  engine.toml: |{{ include "deepgram-self-hosted.engineToml" (dict "Values" $.Values "type" $type) }}
 {{- end }}
