@@ -120,9 +120,9 @@ engine:
 fluxTts:
   enabled: true
 
-  # Replace with the Flux TTS model UUID provided by Deepgram. Confirm the correct
-  # UUID for your release with your Deepgram Account Representative before deploying.
-  uuid: ""
+  # Flux TTS model UUID for the 260812 release. Confirm the correct UUID for your
+  # release with your Deepgram Account Representative before deploying.
+  uuid: "9c3cc12c-c0a2-4966-8676-f9fa22ab5401"
 
   # There is no safe default: the correct value differs substantially between GPUs,
   # and a value tuned for one will perform badly or exhaust memory on another.
