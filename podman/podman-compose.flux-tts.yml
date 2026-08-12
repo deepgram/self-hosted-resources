@@ -1,4 +1,9 @@
 # Make sure to replace placeholder paths to config files and model directories
+#
+# This file runs a License Proxy, so API and Engine must point at it: use the
+# config files from common/license_proxy_deploy/. The common/standard_deploy/
+# versions connect directly to license.deepgram.com and would leave the proxy
+# started here unused.
 
 services:
   # The speech API service.
@@ -57,6 +62,10 @@ services:
       # will fail to start with `libcuda.so.1: cannot open shared object file`.
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      # Flux TTS binds to a single GPU, so pin this Engine to one device.
+      # To use more GPUs, copy this service once per GPU (engine-1, engine-2, ...)
+      # and set a different device index in each copy.
+      CUDA_VISIBLE_DEVICES: "0"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.

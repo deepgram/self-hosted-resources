@@ -11,6 +11,11 @@
 
 ### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
 ### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
+###
+### NOTE: This file connects directly to license.deepgram.com. The Flux TTS
+### compose files (docker-compose.flux-tts.yml, podman-compose.flux-tts.yml)
+### run a License Proxy; with those, use the files from
+### common/license_proxy_deploy/ instead of this one.
 [license]
 server_url = ["https://license.deepgram.com"]
 
