@@ -1,0 +1,138 @@
+# Deepgram Engine — Cloud Run service definition (STT / Nova-2 / Nova-3)
+#
+# Use this file for Speech-to-Text workloads using nova-2 or nova-3 models.
+# An NVIDIA L4 GPU can host up to 5 concurrent nova-2/nova-3 model files.
+#
+# DO NOT enable [flux] in engine.toml for this service — Flux must run on its
+# own dedicated Cloud Run service (see engine-flux.service.yaml). Enabling Flux
+# alongside nova models causes CUDA out-of-memory errors.
+# Aura TTS also requires its own dedicated service (see engine-tts.service.yaml).
+#
+# This file is a template. Variables in ${VAR} notation are substituted
+# by deploy.sh using envsubst before being applied with:
+#   gcloud run services replace - --region=${REGION} --project=${PROJECT_ID}
+#
+# GPU regions: https://cloud.google.com/run/docs/configuring/services/gpu
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: deepgram-engine
+  annotations:
+    # Restrict to internal Cloud Run traffic only — the API service calls this
+    # endpoint directly using its Cloud Run URL. No public access is granted.
+    run.googleapis.com/ingress: internal
+spec:
+  template:
+    metadata:
+      annotations:
+        # Second-generation execution environment is required for GPU support.
+        run.googleapis.com/execution-environment: gen2
+
+        # Attach one NVIDIA L4 GPU per instance. L4 is available in more regions
+        # than A100/H100 and is well-suited for inference workloads.
+        # To use a different GPU type, change this value (e.g. nvidia-a100-80gb).
+        run.googleapis.com/gpu-type: nvidia-l4
+
+        # Disable CPU throttling. GPU workloads must not have their CPU throttled
+        # or model loading and inference will stall.
+        run.googleapis.com/cpu-throttling: "false"
+
+        # Boost CPU during startup to accelerate model loading from GCS.
+        run.googleapis.com/startup-cpu-boost: "true"
+
+        # Disable GPU zonal redundancy. Required unless you have explicit quota
+        # for GPU zonal redundancy (g.co/cloudrun/gpu-redundancy-help).
+        run.googleapis.com/gpu-zonal-redundancy-disabled: "true"
+
+        # Attach the Engine to the Deepgram VPC via Direct VPC Egress so that
+        # intra-service traffic stays on the private network.
+        run.googleapis.com/network-interfaces: '[{"network":"${VPC_NETWORK}","subnetwork":"${VPC_SUBNETWORK}"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+
+        # Keep at least one warm instance running at all times to eliminate
+        # GPU cold-start latency (~2–5 min). Set to "0" only if cost is a
+        # higher priority than availability.
+        autoscaling.knative.dev/minScale: "1"
+
+        # Maximum number of GPU instances. Each instance requires its own L4
+        # GPU quota. Request additional quota in the GCP console before raising
+        # this value.
+        autoscaling.knative.dev/maxScale: "3"
+    spec:
+      # Service account used to read models from GCS and secrets from Secret Manager.
+      serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
+
+      # Extend the request timeout to support long batch audio processing jobs.
+      # Cloud Run gen2 maximum is 3600s.
+      timeoutSeconds: 3600
+
+      containers:
+        - image: "${IMAGE_REGISTRY}/self-hosted-engine:${IMAGE_TAG}"
+          # Override the container CMD. The engine config is mounted from Secret Manager.
+          args: ["-v", "serve", "/config/engine.toml"]
+
+          ports:
+            - containerPort: 8080
+
+          env:
+            # Deepgram self-hosted API key, read from Secret Manager at runtime.
+            - name: DEEPGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-api-key
+                  key: latest
+
+            - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+              value: cloud-run
+
+          resources:
+            limits:
+              # 8 vCPU and 32 GiB RAM are the recommended minimums for an L4 GPU
+              # STT inference workload. A single L4 GPU can host up to 5 concurrent
+              # nova-2/nova-3 model files; increase memory if loading many large models.
+              cpu: "8"
+              memory: 32Gi
+              nvidia.com/gpu: "1"
+
+          volumeMounts:
+            # engine.toml is mounted from Secret Manager into /config/engine.toml
+            - name: engine-config
+              mountPath: /config
+              readOnly: true
+
+            # Models are served from a GCS bucket via GCS FUSE.
+            # The bucket is read-only; no writes are performed by the Engine.
+            - name: models
+              mountPath: /models
+              readOnly: true
+
+          # Startup probe: wait up to 5 minutes for the Engine to become ready.
+          # Model preloading (blocking = true in engine.toml) can take several
+          # minutes on first start depending on model size and GCS read speed.
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 30
+            timeoutSeconds: 5
+
+      volumes:
+        # Mount engine.toml from Secret Manager.
+        # The secret value is written to /config/engine.toml inside the container.
+        - name: engine-config
+          secret:
+            secretName: deepgram-engine-config
+            items:
+              - key: latest
+                path: engine.toml
+
+        # Mount the models GCS bucket via GCS FUSE (gen2 only).
+        # The service account must have roles/storage.objectViewer on this bucket.
+        - name: models
+          csi:
+            driver: gcsfuse.run.googleapis.com
+            readOnly: true
+            volumeAttributes:
+              bucketName: ${MODELS_BUCKET}

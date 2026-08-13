@@ -1,0 +1,164 @@
+# Deepgram Engine — Cloud Run service definition (Aura TTS / dedicated)
+#
+# Use this file ONLY for Text-to-Speech workloads using Aura or Aura-2 models.
+# Deepgram strongly recommends dedicating each node to a single service type.
+# Running TTS alongside STT or Flux models causes resource contention and
+# unpredictable latency.
+#
+# Aura TTS requires 2x NVIDIA L4 GPUs per instance. Cloud Run supports up to
+# 2 L4 GPUs on gen2 instances; verify quota in your region before deploying.
+# Request 2x NVIDIA_L4_GPU quota per Engine TTS replica in the GCP console.
+#
+# Before deploying, store the language-specific Aura-2 model UUIDs in Secret
+# Manager (see env section below). UUIDs are provided by your Deepgram Account
+# Representative. See: https://developers.deepgram.com/docs/deploy-tts-services
+#
+# This file is a template. Variables in ${VAR} notation are substituted
+# by deploy.sh using envsubst before being applied with:
+#   gcloud run services replace - --region=${REGION} --project=${PROJECT_ID}
+#
+# GPU regions: https://cloud.google.com/run/docs/configuring/services/gpu
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: deepgram-engine-tts
+  annotations:
+    # Restrict to internal Cloud Run traffic only — the API service calls this
+    # endpoint directly using its Cloud Run URL. No public access is granted.
+    run.googleapis.com/ingress: internal
+spec:
+  template:
+    metadata:
+      annotations:
+        # Second-generation execution environment is required for GPU support.
+        run.googleapis.com/execution-environment: gen2
+
+        # Aura TTS requires 2 NVIDIA L4 GPUs per instance (32 GB GPU RAM total).
+        # CUDA_VISIBLE_DEVICES=0,1 (set below) pins the TTS engine to both GPUs.
+        run.googleapis.com/gpu-type: nvidia-l4
+
+        # Disable CPU throttling. TTS synthesis is compute-intensive and must
+        # not be throttled or first-byte latency will degrade significantly.
+        run.googleapis.com/cpu-throttling: "false"
+
+        # Boost CPU during startup to accelerate model loading from GCS.
+        run.googleapis.com/startup-cpu-boost: "true"
+
+        # Disable GPU zonal redundancy. Required unless you have explicit quota
+        # for GPU zonal redundancy (g.co/cloudrun/gpu-redundancy-help).
+        run.googleapis.com/gpu-zonal-redundancy-disabled: "true"
+
+        run.googleapis.com/network-interfaces: '[{"network":"${VPC_NETWORK}","subnetwork":"${VPC_SUBNETWORK}"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+
+        # Keep at least one warm TTS instance running to avoid cold-start
+        # latency (~2–5 min for TTS model loading).
+        autoscaling.knative.dev/minScale: "1"
+
+        # Maximum number of TTS GPU instances. Each instance requires 2x L4
+        # GPU quota. Request quota before raising this value.
+        autoscaling.knative.dev/maxScale: "2"
+    spec:
+      # Service account used to read models from GCS and secrets from Secret Manager.
+      serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
+
+      # Extend timeout to support long TTS synthesis jobs.
+      timeoutSeconds: 3600
+
+      containers:
+        - image: "${IMAGE_REGISTRY}/self-hosted-engine:${IMAGE_TAG}"
+          args: ["-v", "serve", "/config/engine.toml"]
+
+          ports:
+            - name: h2c
+              containerPort: 8080
+
+          env:
+            # Deepgram self-hosted API key, read from Secret Manager at runtime.
+            - name: DEEPGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-api-key
+                  key: latest
+
+            - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+              value: cloud-run
+
+            # Pin the TTS engine to both GPUs. Aura requires both GPUs to be
+            # visible; removing this causes the engine to use only one GPU and
+            # fail to initialize the TTS pipeline.
+            - name: CUDA_VISIBLE_DEVICES
+              value: "0,1"
+
+            # Aura-2 model UUIDs — language-specific values provided by Deepgram.
+            # Store these in Secret Manager and create the secrets before deploying.
+            # To create: gcloud secrets create deepgram-tts-t2c-uuid --data-file=-
+            - name: IMPELLER_AURA2_T2C_UUID
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-tts-t2c-uuid
+                  key: latest
+
+            - name: IMPELLER_AURA2_C2A_UUID
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-tts-c2a-uuid
+                  key: latest
+
+            # Maximum batch size for TTS synthesis. 8 is the recommended default
+            # for L4 GPUs. Tune based on latency vs. throughput requirements.
+            - name: IMPELLER_AURA2_MAX_BATCH_SIZE
+              value: "8"
+
+          resources:
+            limits:
+              # Aura TTS requires 2x NVIDIA L4 GPUs (32 GB GPU RAM total),
+              # 8+ CPU cores, and 64 GiB RAM per instance.
+              # See: https://developers.deepgram.com/docs/self-hosted-deployment-environments
+              cpu: "16"
+              memory: 64Gi
+              nvidia.com/gpu: "2"
+
+          volumeMounts:
+            # engine.toml is mounted from Secret Manager into /config/engine.toml.
+            # Use a TTS-specific engine config (provided by Deepgram).
+            - name: engine-config
+              mountPath: /config
+              readOnly: true
+
+            # TTS models are served from a GCS bucket via GCS FUSE.
+            # The bucket should contain only Aura model files.
+            - name: models
+              mountPath: /models
+              readOnly: true
+
+          # TTS model loading is slower than STT. Allow up to 10 minutes for
+          # both GPUs to initialize and models to load.
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 60
+            periodSeconds: 10
+            failureThreshold: 60
+            timeoutSeconds: 5
+
+      volumes:
+        # Mount TTS engine.toml from Secret Manager.
+        # Create this secret with the TTS-specific config provided by Deepgram:
+        #   gcloud secrets create deepgram-engine-tts-config --data-file=engine-tts.toml
+        - name: engine-config
+          secret:
+            secretName: deepgram-engine-tts-config
+            items:
+              - key: latest
+                path: engine.toml
+
+        # Mount the Aura models GCS bucket via GCS FUSE (gen2 only).
+        # The bucket should contain only TTS model files.
+        - name: models
+          csi:
+            driver: gcsfuse.run.googleapis.com
+            readOnly: true
+            volumeAttributes:
+              bucketName: ${MODELS_BUCKET}
