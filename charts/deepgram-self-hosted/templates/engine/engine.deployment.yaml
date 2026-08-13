@@ -47,7 +47,9 @@ spec:
     metadata:
       labels: *labels
       annotations:
-        checksum/config: {{ include (print $.Template.BasePath "/engine/engine.config.yaml") $ | sha256sum }}
+        # Checksum of this engine type's own engine.toml, so a config change
+        # only rolls the Deployments whose rendered config actually changed.
+        checksum/config: {{ include "deepgram-self-hosted.engineToml" (dict "Values" $.Values "type" $type) | sha256sum }}
         {{- with $.Values.engine.additionalAnnotations }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
@@ -205,6 +207,13 @@ spec:
         - name: CUDA_VISIBLE_DEVICES
           value: "{{ $.Values.aura2.polyglot.cudaVisibleDevices }}"
         {{- end }}
+        {{- end }}
+        {{- $fluxTts := $.Values.fluxTts | default dict }}
+        {{- if and (eq (toString $fluxTts.enabled) "true") (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) $fluxTts.cudaVisibleDevices }}
+        # Flux TTS binds to a single GPU. Pin this Engine to the device set in
+        # fluxTts.cudaVisibleDevices so it doesn't compete for GPU 0.
+        - name: CUDA_VISIBLE_DEVICES
+          value: "{{ $fluxTts.cudaVisibleDevices }}"
         {{- end }}
         {{- with $.Values.engine.extraEnv }}
         {{- toYaml . | nindent 8 }}

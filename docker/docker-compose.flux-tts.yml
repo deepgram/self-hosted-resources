@@ -1,4 +1,20 @@
 # Make sure to replace placeholder paths to config files and model directories
+#
+# This file runs a License Proxy, so API and Engine must point at it: use the
+# config files from common/license_proxy_deploy/. The common/standard_deploy/
+# versions connect directly to license.deepgram.com and would leave the proxy
+# started here unused.
+
+x-env-vars: &env
+  # Make sure you `export` your self-hosted API key secret in your local environment
+  # Be sure to use the &env anchor inside an 'environment' mapping for a given service
+  DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
+  DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "docker-compose"
+  # Required for the Engine container to access the GPU. The nvidia-container-runtime
+  # only injects CUDA libraries when these are set; without them the Engine container
+  # will fail to start with `libcuda.so.1: cannot open shared object file`.
+  NVIDIA_VISIBLE_DEVICES: all
+  NVIDIA_DRIVER_CAPABILITIES: compute,utility
 
 services:
   # The speech API service.
@@ -12,21 +28,14 @@ services:
     ports:
       - "8080:8080"
 
-    # Make sure you `export` your self-hosted API key secret in your local environment
     environment:
-      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
-      DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
-      # Required for the Engine container to access the GPU. The nvidia-container-runtime
-      # only injects CUDA libraries when these are set; without them the Engine container
-      # will fail to start with `libcuda.so.1: cannot open shared object file`.
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      <<: *env
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path
     #     specified in the `command` header below.
     volumes:
-      - "/path/to/api.toml:/api.toml:ro,Z"
+      - "./api.flux-tts.toml:/api.toml:ro,Z"
 
     # Invoke the API server
     command: -v serve /api.toml
@@ -36,26 +45,23 @@ services:
       - license-proxy
 
   # The speech engine service.
+  # Flux TTS Driver
   engine:
     image: quay.io/deepgram/self-hosted-engine:release-260812
     restart: always
 
     # Utilize a GPU, if available.
-    devices:
-      - nvidia.com/gpu=all
+    runtime: nvidia
 
     ports:
       - "9991:9991"
 
-    # Make sure you `export` your self-hosted API key secret in your local environment
     environment:
-      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
-      DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
-      # Required for the Engine container to access the GPU. The nvidia-container-runtime
-      # only injects CUDA libraries when these are set; without them the Engine container
-      # will fail to start with `libcuda.so.1: cannot open shared object file`.
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      <<: *env
+      # Flux TTS binds to a single GPU, so pin this Engine to one device.
+      # To use more GPUs, copy this service once per GPU (engine-1, engine-2, ...)
+      # and set a different device index in each copy.
+      CUDA_VISIBLE_DEVICES: "0"
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path.
@@ -63,7 +69,7 @@ services:
       # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
       - "/path/to/models:/models:ro,Z"
       # In-container config path below must match the path specified in the `command` header below.
-      - "/path/to/engine.toml:/engine.toml:ro,Z"
+      - "./engine.flux-tts.toml:/engine.toml:ro,Z"
 
     # Invoke the Engine service
     command: -v serve /engine.toml
@@ -83,21 +89,14 @@ services:
     ports:
       - "8089:8080"
 
-    # Make sure you `export` your self-hosted API key secret in your local environment
     environment:
-      DEEPGRAM_API_KEY: "${DEEPGRAM_API_KEY}"
-      DEEPGRAM_DEPLOYMENT_ORCHESTRATOR: "podman-compose"
-      # Required for the Engine container to access the GPU. The nvidia-container-runtime
-      # only injects CUDA libraries when these are set; without them the Engine container
-      # will fail to start with `libcuda.so.1: cannot open shared object file`.
-      NVIDIA_VISIBLE_DEVICES: all
-      NVIDIA_DRIVER_CAPABILITIES: compute,utility
+      <<: *env
 
     # The path on the left of the colon ':' should point to files/directories on the host machine.
     # The path on the right of the colon ':' is an in-container path. It must match the path
     #     specified in the `command` header below.
     volumes:
-      - "/path/to/license-proxy.toml:/license-proxy.toml:ro,Z"
+      - "./license-proxy.toml:/license-proxy.toml:ro,Z"
 
     # Invoke the License Proxy service
     command: -v serve /license-proxy.toml

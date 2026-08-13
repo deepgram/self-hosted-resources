@@ -1,0 +1,116 @@
+### Keep in mind that all paths are in-container paths and do not need to exist
+### on the host machine.
+
+### Limit the number of active requests handled by a single Engine container.
+### Engine will reject additional requests from API beyond this limit, and the
+### API container will continue with the retry logic configured in `api.toml`.
+###
+### The default is no limit.
+# max_active_requests =
+
+
+### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable
+### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
+[license]
+### Docker Compose and Podman Compose create a dedicated network that allows inter-container communication by app name.
+### See [Networking in Compose](https://docs.docker.com/compose/networking/) for details.
+server_url = ["https://license-proxy:8443", "https://license.deepgram.com"]
+
+
+### Configure the server to listen for requests from the API.
+[server]
+### The IP address to listen on. Since this is likely running in a Docker
+### container, you will probably want to listen on all interfaces.
+host = "0.0.0.0"
+### The port to listen on
+port = 8080
+
+
+### To support metrics we need to expose an Engine endpoint.
+### See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine
+[metrics_server]
+host = "0.0.0.0"
+port = 9991
+
+
+[model_manager]
+### The number of models to have concurrently loaded in system memory.
+### If managing a deployment with dozens of models this setting will
+### help prevent instances where models consume too much memory and
+### offload the models to disk as needed on a least-recently-used basis.
+###
+### The default is no limit.
+# max_concurrently_loaded_models = 20
+
+### Inference models. You can place these in one or multiple directories.
+search_paths = ["/models"]
+
+
+
+### Enable ancillary features
+[features]
+### Allow multichannel requests by setting this to true, set to false to disable
+multichannel = true # or false
+### Enables language detection *if* a valid language detection model is available
+language_detection = true # or false
+### Enables streaming entity formatting *if* a valid NER model is available
+streaming_ner = true # or false
+### Enables use of 36-language detection model
+use_v2_language_detection = false
+
+### Enable Flux turn-based streaming STT
+[flux]
+enabled = false
+
+### Enable Flux TTS speech synthesis, served on the `/v2/speak` API endpoint.
+###
+### WARN: Flux TTS and Aura-2 are mutually exclusive. Engine will refuse to start
+### if the `IMPELLER_AURA2_*` environment variables are also set on this container.
+### Deploy Aura-2 and Flux TTS on separate Engine instances.
+###
+### NOTE: Flux TTS synthesis workers bind to the first configured GPU only.
+### Exposing additional GPUs to this container will not increase its capacity.
+### To use more GPUs, run one Engine per GPU and pin each with CUDA_VISIBLE_DEVICES.
+[flux_tts]
+enabled = true
+### UUID of the Flux TTS model package. Required when `enabled = true`.
+### Obtain this value from your Deepgram Account Representative.
+uuid = "9c3cc12c-c0a2-4966-8676-f9fa22ab5401"
+### The widest batch the Flux TTS workers will assemble.
+### Placeholder; required for production. Set explicitly based on GPU type.
+###
+### There is no safe default: the correct value differs substantially between GPUs,
+### and a value tuned for one will perform badly or exhaust memory on another.
+### Engine will not start until you replace this with a non-zero value.
+### Contact your Deepgram Account Representative for a recommended value.
+max_batch_size = 0
+
+### Size of audio chunks to process in seconds.
+[chunking.batch]
+# min_duration =
+# max_duration =
+[chunking.streaming]
+# min_duration =
+# max_duration =
+
+### How often to return interim results, in seconds. Default is 1.0s.
+###
+### This value may be lowered to increase the frequency of interim results.
+### However, this may cause a signficant decrease in number of concurrent
+### streams supported by a single GPU. Please contact your Deepgram Account
+### representative for more details.
+# step = 1.0
+
+### Models may be pre-loaded in GPU memory to reduce request latency after startup.
+### https://support.deepgram.com/en-US/deepgram/article/ART-528-how-can-i-preload-models-to-reduce-cold-start-latency
+[preload_models]
+blocking = false
+
+[health]
+### Controls whether Engine fails on startup if no GPU is detected
+### Default: false
+###
+### While Engine can run without a GPU, production deployments require one for
+### acceptable performance. Set to true to fail fast if no GPU is available,
+### rather than running with severely degraded performance.
+# gpu_required = true # or false

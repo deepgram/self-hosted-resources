@@ -1,0 +1,193 @@
+# Sample Helm values for a Flux TTS deployment
+#
+# Flux TTS is Deepgram's streaming-first speech synthesis model, served on the
+# `/v2/speak` endpoint. It requires container images from `release-260812` or later.
+#
+# Usage:
+#   1. Set `fluxTts.maxBatchSize` below. It ships as 0 and the chart refuses to
+#      install until you change it, because the right value depends on your GPU.
+#      Contact your Deepgram Account Representative for a recommended value.
+#   2. helm install deepgram ./charts/deepgram-self-hosted -f samples/08-flux-tts-setup.values.yaml
+#
+# IMPORTANT: Flux TTS and Aura-2 are mutually exclusive on a single Engine. Engine
+# refuses to start if both are configured. Do not add an `aura2:` block to this file.
+# To serve both, install this chart twice into separate releases.
+#
+# IMPORTANT: Flux TTS synthesis workers bind to a single GPU. Requesting more than
+# one GPU for a Flux TTS Engine pod will not increase its capacity. Scale out with
+# additional Engine replicas rather than additional GPUs per pod. On multi-GPU
+# nodes, pin each Engine to its own device with `fluxTts.cudaVisibleDevices`, or
+# enable `engine.resources.useNvidiaDevicePlugin` to isolate GPU allocation.
+#
+# NOTE: For a voice agent deployment (`agent.enabled: true`), also override
+# `engine.agentOverrides.agent-text-to-speech.resources` to request/limit 1 GPU.
+# The chart defaults that engine to 2 GPUs for Aura-2, but Flux TTS uses one.
+#
+# NOTE: `fluxTts` below is unrelated to `engine.flux`, which configures Flux
+# turn-based streaming speech-to-text.
+
+global:
+  # pullSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your image pull credentials
+  # with the following commands:
+  # ```bash
+  # docker login quay.io
+  # kubectl create secret docker-registry dg-regcred \
+  #   --docker-server=quay.io \
+  #   --docker-username='QUAY_DG_USER' \
+  #   --docker-password='QUAY_DG_PASSWORD'
+  # ```
+  pullSecretRef: "dg-regcred"
+
+  # deepgramSecretRef should refer to a K8s secret that
+  # must be created prior to installing this Chart.
+  # Consult the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/secret/) for best practices on configuring Secrets for use in your cluster.
+  #
+  # You can create a secret for your Deepgram self-hosted API key
+  # with the following command:
+  # ```bash
+  # kubectl create secret generic dg-self-hosted-api-key --from-literal=DEEPGRAM_API_KEY='<id>'
+  # ```
+  deepgramSecretRef: "dg-self-hosted-api-key"
+
+api:
+  image:
+    tag: release-260812
+
+  features:
+    # Expose Flux TTS on the `/v2/speak` endpoint.
+    # `speakV2` enables the batch REST transport, `speakV2Streaming` the WebSocket
+    # transport. A voice agent deployment needs both.
+    speakV2: true
+    speakV2Streaming: true
+
+  driverPool:
+    standard:
+      timeoutBackoff: 1.2
+      retrySleep: "2s"
+      retryBackoff: 1.6
+      maxResponseSize: "1073741824"
+
+engine:
+  image:
+    tag: release-260812
+
+  # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
+  #
+  # Memory: the Engine allocates up to 60 GB of system RAM while loading the Flux
+  # TTS model at startup; steady-state usage is much lower. The limit must clear
+  # that startup peak or the pod is OOMKilled before it ever becomes ready.
+  # Provision nodes with at least 64 GB of RAM.
+  resources:
+    requests:
+      memory: "48Gi"
+      cpu: "4000m"
+      gpu: 1
+    limits:
+      memory: "62Gi"
+      cpu: "8000m"
+      gpu: 1
+
+  # Fail fast if the Engine pod cannot see a GPU, rather than running in a
+  # severely degraded CPU-only state.
+  health:
+    gpuRequired: true
+
+  modelManager:
+    models:
+      # Add your Flux TTS model link here.
+      # Replace with the actual model link provided by Deepgram.
+      add:
+        # Example (replace with your actual model link):
+        # - https://path.to/flux-tts-model
+      remove:
+        # - https://link-to-old-model-1.dg # Replace these with identifiers for any models already present
+        # - https://link-to-old-model-2.dg #   in the EFS that you'd like removed. For a new installation,
+        # - name-of-old-model-3.dg #   this will likely be empty.
+
+    # Configure volume storage for models
+    volumes:
+      # For AWS EKS deployments
+      aws:
+        efs:
+          enabled: false
+          # fileSystemId: "fs-xxxxxxxxx"
+          forceDownload: false
+
+      # For GCP GKE deployments
+      gcp:
+        gpd:
+          enabled: false
+          # storageCapacity: "100G"
+          # volumeHandle: "projects/PROJECT/zones/ZONE/disks/DISK"
+
+      # Or use custom PVC
+      customVolumeClaim:
+        enabled: false
+        # name: "deepgram-models-pvc"
+        modelsDirectory: "/"
+
+# Flux TTS Engine configuration.
+fluxTts:
+  enabled: true
+
+  # Flux TTS model UUID for the 260812 release. Confirm the correct UUID for your
+  # release with your Deepgram Account Representative before deploying.
+  uuid: "9c3cc12c-c0a2-4966-8676-f9fa22ab5401"
+
+  # There is no safe default: the correct value differs substantially between GPUs,
+  # and a value tuned for one will perform badly or exhaust memory on another.
+  # Engine will not start until you replace this with a non-zero value.
+  # Contact your Deepgram Account Representative for a recommended value.
+  maxBatchSize: 0
+
+# Enable License Proxy for production deployments
+licenseProxy:
+  enabled: true
+  deploySecondReplica: false
+  keepUpstreamServerAsBackup: true
+
+  image:
+    tag: release-260812
+
+# Monitoring configuration
+# Enable Prometheus stack for metrics collection
+kube-prometheus-stack:
+  enabled: true
+  fullnameOverride: "dg-prometheus-stack"
+
+prometheus-adapter:
+  enabled: true
+
+# GPU Operator for NVIDIA GPU support
+gpu-operator:
+  enabled: true
+  driver:
+    enabled: true
+    version: "570.172.08"
+  toolkit:
+    enabled: true
+    version: v1.15.0-ubi8
+
+scaling:
+  replicas:
+    api: 1
+    engine: 1
+
+  auto:
+    # Can toggle to true to enable autoscaling. Make sure to set a value for one of the available metrics
+    enabled: false
+
+    engine:
+      minReplicas: 1
+      maxReplicas: 4
+      metrics:
+        # requestCapacityRatio also requires engine.concurrencyLimit.activeRequests
+        # to be set; the chart refuses to install one without the other.
+        # requestCapacityRatio: 0.8
+        textToSpeech:
+          batch:
+            requestsPerPod: # Discuss a reasonable value with your Deepgram Account Representative

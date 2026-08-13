@@ -256,7 +256,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-260728
+    tag: release-260812
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -430,6 +430,14 @@ api:
     # -- Enables Flux turn-based streaming STT
     listenV2: false
 
+    # -- Enables Flux TTS batch synthesis on the `/v2/speak` endpoint.
+    # Requires `fluxTts.enabled` to configure the Engine side of the deployment.
+    speakV2: false
+
+    # -- Enables Flux TTS streaming synthesis on the `/v2/speak` endpoint.
+    # Requires `fluxTts.enabled` to configure the Engine side of the deployment.
+    speakV2Streaming: false
+
     # -- If API is receiving requests faster than Engine can process them, a request
     # queue will form. By default, this queue is stored in memory. Under high load,
     # the queue may grow too large and cause Out-Of-Memory errors. To avoid this,
@@ -494,7 +502,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-260728
+    tag: release-260812
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -568,6 +576,10 @@ engine:
   # The agent-text-to-speech engine defaults to gpu: 2 because Aura-2 TTS requires
   # a minimum of 2 GPUs to serve traffic. STT and EOT engines are unaffected and
   # continue to use the global engine.resources values (gpu: 1 by default).
+  #
+  # Flux TTS uses a single GPU: if you enable `fluxTts` on a voice agent
+  # deployment, override the TTS engine to gpu: 1 as shown below, or the pod
+  # will request a second GPU it cannot use.
   #
   # If you are not using Aura-2 and want to keep the TTS engine at 1 GPU, override:
   #   engine:
@@ -897,7 +909,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-260728
+    tag: release-260812
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -1067,7 +1079,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-260728
+    tag: release-260812
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent
@@ -1445,3 +1457,32 @@ aura2:
     t2cUuid: ""
     c2aUuid: ""
     cudaVisibleDevices: "2,3"
+
+# -- Flux TTS specific configuration options. This is the text-to-speech model
+# served on the `/v2/speak` endpoint, and is unrelated to `engine.flux`, which
+# configures Flux turn-based streaming STT. Enable the endpoint itself with
+# `api.features.speakV2` and `api.features.speakV2Streaming`.
+# When `enabled` is true, the chart requires `uuid`, a non-zero `maxBatchSize`,
+# and at least one of the two `api.features` flags above, and refuses to combine
+# `fluxTts` with `aura2`. Invalid combinations fail at install time.
+# @default -- ``
+fluxTts:
+  # -- Enable Flux TTS features and configuration
+  enabled: false
+
+  # -- GPUs the Flux TTS Engine may use, as CUDA device indices (e.g. `"0"`).
+  # Flux TTS binds to a single GPU, so on multi-GPU nodes pin each Engine to its
+  # own device. Leave empty to expose all GPUs to the Engine. Not needed when
+  # `engine.resources.useNvidiaDevicePlugin` handles GPU allocation.
+  cudaVisibleDevices: ""
+
+  # -- Maximum number of Flux TTS requests batched together in the Engine process.
+  # There is no safe default: the correct value differs substantially between GPUs, and a
+  # value tuned for one will perform badly or exhaust memory on another. Engine will not
+  # start until you replace this with a non-zero value. Contact your Deepgram Account
+  # Representative for a recommended value.
+  maxBatchSize: 0
+
+  # -- UUID of the Flux TTS model to load. Confirm the correct UUID for your release
+  # with your Deepgram Account Representative before deploying.
+  uuid: ""

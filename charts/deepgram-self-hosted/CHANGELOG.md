@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.42.0] - 2026-08-12
+
+### Changed
+
+- Updated default container tags to the August 2026 release (`release-260812`). Flux TTS requires this release or later.
+- In voice agent deployments, each Engine type's Deployment now tracks a checksum of its own rendered `engine.toml` rather than a shared one, so a config change scoped to one Engine type (e.g. a Flux TTS setting) no longer restarts all three.
+
+### Added
+
+- Added support for Flux TTS, the text-to-speech model served on the `/v2/speak` endpoint. Enable the API endpoint with `api.features.speakV2` (batch) and `api.features.speakV2Streaming` (streaming), both defaulting to `false`. Configure the Engine side with the new `fluxTts` block, which renders a `[flux_tts]` section into the Engine configuration file: set `fluxTts.enabled: true` along with `fluxTts.uuid` to select the model, and `fluxTts.maxBatchSize`, which defaults to `0` and must be set explicitly. There is no safe default: the correct value differs substantially between GPUs, and a value tuned for one will perform badly or exhaust memory on another, so Engine will not start until it is set to a non-zero value. When `agent.enabled` is true, the Flux TTS configuration is applied only to the text-to-speech Engine. Note that `fluxTts` is unrelated to `engine.flux`, which configures Flux turn-based streaming STT.
+- Added `samples/08-flux-tts-setup.values.yaml`, a reference Helm values file for a Flux TTS deployment.
+- Added `fluxTts.cudaVisibleDevices` to pin the Flux TTS Engine to a specific GPU on multi-GPU nodes, mirroring `aura2.*.cudaVisibleDevices`.
+- Added render-time validation for Flux TTS. Invalid configurations fail `helm install`/`helm upgrade` instead of crash-looping pods after rollout: enabling `fluxTts` requires `fluxTts.uuid`, a non-zero `fluxTts.maxBatchSize`, and at least one of `api.features.speakV2`/`speakV2Streaming` (and vice versa); `fluxTts` and `aura2` cannot both be enabled; and `engine.customToml` may not carry its own `[flux_tts]` section.
+
+### Notes
+
+- Flux TTS and Aura-2 are mutually exclusive on a single Engine. Engine refuses to start if both are configured. Deploy them as separate Engine instances, or as separate releases of this chart.
+- Flux TTS synthesis workers bind to a single GPU. Requesting more than one GPU for a Flux TTS Engine pod will not increase its capacity; scale out with additional Engine replicas instead.
+
 ## [0.41.1] - 2026-07-29
 
 ### Fixed

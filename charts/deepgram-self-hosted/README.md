@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.41.1](https://img.shields.io/badge/Version-0.41.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260728](https://img.shields.io/badge/AppVersion-release--260728-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.42.0](https://img.shields.io/badge/Version-0.42.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260812](https://img.shields.io/badge/AppVersion-release--260812-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -291,9 +291,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.formatEntityTags | bool | `true` | Enables format entity tags on pre-recorded audio *if* a valid NER model is available. |
 | api.features.listenV2 | bool | `false` | Enables Flux turn-based streaming STT |
 | api.features.redactUsage | bool | `true` | Enables usage metadata redaction; set to false to disable redaction of usage metadata |
+| api.features.speakV2 | bool | `false` | Enables Flux TTS batch synthesis on the `/v2/speak` endpoint. Requires `fluxTts.enabled` to configure the Engine side of the deployment. |
+| api.features.speakV2Streaming | bool | `false` | Enables Flux TTS streaming synthesis on the `/v2/speak` endpoint. Requires `fluxTts.enabled` to configure the Engine side of the deployment. |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-260728"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
@@ -341,7 +343,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.extraEnv | list | `[]` | Extra environment variables for the Billing container. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-260728"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
 | billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
 | billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
@@ -384,7 +386,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.additionalAnnotations | object | `nil` | Additional annotations to add to the Engine deployment |
 | engine.additionalLabels | object | `{}` | Additional labels to add to Engine resources |
 | engine.affinity | object | `{}` | [Affinity and anti-affinity](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity) to apply for Engine pods. |
-| engine.agentOverrides | object | `` | Per-engine-type resource overrides. Only applied when agent.enabled: true. Allows setting different GPU counts per engine type without affecting other resources. Supported keys: agent-speech-to-text, agent-text-to-speech, agent-end-of-turn  The agent-text-to-speech engine defaults to gpu: 2 because Aura-2 TTS requires a minimum of 2 GPUs to serve traffic. STT and EOT engines are unaffected and continue to use the global engine.resources values (gpu: 1 by default).  If you are not using Aura-2 and want to keep the TTS engine at 1 GPU, override:   engine:     agentOverrides:       agent-text-to-speech:         resources:           requests:             gpu: 1           limits:             gpu: 1 |
+| engine.agentOverrides | object | `` | Per-engine-type resource overrides. Only applied when agent.enabled: true. Allows setting different GPU counts per engine type without affecting other resources. Supported keys: agent-speech-to-text, agent-text-to-speech, agent-end-of-turn  The agent-text-to-speech engine defaults to gpu: 2 because Aura-2 TTS requires a minimum of 2 GPUs to serve traffic. STT and EOT engines are unaffected and continue to use the global engine.resources values (gpu: 1 by default).  Flux TTS uses a single GPU: if you enable `fluxTts` on a voice agent deployment, override the TTS engine to gpu: 1 as shown below, or the pod will request a second GPU it cannot use.  If you are not using Aura-2 and want to keep the TTS engine at 1 GPU, override:   engine:     agentOverrides:       agent-text-to-speech:         resources:           requests:             gpu: 1           limits:             gpu: 1 |
 | engine.agentOverrides.agent-text-to-speech.resources.limits.gpu | int | `2` | Number of GPUs to limit for the TTS engine. Aura-2 requires 2. |
 | engine.agentOverrides.agent-text-to-speech.resources.requests.gpu | int | `2` | Number of GPUs to request for the TTS engine. Aura-2 requires 2. |
 | engine.chunking | object | `` | chunking defines the size of audio chunks to process in seconds. Adjusting these values will affect both inference performance and accuracy of results. Please contact your Deepgram Account Representative if you want to adjust any of these values. |
@@ -406,7 +408,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-260728"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -466,6 +468,11 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.ttlSecondsAfterFinished | int | `900` | This determines the number of seconds that the Pod will be retained, for the Deepgram model manager. As long as this Pod is existing, it will keep a claim on the Kubernetes PersistentVolumeClaim, which can cause the PVC to hang in the "terminating" state, if the Helm chart is deleted (uninstalled). |
 | engine.updateStrategy.rollingUpdate.maxSurge | int | `1` | The maximum number of extra Engine pods that can be created during a rollingUpdate, relative to the number of replicas. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-surge) for more details. |
 | engine.updateStrategy.rollingUpdate.maxUnavailable | int | `0` | The maximum number of Engine pods, relative to the number of replicas, that can go offline during a rolling update. See the [Kubernetes documentation](https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#max-unavailable) for more details. |
+| fluxTts | object | `` | Flux TTS specific configuration options. This is the text-to-speech model served on the `/v2/speak` endpoint, and is unrelated to `engine.flux`, which configures Flux turn-based streaming STT. Enable the endpoint itself with `api.features.speakV2` and `api.features.speakV2Streaming`. When `enabled` is true, the chart requires `uuid`, a non-zero `maxBatchSize`, and at least one of the two `api.features` flags above, and refuses to combine `fluxTts` with `aura2`. Invalid combinations fail at install time. |
+| fluxTts.cudaVisibleDevices | string | `""` | GPUs the Flux TTS Engine may use, as CUDA device indices (e.g. `"0"`). Flux TTS binds to a single GPU, so on multi-GPU nodes pin each Engine to its own device. Leave empty to expose all GPUs to the Engine. Not needed when `engine.resources.useNvidiaDevicePlugin` handles GPU allocation. |
+| fluxTts.enabled | bool | `false` | Enable Flux TTS features and configuration |
+| fluxTts.maxBatchSize | int | `0` | Maximum number of Flux TTS requests batched together in the Engine process. There is no safe default: the correct value differs substantially between GPUs, and a value tuned for one will perform badly or exhaust memory on another. Engine will not start until you replace this with a non-zero value. Contact your Deepgram Account Representative for a recommended value. |
+| fluxTts.uuid | string | `""` | UUID of the Flux TTS model to load. Confirm the correct UUID for your release with your Deepgram Account Representative before deploying. |
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
 | global.deepgramLicenseSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license key for airgapped deployments with Billing container. Only required when billing.enabled is true. |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
@@ -494,7 +501,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.extraEnv | list | `[]` | Extra environment variables for the License Proxy container. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-260728"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
