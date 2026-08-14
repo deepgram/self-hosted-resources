@@ -556,12 +556,20 @@ engine:
     # Note: with this enabled, each pod sees only its allocated GPUs (re-indexed
     # from 0), so any `aura2.*.cudaVisibleDevices` values are interpreted relative
     # to that set. Leave them at defaults and size the GPU request to match
-    # (specifically, Aura-2 needs 2 GPUs). See: https://github.com/NVIDIA/k8s-device-plugin
+    # (specifically, Aura-2 needs 2 GPUs); the chart fails to render if the request
+    # is smaller than the number of devices listed in `aura2.*.cudaVisibleDevices`.
+    # When disabled (the default), the chart mounts all of the node's GPUs into
+    # every Engine pod. A GPU request smaller than the device count still runs in
+    # that mode, but it under-declares GPU usage to the scheduler, which can then
+    # place a second Engine on the same node to bind the same physical devices.
+    # See: https://github.com/NVIDIA/k8s-device-plugin
     useNvidiaDevicePlugin: false
     requests:
       memory: "30Gi"
       cpu: "4000m"
-      # -- Number of GPUs to request
+      # -- Number of GPUs to request. Aura and Aura-2 need 2 GPUs per Engine, and
+      # `engine.agentOverrides` does not apply outside a voice agent deployment, so a
+      # standalone TTS release must set this (and the matching limit) to 2 explicitly.
       gpu: 1
     limits:
       memory: "40Gi"
@@ -574,8 +582,10 @@ engine:
   # Supported keys: agent-speech-to-text, agent-text-to-speech, agent-end-of-turn
   #
   # The agent-text-to-speech engine defaults to gpu: 2 because Aura-2 TTS requires
-  # a minimum of 2 GPUs to serve traffic. STT and EOT engines are unaffected and
-  # continue to use the global engine.resources values (gpu: 1 by default).
+  # exactly 2 GPUs to serve traffic: a single larger GPU does not substitute for two,
+  # and one Engine will not schedule work across more than two. STT and EOT engines
+  # are unaffected and continue to use the global engine.resources values (gpu: 1 by
+  # default).
   #
   # Flux TTS uses a single GPU: if you enable `fluxTts` on a voice agent
   # deployment, override the TTS engine to gpu: 1 as shown below, or the pod

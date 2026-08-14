@@ -179,6 +179,21 @@ spec:
           value: "/openh264/lib64:/gstreamer/lib64:/libtorch/lib:/usr/local/cuda/lib64:/usr/local/lib:/usr/local/nvidia/lib:/usr/local/nvidia/lib64"
         {{- end }}
         {{- if and $.Values.aura2.enabled (or (not $.Values.agent.enabled) (eq $type "agent-text-to-speech")) }}
+        {{- $aura2Block := dict }}
+        {{- if $.Values.aura2.english.enabled }}
+        {{- $aura2Block = $.Values.aura2.english }}
+        {{- else if $.Values.aura2.spanish.enabled }}
+        {{- $aura2Block = $.Values.aura2.spanish }}
+        {{- else if $.Values.aura2.polyglot.enabled }}
+        {{- $aura2Block = $.Values.aura2.polyglot }}
+        {{- end }}
+        {{- if and $.Values.engine.resources.useNvidiaDevicePlugin $aura2Block.cudaVisibleDevices }}
+        {{- $deviceCount := len (splitList "," (trim $aura2Block.cudaVisibleDevices)) }}
+        {{- if lt $gpuRequest $deviceCount }}
+        {{- $gpuKey := ternary (printf "engine.agentOverrides.%s.resources" $type) "engine.resources" (ne $type "") }}
+        {{- fail (printf "Error: Aura-2 needs one allocated GPU per index in cudaVisibleDevices (%q is %d devices), but this Engine requests %d. engine.resources.useNvidiaDevicePlugin is enabled, so the pod only sees the GPUs the device plugin allocates to it, and Engine panics at startup on a device that does not exist. Set %s.requests.gpu and %s.limits.gpu to %d, or reduce cudaVisibleDevices to the devices you allocate." $aura2Block.cudaVisibleDevices $deviceCount $gpuRequest $gpuKey $gpuKey $deviceCount) }}
+        {{- end }}
+        {{- end }}
         {{- if $.Values.aura2.english.enabled }}
         - name: IMPELLER_AURA2_MAX_BATCH_SIZE
           value: "{{ $.Values.aura2.english.maxBatchSize }}"
