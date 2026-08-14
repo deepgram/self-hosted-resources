@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added render-time validation for the Aura-2 GPU count. With `engine.resources.useNvidiaDevicePlugin` enabled, an Engine pod sees only the GPUs the device plugin allocates to it, so a GPU request smaller than the number of devices listed in the active `aura2.*.cudaVisibleDevices` leaves Engine panicking at startup on a device that does not exist. That combination now fails `helm install`/`helm upgrade` with a message naming the values to change, resolving to the `engine.agentOverrides.agent-text-to-speech.resources` path in voice agent deployments and to `engine.resources` otherwise.
+
+### Changed
+
+- Documented that Aura and Aura-2 need exactly 2 GPUs per Engine: a single larger GPU does not substitute for two, and one Engine will not schedule work across more than two. Additional GPUs on a machine serve additional Engine instances. Because `engine.agentOverrides` applies only when `agent.enabled` is true, a standalone TTS release must set `engine.resources.requests.gpu` and `engine.resources.limits.gpu` to `2` itself.
+
+### Notes
+
+- With `engine.resources.useNvidiaDevicePlugin` disabled (the default), the chart mounts every node GPU into every Engine pod, so a GPU request smaller than the `cudaVisibleDevices` device count still runs and is left as-is by the new validation. It does under-declare GPU usage to the scheduler, which can then place a second Engine on the same node and bind the same physical devices. Size the request to the devices the Engine actually uses, or enable the device plugin.
+
 ## [0.42.0] - 2026-08-12
 
 ### Changed
