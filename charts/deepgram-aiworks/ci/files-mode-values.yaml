@@ -1,0 +1,12 @@
+# Files mode with explicit PVC + larger size.
+license:
+  apiKey: "22222222-2222-2222-2222-222222222222"
+selfHosted:
+  apiKey: "test-api-key-padding-to-forty-chars-BBBB"
+  bootstrapSubject: "00000000-0000-0000-0000-0000000000b2"
+storage:
+  mode: files
+  files:
+    persistence:
+      enabled: true
+      size: 10Gi

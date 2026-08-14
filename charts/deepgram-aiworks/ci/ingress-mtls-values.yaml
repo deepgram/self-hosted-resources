@@ -1,0 +1,40 @@
+# Ingress + mTLS + ServiceMonitor + NetworkPolicy.
+license:
+  apiKey: "33333333-3333-3333-3333-333333333333"
+selfHosted:
+  apiKey: "test-api-key-padding-to-forty-chars-CCCC"
+  bootstrapSubject: "00000000-0000-0000-0000-0000000000c3"
+server:
+  tls:
+    enabled: true
+    cert: |
+      -----BEGIN CERTIFICATE-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+      -----END CERTIFICATE-----
+    key: |
+      -----BEGIN PRIVATE KEY-----
+      MIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcw
+      -----END PRIVATE KEY-----
+    clientCaBundle: |
+      -----BEGIN CERTIFICATE-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
+      -----END CERTIFICATE-----
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: aiworks.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+scaling:
+  auto:
+    enabled: true
+networkPolicy:
+  enabled: true
+  ingressFrom:
+    - namespaceSelector:
+        matchLabels:
+          purpose: client
+serviceMonitor:
+  enabled: true
