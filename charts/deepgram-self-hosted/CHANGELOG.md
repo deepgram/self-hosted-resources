@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.43.0] - 2026-08-19
+
+### Added
+
+- New `global.fips.enabled` value (default `false`). When enabled, the chart renders `[fips] mode = "enabled"` into `api.toml`, `engine.toml`, `license-proxy.toml`, and `billing.toml`. The `-fips` images do not enable FIPS mode on their own, so a deployment using them without this value runs OpenSSL in standard mode; set the `-fips` image tag on each component in addition to this value. Services log `openssl_fips_enabled=true` at startup once enabled.
+
+### Fixed
+
+- The API and License Proxy readiness probes now use `grep -q` instead of `grep --quiet`. BusyBox `grep`, used in the `-fips` images, rejects GNU long options and exits non-zero, so the probes could never pass and the pods never became ready.
+
 ## [0.42.0] - 2026-08-12
 
 ### Changed
@@ -532,7 +542,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.1...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...HEAD
+[0.43.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.42.0...deepgram-self-hosted-0.43.0
+[0.42.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.1...deepgram-self-hosted-0.42.0
 [0.41.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.0...deepgram-self-hosted-0.41.1
 [0.41.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...deepgram-self-hosted-0.41.0
 [0.40.2]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...deepgram-self-hosted-0.40.2
