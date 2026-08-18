@@ -192,7 +192,7 @@ spec:
             command:
             - sh
             - -c
-            - curl --silent --insecure http://localhost:{{ .Values.api.server.port }}{{ if not (regexMatch `^\/` .Values.api.server.baseUrl) }}/{{ end }}{{ .Values.api.server.baseUrl}}/status/engine | grep --quiet -e '^{\"engine_connection_status\"\:\"Connected\".*}$'
+            - curl --silent --insecure http://localhost:{{ .Values.api.server.port }}{{ if not (regexMatch `^\/` .Values.api.server.baseUrl) }}/{{ end }}{{ .Values.api.server.baseUrl}}/status/engine | grep -q -e '^{\"engine_connection_status\"\:\"Connected\".*}$'
           initialDelaySeconds: {{ .Values.api.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.api.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.api.readinessProbe.timeoutSeconds }}
