@@ -1,3 +1,6 @@
+{{- if and .Values.global.fips.enabled .Values.api.customToml (contains "[fips]" .Values.api.customToml) }}
+{{- fail "Error: api.customToml contains its own [fips] section. The chart renders [fips] when global.fips.enabled is true; remove the section from api.customToml." }}
+{{- end -}}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -23,6 +26,11 @@ data:
         {{- end }}
       ]
       {{- end }}
+    {{- if .Values.global.fips.enabled }}
+
+    [fips]
+      mode = "enabled"
+    {{- end }}
 
     [server]
       base_url = "{{ .Values.api.server.baseUrl }}"
