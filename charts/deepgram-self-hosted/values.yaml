@@ -18,12 +18,15 @@ global:
   # for every deployed Deepgram service.
   # @default -- ``
   fips:
-    # -- Enable FIPS mode for all Deepgram services. Requires the `-fips` variant
-    # of each Deepgram image (e.g. `release-260812-fips`); set the `-fips` tag on
-    # each component's `image.tag`. The FIPS images do not enable FIPS mode on
-    # their own - a service whose config omits this block runs OpenSSL in
-    # standard mode even on a FIPS image. Services log
-    # `openssl_fips_enabled=true` at startup once enabled.
+    # -- Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on
+    # every component (e.g. `release-260812-fips`) in the same change: the FIPS
+    # images do not enable FIPS mode on their own, and a service whose config
+    # omits this block runs OpenSSL in standard mode even on a FIPS image.
+    # Services log `openssl_fips_enabled=true` at startup once enabled.
+    # Enabling this against an image that has no OpenSSL FIPS provider makes the
+    # service abort at startup ("Failed to load FIPS provider", exit 101) and
+    # crash-loop, so update the tags and this value together. `release-260630`
+    # and earlier predate FIPS support and ignore the block entirely.
     # Note: TLS behavior is fixed by the FIPS images and is not controlled by
     # this flag.
     enabled: false

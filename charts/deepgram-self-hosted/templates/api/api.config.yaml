@@ -1,3 +1,4 @@
+{{- include "deepgram-self-hosted.validateFipsImageTags" . -}}
 {{- if and (.Values.global.fips).enabled .Values.api.customToml (contains "[fips]" .Values.api.customToml) }}
 {{- fail "Error: api.customToml contains its own [fips] section. The chart renders [fips] when global.fips.enabled is true; remove the section from api.customToml." }}
 {{- end -}}

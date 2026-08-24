@@ -10,7 +10,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- New `global.fips.enabled` value (default `false`). When enabled, the chart renders `[fips] mode = "enabled"` into `api.toml`, `engine.toml`, `license-proxy.toml`, and `billing.toml`. The `-fips` images do not enable FIPS mode on their own, so a deployment using them without this value runs OpenSSL in standard mode; set the `-fips` image tag on each component in addition to this value. Services log `openssl_fips_enabled=true` at startup once enabled.
+- New `global.fips.enabled` value (default `false`). When enabled, the chart renders `[fips] mode = "enabled"` into `api.toml`, `engine.toml`, `license-proxy.toml`, and `billing.toml`. The `-fips` images do not enable FIPS mode on their own, so a deployment using them without this value runs OpenSSL in standard mode; set the `-fips` image tag on each component in addition to this value. Services log `openssl_fips_enabled=true` at startup once enabled. Leaving the value at its `false` default renders no `[fips]` section, so deployments on non-FIPS and pre-FIPS images are unaffected.
+- Added render-time validation that rejects `global.fips.enabled` when a component's image tag predates FIPS support (`release-260728`). Those images ship no OpenSSL FIPS provider, and enabling FIPS mode against one aborts the service at startup with `Failed to load FIPS provider` (exit 101), so the deployment would crash-loop after rollout. Image tags that are not official Deepgram release tags are left alone, since a private registry may use its own naming.
 
 ### Fixed
 
