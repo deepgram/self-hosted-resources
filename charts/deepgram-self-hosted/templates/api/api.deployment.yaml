@@ -167,7 +167,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         command: [ "stem" ]
-        args: {{ compact (list "-v" (include "deepgram-self-hosted.logFormatArg" (dict "key" "api.logFormat" "value" .Values.api.logFormat)) "serve" "/etc/config/api.toml") | toJson }}
+        args: {{ compact (list "-v" (include "deepgram-self-hosted.logFormatArg" (dict "key" "api.logFormat" "value" .Values.api.logFormat "extraEnv" .Values.api.extraEnv)) "serve" "/etc/config/api.toml") | toJson }}
         resources:
           requests:
             memory: "{{ .Values.api.resources.requests.memory }}"

@@ -10,10 +10,6 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Added `api.logFormat`, `engine.logFormat`, `licenseProxy.logFormat`, and `billing.logFormat` to select a container's [log output format](https://developers.deepgram.com/docs/log-formats). Accepts `full`, `compact`, `pretty`, or `json`; an unrecognized value fails at template time rather than crash-looping the pod. Defaults to empty, which leaves each container on its own default (`full`) and renders the same arguments as before. Requires `release-260319` or later.
 
-### Notes
-
-- `--log-format` is a top-level option on the Deepgram binaries and must precede the `serve` subcommand, so the chart renders it there. Passing it after the subcommand — as the "Kubernetes" example on the Deepgram log formats documentation page currently shows — makes the container exit with `error: unexpected argument '--log-format' found`.
-
 ## [0.42.0] - 2026-08-12
 
 ### Changed
