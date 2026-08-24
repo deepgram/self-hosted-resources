@@ -219,7 +219,7 @@ spec:
         {{- toYaml . | nindent 8 }}
         {{- end }}
         command: [ "impeller" ]
-        args: ["-v", "serve", "/etc/config/engine.toml"]
+        args: {{ compact (list "-v" (include "deepgram-self-hosted.logFormatArg" (dict "key" "engine.logFormat" "value" $.Values.engine.logFormat)) "serve" "/etc/config/engine.toml") | toJson }}
         resources:
           requests:
             memory: "{{ $.Values.engine.resources.requests.memory }}"

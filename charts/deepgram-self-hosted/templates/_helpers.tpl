@@ -27,3 +27,18 @@ Selector labels
 {{- define "deepgram-self-hosted.selectorLabels" -}}
 app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
+
+{{/*
+Render the --log-format flag for a component, or an empty string if unset.
+Callers must place the result ahead of the subcommand: the Deepgram binaries
+expose --log-format only as a top-level option, and reject it after `serve`.
+Takes a dict of "key" (values path, for the error message) and "value".
+*/}}
+{{- define "deepgram-self-hosted.logFormatArg" -}}
+{{- with .value -}}
+{{- if not (has . (list "full" "compact" "pretty" "json")) -}}
+{{- fail (printf "Error: %s must be one of full, compact, pretty, json (got %q)" $.key .) -}}
+{{- end -}}
+{{- printf "--log-format=%s" . -}}
+{{- end -}}
+{{- end }}

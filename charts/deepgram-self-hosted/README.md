@@ -297,6 +297,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
 | api.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
+| api.logFormat | string | `""` | [Log output format](https://developers.deepgram.com/docs/log-formats) for the API container. One of `full`, `compact`, `pretty`, or `json`. Leave empty to use the container's own default (`full`). Requires `release-260319` or later. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
 | api.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for API pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. |
@@ -355,6 +356,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.licenseFile.secretKey | string | `"license.dg"` | Key within the Secret that contains the license file content |
 | billing.licenseFile.secretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license file |
 | billing.livenessProbe | object | `` | Liveness probe customization for Billing pods. |
+| billing.logFormat | string | `""` | [Log output format](https://developers.deepgram.com/docs/log-formats) for the Billing container. One of `full`, `compact`, `pretty`, or `json`. Leave empty to use the container's own default (`full`). Requires `release-260319` or later. |
 | billing.namePrefix | string | `"deepgram-billing"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram Billing containers. |
 | billing.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to Billing pods. |
 | billing.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for Billing pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. |
@@ -412,6 +414,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
+| engine.logFormat | string | `""` | [Log output format](https://developers.deepgram.com/docs/log-formats) for the Engine container. One of `full`, `compact`, `pretty`, or `json`. Leave empty to use the container's own default (`full`). Requires `release-260319` or later. |
 | engine.metricsServer | object | `` | metricsServer exposes an endpoint on each Engine container for reporting inference-specific system metrics. See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine for more details. |
 | engine.metricsServer.host | string | `"0.0.0.0"` | host is the IP address to listen on for metrics requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.metricsServer.port | int | `9991` | port to listen on for metrics requests |
@@ -504,6 +507,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
+| licenseProxy.logFormat | string | `""` | [Log output format](https://developers.deepgram.com/docs/log-formats) for the License Proxy container. One of `full`, `compact`, `pretty`, or `json`. Leave empty to use the container's own default (`full`). Requires `release-260319` or later. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |
 | licenseProxy.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to License Proxy pods. |
 | licenseProxy.pdb | object | `` | [PodDisruptionBudget](https://kubernetes.io/docs/concepts/workloads/pods/disruptions/#pod-disruption-budgets) for License Proxy pods. Set exactly one of `minAvailable` or `maxUnavailable` when enabled. |
