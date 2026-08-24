@@ -25,7 +25,7 @@ time instead of letting Engine or API pods crash-loop after rollout.
 {{- else if $speakV2Enabled }}
 {{- fail "Error: api.features.speakV2 and api.features.speakV2Streaming serve Flux TTS and require fluxTts.enabled. Enable fluxTts, or disable both features." }}
 {{- end }}
-{{- if and .Values.global.fips.enabled .Values.engine.customToml (contains "[fips]" .Values.engine.customToml) }}
+{{- if and (.Values.global.fips).enabled .Values.engine.customToml (contains "[fips]" .Values.engine.customToml) }}
 {{- fail "Error: engine.customToml contains its own [fips] section. The chart renders [fips] when global.fips.enabled is true; remove the section from engine.customToml." }}
 {{- end }}
 {{- /*
@@ -55,7 +55,7 @@ Invoke with (dict "Values" $.Values "type" $type).
         {{- end }}
       ]
       {{- end }}
-    {{- if $.Values.global.fips.enabled }}
+    {{- if ($.Values.global.fips).enabled }}
 
     [fips]
       mode = "enabled"

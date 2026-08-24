@@ -13,7 +13,7 @@ data:
     [license]
       file = "/license/license.dg"
       journal = "/journal/journal"
-    {{- if .Values.global.fips.enabled }}
+    {{- if (.Values.global.fips).enabled }}
 
     [fips]
       mode = "enabled"
