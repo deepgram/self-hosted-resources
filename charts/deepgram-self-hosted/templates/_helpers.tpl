@@ -50,6 +50,10 @@ the containers panic when it is combined with any format other than json.
 {{- end -}}
 {{- end -}}
 {{- printf "--log-format=%s" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Reject FIPS mode unless every deployed component runs a FIPS image. Standard
 images are not built for FIPS: depending on the base OS, one either aborts at
 startup ("Failed to load FIPS provider", exit 101) or starts and reports

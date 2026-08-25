@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Added
 
 - Added `api.logFormat`, `engine.logFormat`, `licenseProxy.logFormat`, and `billing.logFormat` to select a container's [log output format](https://developers.deepgram.com/docs/log-formats). Accepts `full`, `compact`, `pretty`, or `json`; an unrecognized value fails at template time rather than crash-looping the pod. Defaults to empty, which leaves each container on its own default (`full`) and renders the same arguments as before. Requires `release-260319` or later.
+
 ## [0.43.0] - 2026-08-25
 
 ### Added
