@@ -29,10 +29,12 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
-Reject FIPS mode on image tags that predate FIPS support. Those images have no
-OpenSSL FIPS provider, so the service aborts at startup ("Failed to load FIPS
-provider", exit 101) and crash-loops. Tags that are not official Deepgram
-release tags are left alone, since a private registry may use its own naming.
+Reject FIPS mode unless every deployed component runs a FIPS image. Standard
+images are not built for FIPS: depending on the base OS, one either aborts at
+startup ("Failed to load FIPS provider", exit 101) or starts and reports
+openssl_fips_enabled=true without providing FIPS-validated crypto. Tags that are
+not official Deepgram release tags are left alone, since a private registry may
+use its own naming.
 */}}
 {{- define "deepgram-self-hosted.validateFipsImageTags" -}}
 {{- if (.Values.global.fips).enabled -}}
@@ -47,7 +49,10 @@ release tags are left alone, since a private registry may use its own naming.
 {{- $tag := toString $component.tag -}}
 {{- if regexMatch "^release-[0-9]{6}(-fips)?$" $tag -}}
 {{- if lt (atoi (regexFind "[0-9]{6}" $tag)) 260728 -}}
-{{- fail (printf "Error: global.fips.enabled is true but %s.image.tag is \"%s\", which predates FIPS support. That image has no OpenSSL FIPS provider, so the service aborts at startup and crash-loops. Use a `-fips` tag from release-260728 or later, or disable global.fips.enabled." $component.value $tag) -}}
+{{- fail (printf "Error: global.fips.enabled is true but %s.image.tag is \"%s\", which predates the FIPS image variants. Those start at release-260728. Use a `-fips` tag from release-260728 or later, or disable global.fips.enabled." $component.value $tag) -}}
+{{- end -}}
+{{- if not (hasSuffix "-fips" $tag) -}}
+{{- fail (printf "Error: global.fips.enabled is true but %s.image.tag is \"%s\", which is a standard image. Standard images are not built for FIPS: depending on the base OS, one either aborts at startup (\"Failed to load FIPS provider\", exit 101) or starts and reports openssl_fips_enabled=true without providing FIPS-validated crypto. Use \"%s-fips\", or disable global.fips.enabled." $component.value $tag $tag) -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

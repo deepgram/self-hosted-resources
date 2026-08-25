@@ -22,11 +22,16 @@ global:
     # every component (e.g. `release-260812-fips`) in the same change: the FIPS
     # images do not enable FIPS mode on their own, and a service whose config
     # omits this block runs OpenSSL in standard mode even on a FIPS image.
-    # Services log `openssl_fips_enabled=true` at startup once enabled.
-    # Enabling this against an image that has no OpenSSL FIPS provider makes the
-    # service abort at startup ("Failed to load FIPS provider", exit 101) and
-    # crash-loop, so update the tags and this value together. `release-260630`
-    # and earlier predate FIPS support and ignore the block entirely.
+    # When enabled, the chart requires a `-fips` tag from `release-260728` or
+    # later on every deployed component, and fails at render time otherwise.
+    # Tags that are not official Deepgram release tags are not checked, since a
+    # private registry may use its own naming.
+    # Each service logs `openssl_fips_enabled` and `has_fips_encryption` at
+    # startup. Both must be true. The first reports that FIPS mode was requested
+    # and the OpenSSL FIPS provider loaded; the second reports that the binary
+    # was built with only FIPS-approved crypto. A standard image can report
+    # `openssl_fips_enabled=true` with `has_fips_encryption=false`, so the first
+    # field alone does not establish that a deployment is running FIPS crypto.
     # Note: TLS behavior is fixed by the FIPS images and is not controlled by
     # this flag.
     enabled: false
