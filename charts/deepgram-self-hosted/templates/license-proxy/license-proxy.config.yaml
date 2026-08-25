@@ -15,6 +15,11 @@ data:
       server_url = "https://{{ .Values.billing.namePrefix }}-internal:{{ .Values.billing.server.port}}"
       key = "${DEEPGRAM_LICENSE_KEY}"
     {{- end }}
+    {{- if (.Values.global.fips).enabled }}
+
+    [fips]
+      mode = "enabled"
+    {{- end }}
 
     [server]
       host = "{{ .Values.licenseProxy.server.host }}"

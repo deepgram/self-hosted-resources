@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.42.0](https://img.shields.io/badge/Version-0.42.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260812](https://img.shields.io/badge/AppVersion-release--260812-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.43.0](https://img.shields.io/badge/Version-0.43.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260812](https://img.shields.io/badge/AppVersion-release--260812-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -476,6 +476,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
 | global.deepgramLicenseSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license key for airgapped deployments with Billing container. Only required when billing.enabled is true. |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
+| global.fips.enabled | bool | `false` | Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on every component (e.g. `release-260812-fips`) in the same change: the FIPS images do not enable FIPS mode on their own, and a service whose config omits this block runs OpenSSL in standard mode even on a FIPS image. When enabled, the chart requires a `-fips` tag from `release-260728` or later on every deployed component, and fails at render time otherwise. Tags that are not official Deepgram release tags are not checked, since a private registry may use its own naming. Each service logs `openssl_fips_enabled` and `has_fips_encryption` at startup. Both must be true. The first reports that FIPS mode was requested and the OpenSSL FIPS provider loaded; the second reports that the binary was built with only FIPS-approved crypto. A standard image can report `openssl_fips_enabled=true` with `has_fips_encryption=false`, so the first field alone does not establish that a deployment is running FIPS crypto. Note: TLS behavior is fixed by the FIPS images and is not controlled by this flag. |
 | global.initContainer.image.pullPolicy | string | `"IfNotPresent"` |  |
 | global.initContainer.image.registry | string | `"docker.io"` |  |
 | global.initContainer.image.repository | string | `"ubuntu"` |  |

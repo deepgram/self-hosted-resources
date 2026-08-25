@@ -137,7 +137,7 @@ spec:
             command:
             - sh
             - -c
-            - curl --silent http://localhost:{{ .Values.licenseProxy.server.statusPort }}/v1/status | grep --quiet -e '^{.*\"state\"\:\"\(Connected\|TrustBased\)\".*}$'
+            - curl --silent http://localhost:{{ .Values.licenseProxy.server.statusPort }}/v1/status | grep -q -e '^{.*\"state\"\:\"\(Connected\|TrustBased\)\".*}$'
           initialDelaySeconds: {{ .Values.licenseProxy.readinessProbe.initialDelaySeconds }}
           periodSeconds: {{ .Values.licenseProxy.readinessProbe.periodSeconds }}
           timeoutSeconds: {{ .Values.licenseProxy.readinessProbe.timeoutSeconds }}

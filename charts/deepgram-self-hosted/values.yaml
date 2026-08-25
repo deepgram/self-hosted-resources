@@ -14,6 +14,28 @@ global:
   # Only required when billing.enabled is true.
   deepgramLicenseSecretRef:
 
+  # FIPS 140-3 configuration. Renders `[fips] mode = "enabled"` into the config
+  # for every deployed Deepgram service.
+  # @default -- ``
+  fips:
+    # -- Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on
+    # every component (e.g. `release-260812-fips`) in the same change: the FIPS
+    # images do not enable FIPS mode on their own, and a service whose config
+    # omits this block runs OpenSSL in standard mode even on a FIPS image.
+    # When enabled, the chart requires a `-fips` tag from `release-260728` or
+    # later on every deployed component, and fails at render time otherwise.
+    # Tags that are not official Deepgram release tags are not checked, since a
+    # private registry may use its own naming.
+    # Each service logs `openssl_fips_enabled` and `has_fips_encryption` at
+    # startup. Both must be true. The first reports that FIPS mode was requested
+    # and the OpenSSL FIPS provider loaded; the second reports that the binary
+    # was built with only FIPS-approved crypto. A standard image can report
+    # `openssl_fips_enabled=true` with `has_fips_encryption=false`, so the first
+    # field alone does not establish that a deployment is running FIPS crypto.
+    # Note: TLS behavior is fixed by the FIPS images and is not controlled by
+    # this flag.
+    enabled: false
+
   # Init container configuration for config rendering (used when Billing is enabled)
   initContainer:
     image:

@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.43.0] - 2026-08-25
+
+### Added
+
+- New `global.fips.enabled` value (default `false`). When enabled, the chart renders `[fips] mode = "enabled"` into `api.toml`, `engine.toml`, `license-proxy.toml`, and `billing.toml`. The `-fips` images do not enable FIPS mode on their own, so a deployment using them without this value runs OpenSSL in standard mode; set the `-fips` image tag on each component in addition to this value. Each service logs `openssl_fips_enabled` and `has_fips_encryption` at startup, and both must be true; a standard image can report `openssl_fips_enabled=true` with `has_fips_encryption=false`. Leaving the value at its `false` default renders no `[fips]` section, so deployments on non-FIPS and pre-FIPS images are unaffected.
+- Added render-time validation that rejects `global.fips.enabled` unless every deployed component uses a `-fips` image tag from `release-260728` or later. Standard images are not built for FIPS: depending on the base OS, one either aborts at startup with `Failed to load FIPS provider` (exit 101) or starts and reports `openssl_fips_enabled=true` without providing FIPS-validated crypto. Image tags that are not official Deepgram release tags are left alone, since a private registry may use its own naming.
+
+### Fixed
+
+- The API and License Proxy readiness probes now use `grep -q` instead of `grep --quiet`. BusyBox `grep`, used in the `-fips` images, rejects GNU long options and exits non-zero, so the probes could never pass and the pods never became ready.
+
 ## [0.42.0] - 2026-08-12
 
 ### Changed
@@ -532,7 +543,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.1...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...HEAD
+[0.43.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.42.0...deepgram-self-hosted-0.43.0
+[0.42.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.1...deepgram-self-hosted-0.42.0
 [0.41.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.0...deepgram-self-hosted-0.41.1
 [0.41.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.2...deepgram-self-hosted-0.41.0
 [0.40.2]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.40.1...deepgram-self-hosted-0.40.2
