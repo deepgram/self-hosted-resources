@@ -70,7 +70,9 @@ jobs:
           # The chart rejects these at render time so pods do not crash-loop
           # after rollout. Assert the checks still fire.
           echo "Invalid configurations:"
-          render fails "fips on a pre-fips tag"  $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714
+          render fails "fips on a standard tag"  $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714
+          render fails "fips on the default tags" $SECRET $VOL --set global.fips.enabled=true
+          render fails "fips below the -fips floor" $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714-fips --set engine.image.tag=release-260714-fips
           render fails "fips in api.customToml"  $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS --set-string 'api.customToml=[fips]'
           render fails "flux tts without batch"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
           render fails "flux tts with aura-2"    $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
