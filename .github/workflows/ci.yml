@@ -28,6 +28,7 @@ jobs:
           SECRET="--set global.deepgramSecretRef=ci-secret"
           VOL="--set engine.modelManager.volumes.customVolumeClaim.enabled=true --set engine.modelManager.volumes.customVolumeClaim.name=ci-pvc"
           FIPS_TAGS="--set api.image.tag=release-260812-fips --set engine.image.tag=release-260812-fips --set licenseProxy.image.tag=release-260812-fips"
+          BILLING="--set billing.enabled=true --set global.deepgramLicenseSecretRef=ci-license --set billing.licenseFile.secretRef=ci-license-file"
           failed=0
 
           # render <renders|fails> <name> [helm args...]
@@ -48,6 +49,7 @@ jobs:
           render renders "license proxy"         $SECRET $VOL --set licenseProxy.enabled=true
           render renders "fips enabled"          $SECRET $VOL --set licenseProxy.enabled=true --set global.fips.enabled=true $FIPS_TAGS
           render renders "fips disabled"         $SECRET $VOL --set global.fips.enabled=false
+          render renders "fips with billing"     $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING --set billing.image.tag=release-260812-fips
 
           # Values from a release created by an older chart do not contain keys
           # added since, and `helm upgrade --reuse-values` ignores the new
@@ -73,6 +75,7 @@ jobs:
           render fails "fips on a standard tag"  $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714
           render fails "fips on the default tags" $SECRET $VOL --set global.fips.enabled=true
           render fails "fips below the -fips floor" $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714-fips --set engine.image.tag=release-260714-fips
+          render fails "fips on a standard billing tag" $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING
           render fails "fips in api.customToml"  $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS --set-string 'api.customToml=[fips]'
           render fails "flux tts without batch"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
           render fails "flux tts with aura-2"    $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
