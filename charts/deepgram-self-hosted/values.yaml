@@ -19,7 +19,7 @@ global:
   # @default -- ``
   fips:
     # -- Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on
-    # every component (e.g. `release-260826-fips`) in the same change: the FIPS
+    # every component (e.g. `release-26xxxx-fips`) in the same change: the FIPS
     # images do not enable FIPS mode on their own, and a service whose config
     # omits this block runs OpenSSL in standard mode even on a FIPS image.
     # When enabled, the chart requires a `-fips` tag from `release-260728` or
