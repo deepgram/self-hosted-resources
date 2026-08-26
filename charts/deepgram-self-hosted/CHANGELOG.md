@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.44.0] - 2026-08-26
+
+### Changed
+
+- Updated default container tags to the August 2026 release (`release-260826`).
+
 ## [0.43.0] - 2026-08-25
 
 ### Added

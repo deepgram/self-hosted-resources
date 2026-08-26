@@ -1,7 +1,7 @@
 # Sample Helm values for a Flux TTS deployment
 #
 # Flux TTS is Deepgram's streaming-first speech synthesis model, served on the
-# `/v2/speak` endpoint. It requires container images from `release-260812` or later.
+# `/v2/speak` endpoint. It requires container images from `release-260826` or later.
 #
 # Usage:
 #   1. Set `fluxTts.maxBatchSize` below. It ships as 0 and the chart refuses to
@@ -55,7 +55,7 @@ global:
 
 api:
   image:
-    tag: release-260812
+    tag: release-260826
 
   features:
     # Expose Flux TTS on the `/v2/speak` endpoint.
@@ -73,7 +73,7 @@ api:
 
 engine:
   image:
-    tag: release-260812
+    tag: release-260826
 
   # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
   #
@@ -151,7 +151,7 @@ licenseProxy:
   keepUpstreamServerAsBackup: true
 
   image:
-    tag: release-260812
+    tag: release-260826
 
 # Monitoring configuration
 # Enable Prometheus stack for metrics collection
