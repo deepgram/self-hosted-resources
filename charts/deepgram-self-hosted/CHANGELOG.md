@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.44.0] - 2026-08-26
+
+### Changed
+
+- Updated default container tags to the August 2026 release (`release-260826`).
+- Updated the pinned Flux TTS model UUID to `f94b1bd5-5f6d-4e41-bbda-b326273386c0` in `samples/08-flux-tts-setup.values.yaml` and the `engine.flux-tts.toml` config variants. This is a new Flux TTS model that adds support for the [expressivity](https://developers.deepgram.com/docs/tts-expressivity) control. Deployments running Flux TTS need the new model file alongside the new Engine image; request it from your Deepgram Account Representative. Leaving the previous UUID in place with the new model causes Flux TTS to fail initialization while the rest of the stack starts normally.
+
 ## [0.43.0] - 2026-08-25
 
 ### Added

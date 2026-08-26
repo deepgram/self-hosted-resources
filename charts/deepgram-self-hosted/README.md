@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.43.0](https://img.shields.io/badge/Version-0.43.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260812](https://img.shields.io/badge/AppVersion-release--260812-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.44.0](https://img.shields.io/badge/Version-0.44.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260826](https://img.shields.io/badge/AppVersion-release--260826-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -295,7 +295,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.speakV2Streaming | bool | `false` | Enables Flux TTS streaming synthesis on the `/v2/speak` endpoint. Requires `fluxTts.enabled` to configure the Engine side of the deployment. |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
 | api.nodeSelector | object | `{}` | [Node selector](https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector) to apply to API pods. |
@@ -343,7 +343,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.extraEnv | list | `[]` | Extra environment variables for the Billing container. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
 | billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
 | billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
@@ -408,7 +408,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -476,7 +476,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | global.additionalLabels | object | `{}` | Additional labels to add to all Deepgram resources |
 | global.deepgramLicenseSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram license key for airgapped deployments with Billing container. Only required when billing.enabled is true. |
 | global.deepgramSecretRef | string | `nil` | Name of the pre-configured K8s Secret containing your Deepgram self-hosted API key. See chart docs for more details. |
-| global.fips.enabled | bool | `false` | Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on every component (e.g. `release-260812-fips`) in the same change: the FIPS images do not enable FIPS mode on their own, and a service whose config omits this block runs OpenSSL in standard mode even on a FIPS image. When enabled, the chart requires a `-fips` tag from `release-260728` or later on every deployed component, and fails at render time otherwise. Tags that are not official Deepgram release tags are not checked, since a private registry may use its own naming. Each service logs `openssl_fips_enabled` and `has_fips_encryption` at startup. Both must be true. The first reports that FIPS mode was requested and the OpenSSL FIPS provider loaded; the second reports that the binary was built with only FIPS-approved crypto. A standard image can report `openssl_fips_enabled=true` with `has_fips_encryption=false`, so the first field alone does not establish that a deployment is running FIPS crypto. Note: TLS behavior is fixed by the FIPS images and is not controlled by this flag. |
+| global.fips.enabled | bool | `false` | Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on every component (e.g. `release-26xxxx-fips`) in the same change: the FIPS images do not enable FIPS mode on their own, and a service whose config omits this block runs OpenSSL in standard mode even on a FIPS image. When enabled, the chart requires a `-fips` tag from `release-260728` or later on every deployed component, and fails at render time otherwise. Tags that are not official Deepgram release tags are not checked, since a private registry may use its own naming. Each service logs `openssl_fips_enabled` and `has_fips_encryption` at startup. Both must be true. The first reports that FIPS mode was requested and the OpenSSL FIPS provider loaded; the second reports that the binary was built with only FIPS-approved crypto. A standard image can report `openssl_fips_enabled=true` with `has_fips_encryption=false`, so the first field alone does not establish that a deployment is running FIPS crypto. Note: TLS behavior is fixed by the FIPS images and is not controlled by this flag. |
 | global.initContainer.image.pullPolicy | string | `"IfNotPresent"` |  |
 | global.initContainer.image.registry | string | `"docker.io"` |  |
 | global.initContainer.image.repository | string | `"ubuntu"` |  |
@@ -502,7 +502,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.extraEnv | list | `[]` | Extra environment variables for the License Proxy container. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-260812"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.namePrefix | string | `"deepgram-license-proxy"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram License Proxy containers. |

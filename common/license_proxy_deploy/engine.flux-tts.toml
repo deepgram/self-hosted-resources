@@ -75,7 +75,7 @@ enabled = false
 enabled = true
 ### UUID of the Flux TTS model package. Required when `enabled = true`.
 ### Obtain this value from your Deepgram Account Representative.
-uuid = "9c3cc12c-c0a2-4966-8676-f9fa22ab5401"
+uuid = "f94b1bd5-5f6d-4e41-bbda-b326273386c0"
 ### The widest batch the Flux TTS workers will assemble.
 ### Placeholder; required for production. Set explicitly based on GPU type.
 ###

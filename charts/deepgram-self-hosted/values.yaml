@@ -19,7 +19,7 @@ global:
   # @default -- ``
   fips:
     # -- Enable FIPS mode for all Deepgram services. Set the `-fips` image tag on
-    # every component (e.g. `release-260812-fips`) in the same change: the FIPS
+    # every component (e.g. `release-26xxxx-fips`) in the same change: the FIPS
     # images do not enable FIPS mode on their own, and a service whose config
     # omits this block runs OpenSSL in standard mode even on a FIPS image.
     # When enabled, the chart requires a `-fips` tag from `release-260728` or
@@ -278,7 +278,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-260812
+    tag: release-260826
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -524,7 +524,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-260812
+    tag: release-260826
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -931,7 +931,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-260812
+    tag: release-260826
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -1101,7 +1101,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-260812
+    tag: release-260826
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent
