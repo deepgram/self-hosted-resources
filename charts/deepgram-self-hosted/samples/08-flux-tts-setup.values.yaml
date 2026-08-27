@@ -55,7 +55,7 @@ global:
 
 api:
   image:
-    tag: release-260812
+    tag: release-260826
 
   features:
     # Expose Flux TTS on the `/v2/speak` endpoint.
@@ -73,7 +73,7 @@ api:
 
 engine:
   image:
-    tag: release-260812
+    tag: release-260826
 
   # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
   #
@@ -134,9 +134,9 @@ engine:
 fluxTts:
   enabled: true
 
-  # Flux TTS model UUID for the 260812 release. Confirm the correct UUID for your
+  # Flux TTS model UUID as of the 260826 release. Confirm the correct UUID for your
   # release with your Deepgram Account Representative before deploying.
-  uuid: "9c3cc12c-c0a2-4966-8676-f9fa22ab5401"
+  uuid: "f94b1bd5-5f6d-4e41-bbda-b326273386c0"
 
   # There is no safe default: the correct value differs substantially between GPUs,
   # and a value tuned for one will perform badly or exhaust memory on another.
@@ -151,7 +151,7 @@ licenseProxy:
   keepUpstreamServerAsBackup: true
 
   image:
-    tag: release-260812
+    tag: release-260826
 
 # Monitoring configuration
 # Enable Prometheus stack for metrics collection
