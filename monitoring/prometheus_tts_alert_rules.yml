@@ -1,0 +1,48 @@
+groups:
+  - name: deepgram-tts-latency
+    interval: 30s
+    rules:
+      # Grouped by job so a Prometheus scraping several TTS deployments
+      # reports which one fired. No job selector needed: these metrics only
+      # exist where TTS runs.
+      - record: tts:ttfb_p90:5m
+        expr: histogram_quantile(0.90, sum by (job, le) (rate(engine_tts_first_transcoded_byte_latency_bucket[5m])))
+
+      - record: tts:ttfb_p99:5m
+        expr: histogram_quantile(0.99, sum by (job, le) (rate(engine_tts_first_transcoded_byte_latency_bucket[5m])))
+
+      # Requests per second, not seconds. Guards the alerts below against
+      # a single slow synthesis skewing a quantile on an idle deployment.
+      - record: tts:rps:5m
+        expr: sum by (job) (rate(engine_tts_first_transcoded_byte_latency_count[5m]))
+
+      - alert: TTSLatencyHigh
+        expr: tts:ttfb_p90:5m > 0.2 and tts:rps:5m > 0.1
+        for: 5m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.job }} P90 TTFB {{ $value | humanizeDuration }} (>200ms)"
+
+      - alert: TTSLatencyVeryHigh
+        expr: tts:ttfb_p90:5m > 0.4 and tts:rps:5m > 0.1
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.job }} P90 TTFB {{ $value | humanizeDuration }} (>400ms)"
+
+      - alert: TTSTailLatencyVeryHigh
+        expr: tts:ttfb_p99:5m > 0.5 and tts:rps:5m > 0.1
+        for: 2m
+        labels: { severity: critical }
+        annotations:
+          summary: "{{ $labels.job }} P99 TTFB {{ $value | humanizeDuration }} (>500ms)"
+
+      - alert: TTSLatencyRegression
+        expr: |
+          tts:ttfb_p90:5m > 2 * (tts:ttfb_p90:5m offset 1h)
+          and tts:ttfb_p90:5m > 0.1
+          and tts:rps:5m > 0.5
+        for: 15m
+        labels: { severity: warning }
+        annotations:
+          summary: "{{ $labels.job }} P90 TTFB doubled vs 1h ago"

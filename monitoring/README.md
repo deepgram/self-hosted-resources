@@ -1,6 +1,10 @@
 # Deepgram Self-Hosted Monitoring
 
-This repository contains a Grafana dashboard template for monitoring Deepgram self-hosted deployments.
+This directory contains Grafana dashboard templates and Prometheus alert rules for monitoring Deepgram self-hosted deployments:
+
+- `grafana_dashboard_template.json` — general health and performance
+- `grafana_tts_dashboard_template.json` — TTS first-byte latency
+- `prometheus_tts_alert_rules.yml` — TTS latency alerts, with unit tests
 
 ## Overview
 
@@ -34,6 +38,40 @@ The dashboard includes panels for:
 - Stream capacity and load saturation
 - Connection latency
 - Per-pod error rates and latency metrics
+
+## TTS First-Byte Latency Dashboard
+
+`grafana_tts_dashboard_template.json` covers text-to-speech first-byte latency, which the general dashboard above does not include. It is built on the two histograms Engine exposes for TTS:
+
+- `engine_tts_first_transcoded_byte_latency` — time to the first byte the caller receives, transcoding included
+- `engine_tts_first_raw_byte_latency` — inference only, before transcoding
+
+### Requirements
+
+- Grafana 12.0.0 or higher
+- Prometheus datasource configured
+- Engine's metrics endpoint registered as a Prometheus scrape target
+
+### Usage
+
+1. Import the `grafana_tts_dashboard_template.json` file into your Grafana instance
+2. Configure the Prometheus datasource (DS_PROMETHEUS) when prompted
+3. Select your Engine's scrape job from the **Scrape Job** dropdown
+
+### Panels
+
+- **TTS Latency P50 / P90 / P99** — caller-perceived first-byte latency
+- **Per-Instance TTS Latency P99** — isolates a single slow replica
+- **TTS Latency Raw vs Transcoded (Mean)** — the gap between the two lines is time spent transcoding, which separates a GPU regression from a transcode regression
+- **TTS Request Rate** — the rate the alert rules gate on; read the latency panels against it
+- **TTS Failures During Response** — audio generation that broke after the response had already started
+
+### Notes
+
+- Panels filter on the `job` label rather than `namespace`, so this dashboard works for both Docker Compose and Kubernetes deployments. Add a `namespace` filter if you prefer to match the general dashboard above.
+- TTS metrics are registered lazily. An Engine that has not yet served a TTS request exposes no `engine_tts_*` series at all, so it will not appear in the **Scrape Job** dropdown until it does — use an `up`-based check to detect a silent Engine.
+- Latency values are in seconds, despite these metric names carrying no `_seconds` suffix.
+- The failures panel queries `engine_tts_failures_during_response_total`. Engine exposes counters in OpenMetrics format with the `_total` suffix; if your build omits it, drop the suffix from that panel's query.
 
 ## Recommended Alerts
 
@@ -114,3 +152,40 @@ Repeat similar steps for:
 **Condition:**
 - WHEN `A` **IS ABOVE** `70`
 - FOR `10m`
+
+### TTS first-byte latency alerts
+
+`prometheus_tts_alert_rules.yml` contains three recording rules and four alerts, loadable directly by Prometheus:
+
+| Alert | Condition | Severity |
+|---|---|---|
+| `TTSLatencyHigh` | P90 above 200ms for 5m | warning |
+| `TTSLatencyVeryHigh` | P90 above 400ms for 2m | critical |
+| `TTSTailLatencyVeryHigh` | P99 above 500ms for 2m | critical |
+| `TTSLatencyRegression` | P90 doubled versus an hour earlier, for 15m | warning |
+
+Every threshold sits on an actual histogram bucket boundary (the TTS latency buckets are 0.05, 0.1, 0.2 … 2.0, 2.5, 3.0, 4.0, 5.0, 10.0, 30.0, 60.0), so each condition is exact rather than dependent on interpolation inside a bucket. All four are gated on a minimum request rate, because a quantile computed over a near-empty window just tracks the single slowest request.
+
+Treat the thresholds as a starting point. Baseline against your own hardware under production traffic before committing to them.
+
+Unit tests are included:
+
+```
+promtool check rules prometheus_tts_alert_rules.yml
+promtool test rules prometheus_tts_alert_rules_test.yml
+```
+
+To configure the equivalent as a Grafana-managed alert instead, follow the steps in the streaming example above using this query:
+
+```
+histogram_quantile(
+  0.90,
+  sum by (le) (
+    rate(engine_tts_first_transcoded_byte_latency_bucket[5m])
+  )
+)
+```
+
+**Condition:**
+- WHEN `A` **IS ABOVE** `0.2`
+- FOR `5m`

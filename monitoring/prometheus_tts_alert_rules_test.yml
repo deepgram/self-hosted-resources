@@ -1,0 +1,116 @@
+# Unit tests for prometheus_tts_alert_rules.yml
+#
+#   promtool test rules prometheus_tts_alert_rules_test.yml
+#
+# Each case feeds synthetic histogram buckets matching the real Engine layout
+# and asserts the alert conditions match (or don't) at the intended boundaries.
+
+rule_files:
+  - prometheus_tts_alert_rules.yml
+
+evaluation_interval: 30s
+
+tests:
+  # ---- healthy: every request under 100ms -> nothing should fire ----
+  - interval: 30s
+    name: healthy traffic stays silent
+    input_series:
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.05"}'
+        values: '0+0x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.1"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.2"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.3"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.4"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.5"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.6"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="+Inf"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_count{job="deepgram_tts"}'
+        values: '0+20x40'
+    promql_expr_test:
+      - expr: tts:ttfb_p90:5m > 0.2 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples: []
+      - expr: tts:ttfb_p99:5m > 0.5 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples: []
+
+  # ---- degraded: P90 = 250ms -> warning only ----
+  - interval: 30s
+    name: P90 250ms trips warning but not critical
+    input_series:
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.05"}'
+        values: '0+0x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.1"}'
+        values: '0+16x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.2"}'
+        values: '0+16x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.3"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.4"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.5"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.6"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="+Inf"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_count{job="deepgram_tts"}'
+        values: '0+20x40'
+    promql_expr_test:
+      - expr: tts:ttfb_p90:5m
+        eval_time: 15m
+        exp_samples:
+          - labels: 'tts:ttfb_p90:5m{job="deepgram_tts"}'
+            value: 0.25000000000000006
+      - expr: tts:ttfb_p90:5m > 0.2 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples:
+          - labels: 'tts:ttfb_p90:5m{job="deepgram_tts"}'
+            value: 0.25000000000000006
+      - expr: tts:ttfb_p90:5m > 0.4 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples: []
+      - expr: tts:ttfb_p99:5m > 0.5 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples: []
+
+  # ---- severe: P90 = 550ms, P99 = 595ms -> both criticals ----
+  - interval: 30s
+    name: P90 550ms trips both criticals
+    input_series:
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.05"}'
+        values: '0+0x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.1"}'
+        values: '0+0x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.2"}'
+        values: '0+0x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.3"}'
+        values: '0+0x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.4"}'
+        values: '0+16x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.5"}'
+        values: '0+16x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="0.6"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_bucket{job="deepgram_tts",le="+Inf"}'
+        values: '0+20x40'
+      - series: 'engine_tts_first_transcoded_byte_latency_count{job="deepgram_tts"}'
+        values: '0+20x40'
+    promql_expr_test:
+      - expr: tts:ttfb_p90:5m > 0.4 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples:
+          - labels: 'tts:ttfb_p90:5m{job="deepgram_tts"}'
+            value: 0.55
+      - expr: tts:ttfb_p99:5m > 0.5 and tts:rps:5m > 0.1
+        eval_time: 15m
+        exp_samples:
+          - labels: 'tts:ttfb_p99:5m{job="deepgram_tts"}'
+            value: 0.595
