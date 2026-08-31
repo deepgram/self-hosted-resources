@@ -48,7 +48,7 @@ The dashboard includes panels for:
 
 ![TTS first-byte latency dashboard](tts_dashboard.png)
 
-*Example data for illustration. These values are not a benchmark or a performance claim — measure your own deployment.*
+*Example data for illustration.*
 
 ### Requirements
 
