@@ -46,6 +46,10 @@ The dashboard includes panels for:
 - `engine_tts_first_transcoded_byte_latency` — time to the first byte the caller receives, transcoding included
 - `engine_tts_first_raw_byte_latency` — inference only, before transcoding
 
+![TTS first-byte latency dashboard](tts_dashboard.png)
+
+*Example data for illustration. These values are not a benchmark or a performance claim — measure your own deployment.*
+
 ### Requirements
 
 - Grafana 12.0.0 or higher
