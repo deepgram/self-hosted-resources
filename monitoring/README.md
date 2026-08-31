@@ -50,6 +50,19 @@ The dashboard includes panels for:
 
 *Example data for illustration.*
 
+### Model coverage
+
+Deepgram serves TTS through two model generations, on separate endpoints:
+
+| Model family | Endpoint | Notes |
+|---|---|---|
+| Aura / Aura-2 | `/v1/speak` | |
+| Flux TTS | `/v2/speak` | streaming-first; requires `release-260812` or later |
+
+Flux TTS requires a dedicated Engine and cannot share one with Aura models, so each runs as its own scrape target. The panels do not filter on the `tier` label, so they apply to whichever model family the selected Engine serves — choose it with the **Scrape Job** dropdown.
+
+Not to be confused with `engine.flux` in the Helm chart, which configures Flux turn-based streaming *speech-to-text*. Its `engine_flux_*` metrics are unrelated to TTS and are not covered by this dashboard.
+
 ### Requirements
 
 - Grafana 12.0.0 or higher
@@ -170,7 +183,7 @@ Repeat similar steps for:
 
 Every threshold sits on an actual histogram bucket boundary (the TTS latency buckets are 0.05, 0.1, 0.2 … 2.0, 2.5, 3.0, 4.0, 5.0, 10.0, 30.0, 60.0), so each condition is exact rather than dependent on interpolation inside a bucket. All four are gated on a minimum request rate, because a quantile computed over a near-empty window just tracks the single slowest request.
 
-Treat the thresholds as a starting point. Baseline against your own hardware under production traffic before committing to them.
+Treat the thresholds as a starting point. Baseline against your own hardware under production traffic before committing to them. They were derived from an Aura-2 deployment; Flux TTS is streaming-first and may have a different first-byte profile, so re-baseline before adopting them there.
 
 Unit tests are included:
 
