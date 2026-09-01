@@ -511,6 +511,12 @@ api:
   #         name: my-secret
   #         key: my-key
 
+  # -- [Log output format](https://developers.deepgram.com/docs/log-formats)
+  # for the API container. One of `full`, `compact`, `pretty`, or `json`.
+  # Leave empty to use the container's own default (`full`).
+  # @default -- `""`
+  logFormat: ""
+
 engine:
   # -- namePrefix is the prefix to apply to the name of all K8s objects
   # associated with the Deepgram Engine containers.
@@ -742,6 +748,12 @@ engine:
   #       secretKeyRef:
   #         name: my-secret
   #         key: my-key
+
+  # -- [Log output format](https://developers.deepgram.com/docs/log-formats)
+  # for the Engine container. One of `full`, `compact`, `pretty`, or `json`.
+  # Leave empty to use the container's own default (`full`).
+  # @default -- `""`
+  logFormat: ""
 
   # -- Configure Engine containers to listen for requests from API containers.
   # @default -- ``
@@ -1074,6 +1086,12 @@ licenseProxy:
   #         name: my-secret
   #         key: my-key
 
+  # -- [Log output format](https://developers.deepgram.com/docs/log-formats)
+  # for the License Proxy container. One of `full`, `compact`, `pretty`, or `json`.
+  # Leave empty to use the container's own default (`full`).
+  # @default -- `""`
+  logFormat: ""
+
 # -- Configuration options for the Deepgram Billing container.
 # The Billing container is used for airgapped deployments where API and Engine
 # cannot reach license.deepgram.com. It validates licenses locally using a
@@ -1268,6 +1286,12 @@ billing:
   #       secretKeyRef:
   #         name: my-secret
   #         key: my-key
+
+  # -- [Log output format](https://developers.deepgram.com/docs/log-formats)
+  # for the Billing container. One of `full`, `compact`, `pretty`, or `json`.
+  # Leave empty to use the container's own default (`full`).
+  # @default -- `""`
+  logFormat: ""
 
 # -- Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml)
 # You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs.

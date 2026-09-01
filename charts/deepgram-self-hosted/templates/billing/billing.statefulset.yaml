@@ -95,7 +95,7 @@ spec:
         {{- with .Values.billing.extraEnv }}
         {{- toYaml . | nindent 8 }}
         {{- end }}
-        args: ["serve", "--config", "/etc/config/billing.toml"]
+        args: {{ compact (list (include "deepgram-self-hosted.logFormatArg" (dict "key" "billing.logFormat" "value" .Values.billing.logFormat "extraEnv" .Values.billing.extraEnv)) "serve" "--config" "/etc/config/billing.toml") | toJson }}
         resources:
           requests:
             memory: "{{ .Values.billing.resources.requests.memory }}"

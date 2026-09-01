@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.45.0] - 2026-09-01
+
+### Added
+
+- Added `api.logFormat`, `engine.logFormat`, `licenseProxy.logFormat`, and `billing.logFormat` to select a container's [log output format](https://developers.deepgram.com/docs/log-formats). Accepts `full`, `compact`, `pretty`, or `json`; an unrecognized value fails at template time rather than crash-looping the pod. Defaults to empty, which leaves each container on its own default (`full`) and renders the same arguments as before. Requires `release-260319` or later.
+
 ## [0.44.0] - 2026-08-26
 
 ### Changed
@@ -550,7 +556,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.45.0...HEAD
+[0.45.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.44.0...deepgram-self-hosted-0.45.0
+[0.44.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...deepgram-self-hosted-0.44.0
 [0.43.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.42.0...deepgram-self-hosted-0.43.0
 [0.42.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.1...deepgram-self-hosted-0.42.0
 [0.41.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.41.0...deepgram-self-hosted-0.41.1

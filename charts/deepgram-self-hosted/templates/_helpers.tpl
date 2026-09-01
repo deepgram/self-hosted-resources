@@ -29,6 +29,31 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 
 {{/*
+Render the --log-format flag for a component, or an empty string if unset.
+Callers must place the result ahead of the subcommand: the Deepgram binaries
+expose --log-format only as a top-level option, and reject it after `serve`.
+Takes a dict of "key" (values path, for the error message), "value", and the
+component's "extraEnv", which is checked for the legacy JSON=true variable:
+the containers panic when it is combined with any format other than json.
+*/}}
+{{- define "deepgram-self-hosted.logFormatArg" -}}
+{{- with .value -}}
+{{- if not (has . (list "full" "compact" "pretty" "json")) -}}
+{{- fail (printf "Error: %s must be one of full, compact, pretty, json (got %q)" $.key .) -}}
+{{- end -}}
+{{- if ne . "json" -}}
+{{- $envKey := printf "%s.extraEnv" (trimSuffix ".logFormat" $.key) -}}
+{{- range $.extraEnv -}}
+{{- if and (eq (toString (.name | default "")) "JSON") (eq (lower (toString (.value | default ""))) "true") -}}
+{{- fail (printf "Error: %s is %q, but %s sets JSON=true, which forces JSON output. The container panics when both are set. Remove the JSON variable, or set %s to json." $.key $.value $envKey $.key) -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- printf "--log-format=%s" . -}}
+{{- end -}}
+{{- end -}}
+
+{{/*
 Reject FIPS mode unless every deployed component runs a FIPS image. Standard
 images are not built for FIPS: depending on the base OS, one either aborts at
 startup ("Failed to load FIPS provider", exit 101) or starts and reports
