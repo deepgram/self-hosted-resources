@@ -31,16 +31,23 @@ jobs:
           BILLING="--set billing.enabled=true --set global.deepgramLicenseSecretRef=ci-license --set billing.licenseFile.secretRef=ci-license-file"
           failed=0
 
-          # render <renders|fails> <name> [helm args...]
+          # render renders <name> [helm args...]
+          # render fails   <name> <error substring> [helm args...]
           render() {
             expected=$1; name=$2; shift 2
+            want=""
+            if [ "$expected" = fails ]; then want=$1; shift; fi
             if helm template ci "$CHART" "$@" >/dev/null 2>/tmp/render-err; then actual=renders; else actual=fails; fi
-            if [ "$expected" = "$actual" ]; then
-              echo "  ok    $name"
-            else
+            if [ "$expected" != "$actual" ]; then
               echo "  FAIL  $name: expected to $expected, but it $actual"
               head -3 /tmp/render-err | sed 's/^/          /'
               failed=1
+            elif [ -n "$want" ] && ! grep -qF -- "$want" /tmp/render-err; then
+              echo "  FAIL  $name: failed, but not with \"$want\""
+              head -3 /tmp/render-err | sed 's/^/          /'
+              failed=1
+            else
+              echo "  ok    $name"
             fi
           }
 
@@ -70,15 +77,16 @@ jobs:
           render renders "08 flux tts"           -f $CHART/samples/08-flux-tts-setup.values.yaml $VOL --set fluxTts.maxBatchSize=4
 
           # The chart rejects these at render time so pods do not crash-loop
-          # after rollout. Assert the checks still fire.
+          # after rollout. Assert each check still fires with its own message,
+          # so a neighbouring check cannot mask one that has stopped working.
           echo "Invalid configurations:"
-          render fails "fips on a standard tag"  $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714
-          render fails "fips on the default tags" $SECRET $VOL --set global.fips.enabled=true
-          render fails "fips below the -fips floor" $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714-fips --set engine.image.tag=release-260714-fips
-          render fails "fips on a standard billing tag" $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING
-          render fails "fips in api.customToml"  $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS --set-string 'api.customToml=[fips]'
-          render fails "flux tts without batch"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
-          render fails "flux tts with aura-2"    $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
+          render fails "fips on a standard tag"  "is a standard image"               $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260812
+          render fails "fips on the default tags" "is a standard image"              $SECRET $VOL --set global.fips.enabled=true
+          render fails "fips below the -fips floor" "predates the FIPS image variants" $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714-fips --set engine.image.tag=release-260714-fips
+          render fails "fips on a standard billing tag" "is a standard image"        $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING
+          render fails "fips in api.customToml"  "api.customToml contains its own [fips]" $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS --set-string 'api.customToml=[fips]'
+          render fails "flux tts without batch"  "fluxTts.maxBatchSize must be set"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
+          render fails "flux tts with aura-2"    "fluxTts and aura2 cannot both be enabled" $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
 
           exit $failed
 
