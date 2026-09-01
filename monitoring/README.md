@@ -54,12 +54,12 @@ The dashboard includes panels for:
 
 Deepgram serves TTS through two model generations, on separate endpoints:
 
-| Model family | Endpoint | Notes |
+| Model family | Endpoint | `tier` label |
 |---|---|---|
-| Aura / Aura-2 | `/v1/speak` | |
-| Flux TTS | `/v2/speak` | streaming-first; requires `release-260812` or later |
+| Aura / Aura-2 | `/v1/speak` | `aura`, `aura-2` |
+| Flux TTS | `/v2/speak` | `flux` |
 
-Flux TTS requires a dedicated Engine and cannot share one with Aura models, so each runs as its own scrape target. The panels do not filter on the `tier` label, so they apply to whichever model family the selected Engine serves — choose it with the **Scrape Job** dropdown.
+Flux TTS is streaming-first and requires `release-260812` or later. It also requires a dedicated Engine and cannot share one with Aura models, so each runs as its own scrape target. The panels do not filter on the `tier` label, so they apply to whichever model family the selected Engine serves — choose it with the **Scrape Job** dropdown.
 
 Not to be confused with `engine.flux` in the Helm chart, which configures Flux turn-based streaming *speech-to-text*. Its `engine_flux_*` metrics are unrelated to TTS and are not covered by this dashboard.
 
@@ -88,6 +88,7 @@ Not to be confused with `engine.flux` in the Helm chart, which configures Flux t
 - Panels filter on the `job` label rather than `namespace`, so this dashboard works for both Docker Compose and Kubernetes deployments. Add a `namespace` filter if you prefer to match the general dashboard above.
 - TTS metrics are registered lazily. An Engine that has not yet served a TTS request exposes no `engine_tts_*` series at all, so it will not appear in the **Scrape Job** dropdown until it does — use an `up`-based check to detect a silent Engine.
 - Latency values are in seconds, despite these metric names carrying no `_seconds` suffix.
+- The first-byte histograms are the whole TTS latency surface for self-hosted builds. Per-pipeline internals (Aura-2 batcher, Flux TTS slot and queue depths) are not exposed, so there is nothing more granular to chart.
 - The failures panel queries `engine_tts_failures_during_response_total`. Engine exposes counters in OpenMetrics format with the `_total` suffix; if your build omits it, drop the suffix from that panel's query.
 
 ## Recommended Alerts
