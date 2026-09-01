@@ -52,7 +52,7 @@ The dashboard includes panels for:
 
 ### Model coverage
 
-Deepgram serves TTS through two model generations, on separate endpoints:
+This dashboard covers both Aura-2 and Flux TTS. They are served on separate endpoints and distinguished by the `tier` label, but report through the same two histograms:
 
 | Model family | Endpoint | `tier` label |
 |---|---|---|
