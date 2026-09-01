@@ -177,12 +177,21 @@ Repeat similar steps for:
 
 | Alert | Condition | Severity |
 |---|---|---|
-| `TTSLatencyHigh` | P90 above 200ms for 5m | warning |
+| `TTSLatencyHigh` | P90 above 200ms for 2m | warning |
 | `TTSLatencyVeryHigh` | P90 above 400ms for 2m | critical |
 | `TTSTailLatencyVeryHigh` | P99 above 500ms for 2m | critical |
 | `TTSLatencyRegression` | P90 doubled versus an hour earlier, for 15m | warning |
 
 Every threshold sits on an actual histogram bucket boundary (the TTS latency buckets are 0.05, 0.1, 0.2 … 2.0, 2.5, 3.0, 4.0, 5.0, 10.0, 30.0, 60.0), so each condition is exact rather than dependent on interpolation inside a bucket. All four are gated on a minimum request rate, because a quantile computed over a near-empty window just tracks the single slowest request.
+
+The two P90 alerts share the same `for:`, so the threshold alone carries the severity and they cannot fire out of order. To stop the warning paging alongside the critical, add an Alertmanager inhibit rule:
+
+```yaml
+inhibit_rules:
+  - source_matchers: [severity="critical"]
+    target_matchers: [severity="warning"]
+    equal: ['job']
+```
 
 Treat the thresholds as a starting point. Baseline against your own hardware under production traffic before committing to them. They were derived from an Aura-2 deployment; Flux TTS is streaming-first and may have a different first-byte profile, so re-baseline before adopting them there.
 

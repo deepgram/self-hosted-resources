@@ -18,7 +18,7 @@ groups:
 
       - alert: TTSLatencyHigh
         expr: tts:ttfb_p90:5m > 0.2 and tts:rps:5m > 0.1
-        for: 5m
+        for: 2m
         labels: { severity: warning }
         annotations:
           summary: "{{ $labels.job }} P90 TTFB {{ $value | humanizeDuration }} (>200ms)"
