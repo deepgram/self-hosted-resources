@@ -19,6 +19,77 @@ jobs:
       - name: Run helm lint
         run: helm lint ./charts/deepgram-self-hosted
 
+      # `helm lint` does not evaluate the templates, so it misses nil pointer
+      # dereferences and other render-time errors. Render the chart across the
+      # deployment shapes we support instead.
+      - name: Render chart templates
+        run: |
+          CHART=./charts/deepgram-self-hosted
+          SECRET="--set global.deepgramSecretRef=ci-secret"
+          VOL="--set engine.modelManager.volumes.customVolumeClaim.enabled=true --set engine.modelManager.volumes.customVolumeClaim.name=ci-pvc"
+          FIPS_TAGS="--set api.image.tag=release-260812-fips --set engine.image.tag=release-260812-fips --set licenseProxy.image.tag=release-260812-fips"
+          BILLING="--set billing.enabled=true --set global.deepgramLicenseSecretRef=ci-license --set billing.licenseFile.secretRef=ci-license-file"
+          failed=0
+
+          # render renders <name> [helm args...]
+          # render fails   <name> <error substring> [helm args...]
+          render() {
+            expected=$1; name=$2; shift 2
+            want=""
+            if [ "$expected" = fails ]; then want=$1; shift; fi
+            if helm template ci "$CHART" "$@" >/dev/null 2>/tmp/render-err; then actual=renders; else actual=fails; fi
+            if [ "$expected" != "$actual" ]; then
+              echo "  FAIL  $name: expected to $expected, but it $actual"
+              head -3 /tmp/render-err | sed 's/^/          /'
+              failed=1
+            elif [ -n "$want" ] && ! grep -qF -- "$want" /tmp/render-err; then
+              echo "  FAIL  $name: failed, but not with \"$want\""
+              head -3 /tmp/render-err | sed 's/^/          /'
+              failed=1
+            else
+              echo "  ok    $name"
+            fi
+          }
+
+          echo "Deployment shapes:"
+          render renders "defaults"              $SECRET $VOL
+          render renders "license proxy"         $SECRET $VOL --set licenseProxy.enabled=true
+          render renders "fips enabled"          $SECRET $VOL --set licenseProxy.enabled=true --set global.fips.enabled=true $FIPS_TAGS
+          render renders "fips disabled"         $SECRET $VOL --set global.fips.enabled=false
+          render renders "fips with billing"     $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING --set billing.image.tag=release-260812-fips
+
+          # Values from a release created by an older chart do not contain keys
+          # added since, and `helm upgrade --reuse-values` ignores the new
+          # chart's defaults.
+          echo "Upgrade from an older chart (--reuse-values):"
+          render renders "newer keys absent"     $SECRET $VOL \
+            --set global.fips=null --set fluxTts=null \
+            --set api.features.speakV2=null --set api.features.speakV2Streaming=null
+
+          echo "Sample values files:"
+          render renders "01 aws"                -f $CHART/samples/01-basic-setup-aws.values.yaml
+          render renders "02 gcp"                -f $CHART/samples/02-basic-setup-gcp.yaml
+          render renders "03 onprem"             -f $CHART/samples/03-basic-setup-onprem.yaml
+          render renders "04 aura-2"             -f $CHART/samples/04-aura-2-setup.values.yaml $VOL
+          render renders "05 voice agent"        -f $CHART/samples/05-voice-agent-aws.values.yaml
+          render renders "06 aura-2 polyglot"    -f $CHART/samples/06-aura-2-polyglot-setup.values.yaml $VOL
+          render renders "07 airgapped billing"  -f $CHART/samples/07-basic-setup-aws-airgapped.values.yaml
+          render renders "08 flux tts"           -f $CHART/samples/08-flux-tts-setup.values.yaml $VOL --set fluxTts.maxBatchSize=4
+
+          # The chart rejects these at render time so pods do not crash-loop
+          # after rollout. Assert each check still fires with its own message,
+          # so a neighbouring check cannot mask one that has stopped working.
+          echo "Invalid configurations:"
+          render fails "fips on a standard tag"  "is a standard image"               $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260812
+          render fails "fips on the default tags" "is a standard image"              $SECRET $VOL --set global.fips.enabled=true
+          render fails "fips below the -fips floor" "predates the FIPS image variants" $SECRET $VOL --set global.fips.enabled=true --set api.image.tag=release-260714-fips --set engine.image.tag=release-260714-fips
+          render fails "fips on a standard billing tag" "is a standard image"        $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING
+          render fails "fips in api.customToml"  "api.customToml contains its own [fips]" $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS --set-string 'api.customToml=[fips]'
+          render fails "flux tts without batch"  "fluxTts.maxBatchSize must be set"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
+          render fails "flux tts with aura-2"    "fluxTts and aura2 cannot both be enabled" $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
+
+          exit $failed
+
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
