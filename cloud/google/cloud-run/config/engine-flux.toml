@@ -1,0 +1,88 @@
+### Deepgram Engine configuration for Google Cloud Run — Flux (dedicated)
+###
+### This configuration is exclusively for Flux turn-based streaming STT.
+### DO NOT add nova, TTS, diarizer, NER, or any other models to this engine.
+### Flux allocates all GPU memory for streams at startup; mixing models causes
+### CUDA out-of-memory errors and crashes.
+###
+### Requires container image release-251015 or later.
+### See: https://developers.deepgram.com/docs/flux-self-hosted
+###
+### Keep in mind that all paths are in-container paths and do not need to exist
+### on the host machine.
+
+### max_active_requests does NOT apply to Flux. Flux concurrency is controlled
+### exclusively by flux.max_streams below.
+
+
+### Configure license validation by passing in a DEEPGRAM_API_KEY environment variable.
+### See https://developers.deepgram.com/docs/deploy-deepgram-services#credentials
+[license]
+server_url = ["https://license.deepgram.com"]
+
+
+### Configure the server to listen for requests from the API.
+[server]
+### Listen on all interfaces inside the container.
+host = "0.0.0.0"
+### Cloud Run expects the container to listen on port 8080.
+port = 8080
+
+
+### Metrics server for Prometheus-compatible scraping.
+### Note: In Cloud Run, port 9991 is not exposed by the load balancer.
+### Metrics are accessible only within the container or via Cloud Run sidecar patterns.
+[metrics_server]
+host = "0.0.0.0"
+port = 9991
+
+
+[model_manager]
+### Flux must be the only model loaded. Do not configure additional models here.
+### The Flux model file must be present in the models directory at startup.
+search_paths = ["/models"]
+
+
+### Enable Flux turn-based streaming STT
+[flux]
+enabled = true
+
+### REQUIRED for production: set max_streams explicitly based on GPU type.
+### Flux automatically derives a value from available GPU memory, but the
+### auto-calculated value may be too high under sustained load, leading to:
+###   - Voice agents stopping or experiencing long delays
+###   - Calls dropped after sustained concurrent usage
+###   - "audio_window_end increased by more than 3 frames" errors in API logs
+###
+### Contact your Deepgram Account Representative for the recommended value
+### for your GPU type (e.g. NVIDIA L4).
+###
+### Monitor stream utilization via Engine metrics:
+###   flux_used_streams     — active Flux streams
+###   flux_max_streams      — configured maximum
+###   flux_fraction_streams — fraction of capacity in use (scale out at ~0.8)
+# max_streams = 0
+
+
+### Size of audio chunks to process in seconds.
+[chunking.batch]
+# min_duration =
+# max_duration =
+[chunking.streaming]
+# min_duration =
+# max_duration =
+
+
+### Pre-load the Flux model into GPU memory at startup. Flux pre-allocates GPU
+### memory for all configured streams on startup regardless of this setting.
+### blocking = true prevents Cloud Run from routing requests until the model is
+### ready, which is strongly recommended to avoid in-flight failures.
+[preload_models]
+blocking = true
+
+
+[health]
+### Fail on startup if no GPU is detected.
+### In Cloud Run GPU deployments this should always be true.
+### For Flux specifically, a CPU fallback produces OOM errors and high latency.
+gpu_required = true

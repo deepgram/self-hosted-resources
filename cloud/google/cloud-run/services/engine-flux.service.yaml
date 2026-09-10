@@ -1,0 +1,146 @@
+# Deepgram Engine — Cloud Run service definition (Flux / dedicated STT)
+#
+# Use this file ONLY for Flux turn-based streaming STT workloads.
+# Flux must run in complete isolation — no other Deepgram models (nova, TTS,
+# diarizer, NER, etc.) may be present on the same Engine instance. Mixing
+# models causes CUDA out-of-memory errors and request failures.
+#
+# Flux requires container images from October 2025 or later (release-251015+).
+# The current IMAGE_TAG default satisfies this requirement.
+#
+# Concurrency for Flux is controlled exclusively by flux.max_streams in
+# engine-flux.toml. The max_active_requests setting does not apply to Flux.
+#
+# For optimal streaming performance, Deepgram recommends a separate API service
+# routing Flux traffic to this engine. You may reuse the standard deepgram-api
+# service for low-to-moderate Flux traffic.
+#
+# See: https://developers.deepgram.com/docs/flux-self-hosted
+#
+# This file is a template. Variables in ${VAR} notation are substituted
+# by deploy.sh using envsubst before being applied with:
+#   gcloud run services replace - --region=${REGION} --project=${PROJECT_ID}
+#
+# GPU regions: https://cloud.google.com/run/docs/configuring/services/gpu
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: deepgram-engine-flux
+  annotations:
+    # Restrict to internal Cloud Run traffic only — the API service calls this
+    # endpoint directly using its Cloud Run URL. No public access is granted.
+    run.googleapis.com/ingress: internal
+spec:
+  template:
+    metadata:
+      annotations:
+        # Second-generation execution environment is required for GPU support.
+        run.googleapis.com/execution-environment: gen2
+
+        # Attach one NVIDIA L4 GPU per instance. Flux allocates all GPU memory
+        # for streams at startup; no other models may share this GPU.
+        run.googleapis.com/gpu-type: nvidia-l4
+
+        # Disable CPU throttling. GPU workloads must not have their CPU throttled
+        # or model loading and inference will stall.
+        run.googleapis.com/cpu-throttling: "false"
+
+        # Boost CPU during startup to accelerate model loading from GCS.
+        run.googleapis.com/startup-cpu-boost: "true"
+
+        # Disable GPU zonal redundancy. Required unless you have explicit quota
+        # for GPU zonal redundancy (g.co/cloudrun/gpu-redundancy-help).
+        run.googleapis.com/gpu-zonal-redundancy-disabled: "true"
+
+        run.googleapis.com/network-interfaces: '[{"network":"${VPC_NETWORK}","subnetwork":"${VPC_SUBNETWORK}"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+
+        # Keep at least one warm Flux instance running to eliminate cold-start
+        # latency. Flux pre-allocates GPU memory on startup, so cold starts are
+        # especially disruptive for real-time voice agent traffic.
+        autoscaling.knative.dev/minScale: "1"
+
+        # Maximum number of Flux GPU instances. Each instance requires its own
+        # L4 GPU quota. Flux stream capacity per instance is controlled by
+        # flux.max_streams in engine-flux.toml — scale out instances when
+        # flux_fraction_streams consistently approaches 1.0.
+        autoscaling.knative.dev/maxScale: "3"
+    spec:
+      # Service account used to read models from GCS and secrets from Secret Manager.
+      serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
+
+      # Extend the request timeout to support long-lived Flux streaming sessions.
+      # Cloud Run gen2 maximum is 3600s.
+      timeoutSeconds: 3600
+
+      containers:
+        - image: "${IMAGE_REGISTRY}/self-hosted-engine:${IMAGE_TAG}"
+          # Mount the Flux-specific engine config from Secret Manager.
+          args: ["-v", "serve", "/config/engine.toml"]
+
+          ports:
+            - name: h2c
+              containerPort: 8080
+
+          env:
+            # Deepgram self-hosted API key, read from Secret Manager at runtime.
+            - name: DEEPGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-api-key
+                  key: latest
+
+            - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+              value: cloud-run
+
+          resources:
+            limits:
+              # 8 vCPU and 32 GiB RAM are the recommended minimums for an L4 GPU
+              # Flux workload. Flux is memory-intensive at startup because it
+              # pre-allocates GPU memory for all configured streams.
+              cpu: "8"
+              memory: 32Gi
+              nvidia.com/gpu: "1"
+
+          volumeMounts:
+            # engine-flux.toml is mounted from Secret Manager into /config/engine.toml
+            - name: engine-config
+              mountPath: /config
+              readOnly: true
+
+            # Models are served from a GCS bucket via GCS FUSE.
+            # Only the Flux model file should be present — no nova or TTS models.
+            - name: models
+              mountPath: /models
+              readOnly: true
+
+          # Startup probe: Flux pre-loads its model and allocates GPU memory
+          # during startup. Allow up to 10 minutes for large GPU allocations.
+          startupProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            failureThreshold: 60
+            timeoutSeconds: 5
+
+      volumes:
+        # Mount engine-flux.toml from Secret Manager.
+        # Create this secret with: gcloud secrets create deepgram-engine-flux-config
+        - name: engine-config
+          secret:
+            secretName: deepgram-engine-flux-config
+            items:
+              - key: latest
+                path: engine.toml
+
+        # Mount the Flux models GCS bucket via GCS FUSE (gen2 only).
+        # The bucket should contain only the Flux model file to prevent
+        # accidental loading of incompatible models.
+        - name: models
+          csi:
+            driver: gcsfuse.run.googleapis.com
+            readOnly: true
+            volumeAttributes:
+              bucketName: ${MODELS_BUCKET}
