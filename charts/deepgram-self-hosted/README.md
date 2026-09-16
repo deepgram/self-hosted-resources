@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.45.0](https://img.shields.io/badge/Version-0.45.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260826](https://img.shields.io/badge/AppVersion-release--260826-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.46.0](https://img.shields.io/badge/Version-0.46.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-260915](https://img.shields.io/badge/AppVersion-release--260915-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -295,7 +295,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | api.features.speakV2Streaming | bool | `false` | Enables Flux TTS streaming synthesis on the `/v2/speak` endpoint. Requires `fluxTts.enabled` to configure the Engine side of the deployment. |
 | api.image.path | string | `"quay.io/deepgram/self-hosted-api"` | path configures the image path to use for creating API containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | api.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram API image |
-| api.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for API containers |
+| api.image.tag | string | `"release-260915"` | tag defines which Deepgram release to use for API containers |
 | api.livenessProbe | object | `` | Liveness probe customization for API pods. |
 | api.logFormat | string | `""` | [Log output format](https://developers.deepgram.com/docs/log-formats) for the API container. One of `full`, `compact`, `pretty`, or `json`. Leave empty to use the container's own default (`full`). |
 | api.namePrefix | string | `"deepgram-api"` | namePrefix is the prefix to apply to the name of all K8s objects associated with the Deepgram API containers. |
@@ -344,7 +344,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | billing.extraEnv | list | `[]` | Extra environment variables for the Billing container. |
 | billing.image.path | string | `"quay.io/deepgram/self-hosted-billing"` | path configures the image path to use for creating Billing containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | billing.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Billing image |
-| billing.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for Billing containers |
+| billing.image.tag | string | `"release-260915"` | tag defines which Deepgram release to use for Billing containers |
 | billing.journal | object | `` | Configuration for the usage journal volume. The journal tracks usage for billing purposes and must be persisted. WARNING: Do not delete or lose this volume as it contains critical billing data. Failure to persist and return journal files may result in suspension of service. |
 | billing.journal.aws | object | `` | AWS-specific volume configuration for billing journals |
 | billing.journal.aws.efs.size | string | `"1Gi"` | Size of the EFS PVC for journals. |
@@ -410,7 +410,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.health.gpuRequired | bool | `false` | Engine will automatically fall back to CPU when a GPU is not detected. You can explicitly require a GPU by setting this option to true, production deployments must use a GPU for acceptable performance. |
 | engine.image.path | string | `"quay.io/deepgram/self-hosted-engine"` | path configures the image path to use for creating Engine containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | engine.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image |
-| engine.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for Engine containers |
+| engine.image.tag | string | `"release-260915"` | tag defines which Deepgram release to use for Engine containers |
 | engine.lifecycle | object | `` | Configuration for container lifecycle hooks |
 | engine.lifecycle.postStart.command | list | `[]` | Command to execute in a postStart hook. Leave empty to disable. Example: ["/sbin/ldconfig"] |
 | engine.livenessProbe | object | `` | Liveness probe customization for Engine pods. |
@@ -489,7 +489,8 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | global.pullSecretRef | string | `nil` | If using images from the Deepgram Quay image repositories, or another private registry to which your cluster doesn't have default access, you will need to provide a pre-configured K8s Secret with image repository credentials. See chart docs for more details. |
 | gpu-operator | object | `` | Passthrough values for [NVIDIA GPU Operator Helm chart](https://github.com/NVIDIA/gpu-operator/blob/master/deployments/gpu-operator/values.yaml) You may use the NVIDIA GPU Operator to manage installation of NVIDIA drivers and the container toolkit on nodes with attached GPUs. |
 | gpu-operator.driver.enabled | bool | `true` | Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected. If your Kubernetes nodes run a base image that comes with NVIDIA drivers pre-configured, disable this option, but keep the parent `gpu-operator` and sibling `toolkit` options enabled. |
-| gpu-operator.driver.version | string | `"550.54.15"` | NVIDIA driver version to install. |
+| gpu-operator.driver.useOpenKernelModules | bool | `true` | Whether to install the open NVIDIA kernel modules rather than the proprietary ones. Deepgram requires the open modules. Blackwell-generation GPUs are not supported by the proprietary build and will not be visible to the system at all. This key applies to GPU Operator 24.x, which is the version range this chart depends on. GPU Operator 25.0 and later replace it with `driver.kernelModuleType`, where this key is accepted but has no effect — if you override the `gpu-operator` dependency to 25.x or later, set `driver.kernelModuleType: open` instead. |
+| gpu-operator.driver.version | string | `"580.173.02"` | NVIDIA driver version to install. Deepgram requires `>=580`, because the Engine image is built against CUDA 13 and NVIDIA's CUDA 13 support begins with the `580` driver branch. |
 | gpu-operator.enabled | bool | `true` | Whether to install the NVIDIA GPU Operator to manage driver and/or container toolkit installation. See the list of [supported Operating Systems](https://docs.nvidia.com/datacenter/cloud-native/gpu-operator/latest/platform-support.html#supported-operating-systems-and-kubernetes-platforms) to verify compatibility with your cluster/nodes. Disable this option if your cluster/nodes are not compatible. If disabled, you will need to self-manage NVIDIA software installation on all nodes where you want to schedule Deepgram Engine pods. |
 | gpu-operator.toolkit.enabled | bool | `true` | Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected. |
 | gpu-operator.toolkit.version | string | `"v1.15.0-ubi8"` | NVIDIA container toolkit to install. The default `ubuntu` image tag for the toolkit requires a dynamic runtime link to a version of GLIBC that may not be present on nodes running older Linux distribution releases, such as Ubuntu 22.04. Therefore, we specify the `ubi8` image, which statically links the GLIBC library and avoids this issue. |
@@ -505,7 +506,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | licenseProxy.extraEnv | list | `[]` | Extra environment variables for the License Proxy container. |
 | licenseProxy.image.path | string | `"quay.io/deepgram/self-hosted-license-proxy"` | path configures the image path to use for creating License Proxy containers. You may change this from the public Quay image path if you have imported Deepgram images into a private container registry. |
 | licenseProxy.image.pullPolicy | string | `"IfNotPresent"` | pullPolicy configures how the Kubelet attempts to pull the Deepgram License Proxy image |
-| licenseProxy.image.tag | string | `"release-260826"` | tag defines which Deepgram release to use for License Proxy containers |
+| licenseProxy.image.tag | string | `"release-260915"` | tag defines which Deepgram release to use for License Proxy containers |
 | licenseProxy.keepUpstreamServerAsBackup | bool | `true` | Even with a License Proxy deployed, API and Engine pods can be configured to keep the upstream `license.deepgram.com` license server as a fallback licensing option if the License Proxy is unavailable. Disable this option if you are restricting API/Engine Pod network access for security reasons, and only the License Proxy should send egress traffic to the upstream license server. |
 | licenseProxy.livenessProbe | object | `` | Liveness probe customization for Proxy pods. |
 | licenseProxy.logFormat | string | `""` | [Log output format](https://developers.deepgram.com/docs/log-formats) for the License Proxy container. One of `full`, `compact`, `pretty`, or `json`. Leave empty to use the container's own default (`full`). |

@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.46.0] - 2026-09-15
+
+### Changed
+
+- Updated default container tags to the September 2026 release (`release-260915`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-september-2026-release-260915) for additional details.
+- Raised `gpu-operator.driver.version` from `550.54.15` to `580.173.02`, and set the new `gpu-operator.driver.useOpenKernelModules` to `true`. The Engine image is built against CUDA 13, whose official NVIDIA support begins with the `580` driver branch, and Deepgram requires the **open** kernel modules rather than the proprietary build. Blackwell-generation GPUs are not supported by the proprietary `580` build and will not be visible to the system at all. The same pin was updated in `samples/04-aura-2-setup.values.yaml`, `samples/06-aura-2-polyglot-setup.values.yaml`, and `samples/08-flux-tts-setup.values.yaml`.
+  - If the GPU Operator manages your drivers, upgrading reinstalls the driver on every GPU node, which restarts GPU workloads on that node. Plan the upgrade accordingly. If your nodes run a base image with drivers pre-configured and `gpu-operator.driver.enabled` is `false`, verify independently that those nodes meet the `>=580` open-kernel-module requirement.
+
 ## [0.45.0] - 2026-09-01
 
 ### Added
@@ -556,7 +564,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.45.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...HEAD
+[0.46.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.45.0...deepgram-self-hosted-0.46.0
 [0.45.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.44.0...deepgram-self-hosted-0.45.0
 [0.44.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...deepgram-self-hosted-0.44.0
 [0.43.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.42.0...deepgram-self-hosted-0.43.0

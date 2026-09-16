@@ -55,7 +55,7 @@ global:
 
 api:
   image:
-    tag: release-260826
+    tag: release-260915
 
   features:
     # Expose Flux TTS on the `/v2/speak` endpoint.
@@ -73,7 +73,7 @@ api:
 
 engine:
   image:
-    tag: release-260826
+    tag: release-260915
 
   # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
   #
@@ -151,7 +151,7 @@ licenseProxy:
   keepUpstreamServerAsBackup: true
 
   image:
-    tag: release-260826
+    tag: release-260915
 
 # Monitoring configuration
 # Enable Prometheus stack for metrics collection
@@ -167,7 +167,8 @@ gpu-operator:
   enabled: true
   driver:
     enabled: true
-    version: "570.172.08"
+    version: "580.173.02"
+    useOpenKernelModules: true
   toolkit:
     enabled: true
     version: v1.15.0-ubi8
