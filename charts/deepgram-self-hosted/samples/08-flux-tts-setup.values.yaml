@@ -167,7 +167,8 @@ gpu-operator:
   enabled: true
   driver:
     enabled: true
-    version: "570.172.08"
+    version: "580.173.02"
+    useOpenKernelModules: true
   toolkit:
     enabled: true
     version: v1.15.0-ubi8

@@ -1309,8 +1309,18 @@ gpu-operator:
     # disable this option, but keep the parent `gpu-operator` and sibling `toolkit`
     # options enabled.
     enabled: true
-    # -- NVIDIA driver version to install.
-    version: "550.54.15"
+    # -- NVIDIA driver version to install. Deepgram requires `>=580`, because the Engine
+    # image is built against CUDA 13 and NVIDIA's CUDA 13 support begins with the `580`
+    # driver branch.
+    version: "580.173.02"
+    # -- Whether to install the open NVIDIA kernel modules rather than the proprietary
+    # ones. Deepgram requires the open modules. Blackwell-generation GPUs are not
+    # supported by the proprietary build and will not be visible to the system at all.
+    # This key applies to GPU Operator 24.x, which is the version range this chart
+    # depends on. GPU Operator 25.0 and later replace it with `driver.kernelModuleType`,
+    # where this key is accepted but has no effect — if you override the `gpu-operator`
+    # dependency to 25.x or later, set `driver.kernelModuleType: open` instead.
+    useOpenKernelModules: true
   toolkit:
     # -- Whether to install NVIDIA drivers on nodes where a NVIDIA GPU is detected.
     enabled: true
