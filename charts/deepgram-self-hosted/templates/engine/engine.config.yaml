@@ -42,18 +42,18 @@ Invoke with (dict "Values" $.Values "type" $type).
     {{- end }}
 
     [license]
-      {{- if $.Values.billing.enabled }}
+      {{- if $.Values.licenseProxy.enabled }}
+      server_url = [
+        "https://{{ $.Values.licenseProxy.namePrefix }}-internal:{{ $.Values.licenseProxy.server.port}}{{ $.Values.licenseProxy.server.baseUrl }}"
+        {{- if and (not $.Values.billing.enabled) $.Values.licenseProxy.keepUpstreamServerAsBackup }}
+        ,"https://license.deepgram.com"
+        {{- end }}
+      ]
+      {{- else if $.Values.billing.enabled }}
       server_url = ["https://{{ $.Values.billing.namePrefix }}-internal:{{ $.Values.billing.server.port}}"]
       key = "${DEEPGRAM_LICENSE_KEY}"
       {{- else }}
-      server_url = [
-        {{- if $.Values.licenseProxy.enabled }}
-        "https://{{ $.Values.licenseProxy.namePrefix }}-internal:{{ $.Values.licenseProxy.server.port}}{{ $.Values.licenseProxy.server.baseUrl }}"
-        {{- end }}
-        {{- if or (not $.Values.licenseProxy.enabled) $.Values.licenseProxy.keepUpstreamServerAsBackup }}
-        {{- if $.Values.licenseProxy.enabled -}},{{- end -}}"https://license.deepgram.com"
-        {{- end }}
-      ]
+      server_url = ["https://license.deepgram.com"]
       {{- end }}
     {{- if ($.Values.global.fips).enabled }}
 
