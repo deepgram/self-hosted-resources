@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Fixed
+
+- Fixed API and Engine bypassing the License Proxy when `billing.enabled` and `licenseProxy.enabled` were both `true`. Previously the `billing` condition took precedence, so API/Engine connected directly to the Billing container and the deployed License Proxy never received traffic even though it was already configured to chain to Billing. API and Engine now route through the License Proxy whenever it is enabled, regardless of `billing.enabled`.
+
 ## [0.46.0] - 2026-09-15
 
 ### Changed
