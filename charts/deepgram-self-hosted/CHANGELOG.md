@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.47.0] - 2026-10-01
+
+### Added
+
+- Added `fluxTts.watermarkerUuid`, rendered as `watermarker_uuid` under `[flux_tts]` in the Engine configuration. Flux TTS audio is now watermarked, and the watermarker ships as its own model file alongside the Flux TTS model. Engine will not start with Flux TTS enabled if the watermarker is missing, so the chart now fails at render time when `fluxTts.enabled` is `true` and `fluxTts.watermarkerUuid` is unset. Existing Flux TTS releases must set this value when upgrading, including upgrades that use `--reuse-values`. Request the watermarker model file from your Deepgram Account Representative. Requires `release-261001` or later.
+
+### Changed
+
+- Updated default container tags to the October 2026 release (`release-261001`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-october-2026-release-261001) for additional details.
+- Pinned the watermarker model UUID `2c4e7068-5d1d-4425-a207-b2f221fabe79` in `samples/08-flux-tts-setup.values.yaml` and the `engine.flux-tts.toml` config variants, and raised the Flux TTS minimum release noted there to `release-261001`.
+
 ### Fixed
 
 - Fixed API and Engine bypassing the License Proxy when `billing.enabled` and `licenseProxy.enabled` were both `true`. Previously the `billing` condition took precedence, so API/Engine connected directly to the Billing container and the deployed License Proxy never received traffic even though it was already configured to chain to Billing. API and Engine now route through the License Proxy whenever it is enabled, regardless of `billing.enabled`.
@@ -568,7 +579,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.47.0...HEAD
+[0.47.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...deepgram-self-hosted-0.47.0
 [0.46.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.45.0...deepgram-self-hosted-0.46.0
 [0.45.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.44.0...deepgram-self-hosted-0.45.0
 [0.44.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...deepgram-self-hosted-0.44.0

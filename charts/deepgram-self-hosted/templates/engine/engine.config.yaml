@@ -16,6 +16,9 @@ time instead of letting Engine or API pods crash-loop after rollout.
 {{- if not $fluxTtsValues.maxBatchSize }}
 {{- fail "Error: fluxTts.maxBatchSize must be set to a non-zero value when fluxTts is enabled. Contact your Deepgram Account Representative for a recommended value." }}
 {{- end }}
+{{- if not $fluxTtsValues.watermarkerUuid }}
+{{- fail "Error: fluxTts.watermarkerUuid must be set when fluxTts is enabled. Engine will not start Flux TTS without the watermarker model. Confirm the correct UUID with your Deepgram Account Representative." }}
+{{- end }}
 {{- if and .Values.engine.customToml (contains "[flux_tts]" .Values.engine.customToml) }}
 {{- fail "Error: engine.customToml contains its own [flux_tts] section. The chart renders [flux_tts] from the fluxTts values when fluxTts is enabled; remove the section from engine.customToml." }}
 {{- end }}
@@ -97,6 +100,7 @@ Invoke with (dict "Values" $.Values "type" $type).
     [flux_tts]
       enabled = true
       uuid = "{{ $fluxTts.uuid }}"
+      watermarker_uuid = "{{ $fluxTts.watermarkerUuid }}"
       max_batch_size = {{ $fluxTts.maxBatchSize }}
     {{- end }}
 
