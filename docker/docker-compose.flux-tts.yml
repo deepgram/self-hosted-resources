@@ -67,6 +67,8 @@ services:
     # The path on the right of the colon ':' is an in-container path.
     volumes:
       # In-container models path below must match the one specified in the Engine configuration file. The default location is "/models"
+      # This directory must contain both the Flux TTS model and the watermarker model (`watermarker.<uuid>.dgv2`).
+      # Engine will not start Flux TTS without the watermarker. Requires `release-261001` or later.
       - "/path/to/models:/models:ro,Z"
       # In-container config path below must match the path specified in the `command` header below.
       - "./engine.flux-tts.toml:/engine.toml:ro,Z"
