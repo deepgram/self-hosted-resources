@@ -59,7 +59,7 @@ This dashboard covers both Aura-2 and Flux TTS. They are served on separate endp
 | Aura / Aura-2 | `/v1/speak` | `aura`, `aura-2` |
 | Flux TTS | `/v2/speak` | `flux` |
 
-Flux TTS is streaming-first and requires `release-260812` or later. It also requires a dedicated Engine and cannot share one with Aura models, so each runs as its own scrape target. The panels do not filter on the `tier` label, so they apply to whichever model family the selected Engine serves — choose it with the **Scrape Job** dropdown.
+Flux TTS is streaming-first and requires `release-261001` or later. It also requires a dedicated Engine and cannot share one with Aura models, so each runs as its own scrape target. The panels do not filter on the `tier` label, so they apply to whichever model family the selected Engine serves — choose it with the **Scrape Job** dropdown.
 
 Not to be confused with `engine.flux` in the Helm chart, which configures Flux turn-based streaming *speech-to-text*. Its `engine_flux_*` metrics are unrelated to TTS and are not covered by this dashboard.
 

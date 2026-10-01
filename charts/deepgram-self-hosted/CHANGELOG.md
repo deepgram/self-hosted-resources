@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.47.0] - 2026-10-01
+
+### Upgrade Required
+
+- **Existing Flux TTS deployments must set `fluxTts.watermarkerUuid` before upgrading.** With `fluxTts.enabled: true`, the chart now fails at render time until this value is set, and that includes `helm upgrade --reuse-values`. Deployments that do not enable Flux TTS are unaffected.
+  - The render-time check confirms only that the value is set, not that the watermarker model file is present. Engine will not start Flux TTS without the file, so make sure `watermarker.<uuid>.dgv2` is in your models volume alongside the Flux TTS model before upgrading. If you do not have it, request it from your Deepgram Account Representative. Setting the UUID without the file renders cleanly but leaves the Engine pod crash-looping.
+
+### Added
+
+- Added `fluxTts.watermarkerUuid`, rendered as `watermarker_uuid` under `[flux_tts]` in the Engine configuration. Flux TTS audio is now watermarked, and the watermarker ships as its own model file alongside the Flux TTS model. Required when `fluxTts.enabled` is `true`; see Upgrade Required above. Requires `release-261001` or later.
+
+### Changed
+
+- Updated default container tags to the October 2026 release (`release-261001`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-october-2026-release-261001) for additional details.
+- Pinned the watermarker model UUID `2c4e7068-5d1d-4425-a207-b2f221fabe79` in `samples/08-flux-tts-setup.values.yaml` and the `engine.flux-tts.toml` config variants, and raised the Flux TTS minimum release noted there to `release-261001`.
+
 ### Fixed
 
 - Fixed API and Engine bypassing the License Proxy when `billing.enabled` and `licenseProxy.enabled` were both `true`. Previously the `billing` condition took precedence, so API/Engine connected directly to the Billing container and the deployed License Proxy never received traffic even though it was already configured to chain to Billing. API and Engine now route through the License Proxy whenever it is enabled, regardless of `billing.enabled`.
@@ -568,7 +584,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.47.0...HEAD
+[0.47.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...deepgram-self-hosted-0.47.0
 [0.46.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.45.0...deepgram-self-hosted-0.46.0
 [0.45.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.44.0...deepgram-self-hosted-0.45.0
 [0.44.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.43.0...deepgram-self-hosted-0.44.0

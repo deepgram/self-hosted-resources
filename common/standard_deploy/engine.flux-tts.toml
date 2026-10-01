@@ -79,6 +79,10 @@ enabled = true
 ### UUID of the Flux TTS model package. Required when `enabled = true`.
 ### Obtain this value from your Deepgram Account Representative.
 uuid = "f94b1bd5-5f6d-4e41-bbda-b326273386c0"
+### UUID of the watermarker model, delivered as its own model file alongside the
+### Flux TTS model. Required when `enabled = true`; Engine will not start Flux TTS
+### without it. Requires `release-261001` or later.
+watermarker_uuid = "2c4e7068-5d1d-4425-a207-b2f221fabe79"
 ### The widest batch the Flux TTS workers will assemble.
 ### Placeholder; required for production. Set explicitly based on GPU type.
 ###

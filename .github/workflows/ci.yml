@@ -86,6 +86,7 @@ jobs:
           render fails "fips on a standard billing tag" "is a standard image"        $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING
           render fails "fips in api.customToml"  "api.customToml contains its own [fips]" $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS --set-string 'api.customToml=[fips]'
           render fails "flux tts without batch"  "fluxTts.maxBatchSize must be set"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
+          render fails "flux tts without watermarker" "fluxTts.watermarkerUuid must be set" $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true
           render fails "flux tts with aura-2"    "fluxTts and aura2 cannot both be enabled" $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
 
           exit $failed
