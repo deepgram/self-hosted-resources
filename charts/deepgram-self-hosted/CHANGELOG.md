@@ -8,9 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [0.47.0] - 2026-10-01
 
+### Upgrade Required
+
+- **Existing Flux TTS deployments must set `fluxTts.watermarkerUuid` before upgrading.** With `fluxTts.enabled: true`, the chart now fails at render time until this value is set, and that includes `helm upgrade --reuse-values`. Deployments that do not enable Flux TTS are unaffected.
+  - The render-time check confirms only that the value is set, not that the watermarker model file is present. Engine will not start Flux TTS without the file, so make sure `watermarker.<uuid>.dgv2` is in your models volume alongside the Flux TTS model before upgrading. If you do not have it, request it from your Deepgram Account Representative. Setting the UUID without the file renders cleanly but leaves the Engine pod crash-looping.
+
 ### Added
 
-- Added `fluxTts.watermarkerUuid`, rendered as `watermarker_uuid` under `[flux_tts]` in the Engine configuration. Flux TTS audio is now watermarked, and the watermarker ships as its own model file alongside the Flux TTS model. Engine will not start with Flux TTS enabled if the watermarker is missing, so the chart now fails at render time when `fluxTts.enabled` is `true` and `fluxTts.watermarkerUuid` is unset. Existing Flux TTS releases must set this value when upgrading, including upgrades that use `--reuse-values`. Request the watermarker model file from your Deepgram Account Representative. Requires `release-261001` or later.
+- Added `fluxTts.watermarkerUuid`, rendered as `watermarker_uuid` under `[flux_tts]` in the Engine configuration. Flux TTS audio is now watermarked, and the watermarker ships as its own model file alongside the Flux TTS model. Required when `fluxTts.enabled` is `true`; see Upgrade Required above. Requires `release-261001` or later.
 
 ### Changed
 
