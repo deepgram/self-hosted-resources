@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "deepgram-aiworks.fullname" . }}-config
+  labels:
+    {{- include "deepgram-aiworks.labels" . | nindent 4 }}
+data:
+  config.toml: |
+    # NOTE: [self_hosted].api_key uses ${VW_API_KEY} env-var
+    # substitution — voiceworks's config loader resolves it from the
+    # pod env at startup. See backend/src/config.rs for the
+    # resolution logic (commit 9302010).
+
+    [server]
+    host   = "{{ .Values.server.host }}"
+    port   = {{ .Values.server.port }}
+    prefix = "{{ .Values.server.prefix }}"
+    ws_idle_timeout = "{{ .Values.server.wsIdleTimeout }}"
+    {{- if .Values.server.tls.enabled }}
+    cert = "/etc/voiceworks/tls/tls.crt"
+    key  = "/etc/voiceworks/tls/tls.key"
+    {{- if or .Values.server.tls.clientCaBundle .Values.server.tls.clientCaBundleExistingSecret }}
+    client_ca_bundle = "/etc/voiceworks/tls/ca.crt"
+    {{- end }}
+    {{- end }}
+
+    [storage]
+    mode = "{{ .Values.storage.mode }}"
+    {{- if eq .Values.storage.mode "files" }}
+    [storage.files]
+    flows_dir = "{{ .Values.storage.files.flowsDir }}"
+    {{- end }}
+
+    [deepgram]
+    streaming_listen_url = "{{ .Values.deepgram.streamingListenUrl }}"
+    batch_listen_url     = "{{ .Values.deepgram.batchListenUrl }}"
+
+    {{- if .Values.selfHosted.enabled }}
+    [self_hosted]
+    enabled = true
+    api_key = "${VW_API_KEY}"
+    bootstrap_subject = "{{ required "selfHosted.bootstrapSubject is required when selfHosted.enabled" .Values.selfHosted.bootstrapSubject }}"
+    {{- if .Values.license.proxyStatusUrl }}
+    license_proxy_status_url = "{{ .Values.license.proxyStatusUrl }}"
+    {{- end }}
+    {{- end }}
+
+    [license]
+    server_url = [
+    {{- range $i, $url := .Values.license.serverUrl }}
+      {{- if $i }},{{ end }}
+      "{{ $url }}"
+    {{- end }}
+    ]

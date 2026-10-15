@@ -1,0 +1,16 @@
+{{- if and (eq .Values.storage.mode "files") .Values.storage.files.persistence.enabled (not .Values.storage.files.persistence.existingClaim) }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "deepgram-aiworks.fullname" . }}-flows
+  labels:
+    {{- include "deepgram-aiworks.labels" . | nindent 4 }}
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: {{ .Values.storage.files.persistence.size }}
+  {{- if .Values.storage.files.persistence.storageClassName }}
+  storageClassName: {{ .Values.storage.files.persistence.storageClassName | quote }}
+  {{- end }}
+{{- end }}

@@ -1,0 +1,40 @@
+name: aiworks-chart-ci
+
+on:
+  pull_request:
+    paths:
+      - "charts/deepgram-aiworks/**"
+      - ".github/workflows/aiworks-chart-ci.yml"
+  push:
+    branches: [main]
+    paths:
+      - "charts/deepgram-aiworks/**"
+
+jobs:
+  lint-and-template:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        values:
+          - ci/default-values.yaml
+          - ci/files-mode-values.yaml
+          - ci/ingress-mtls-values.yaml
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install helm
+        uses: azure/setup-helm@v4
+
+      - name: helm lint
+        run: helm lint charts/deepgram-aiworks --values charts/deepgram-aiworks/${{ matrix.values }}
+
+      - name: helm template
+        run: helm template aiworks-test charts/deepgram-aiworks --values charts/deepgram-aiworks/${{ matrix.values }} > /tmp/rendered.yaml
+
+      - name: Install kubeconform
+        run: |
+          set -e
+          curl -sL https://github.com/yannh/kubeconform/releases/latest/download/kubeconform-linux-amd64.tar.gz | tar -xz -C /usr/local/bin
+
+      - name: kubeconform render
+        run: kubeconform -strict -summary -kubernetes-version 1.28.0 -ignore-missing-schemas /tmp/rendered.yaml
