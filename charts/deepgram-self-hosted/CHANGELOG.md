@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.48.0] - 2026-10-20
+
+### Upgrade Required
+
+- **Existing Flux STT deployments need new Flux model files before upgrading.** Engine in `release-261020` runs Flux STT on a new runtime that loads only the `.dgv2` Flux model files (`flux-general-en.<uuid>.dgv2`, `flux-general-multi.<uuid>.dgv2`). Previously delivered `.dg` Flux files do not load, and an Engine with `engine.flux.enabled: true` will not start until the new file is in your models volume. Request it from your Deepgram Account Representative. Deployments that do not enable Flux STT are unaffected. No chart values change.
+
+### Changed
+
+- Updated default container tags to the October 2026 release (`release-261020`). Refer to the [main Deepgram changelog](https://developers.deepgram.com/changelog/self-hosted-changelog#deepgram-self-hosted-october-2026-release-261020) for additional details.
+
 ## [0.47.0] - 2026-10-01
 
 ### Upgrade Required
@@ -584,7 +594,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.47.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.48.0...HEAD
+[0.48.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.47.0...deepgram-self-hosted-0.48.0
 [0.47.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...deepgram-self-hosted-0.47.0
 [0.46.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.45.0...deepgram-self-hosted-0.46.0
 [0.45.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.44.0...deepgram-self-hosted-0.45.0
