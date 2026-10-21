@@ -8,7 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Added
 
-- Added `api.server.requestTimeout` and `api.server.callbackRequestTimeout`, rendered as `request_timeout` and `callback_request_timeout` under `[server]` in the API configuration. `requestTimeout` bounds a pre-recorded request end to end (the API returns 504 when it expires) and each HTTP request from the API to an Engine (not streaming or TTS connections); `callbackRequestTimeout` bounds processing of a callback request, not delivery, and falls back to `requestTimeout`. Both default to empty, which renders nothing and keeps the API default of 3600 seconds, so upgrades are a no-op unless set.
+- Added `api.server.requestTimeout` and `api.server.callbackRequestTimeout`, rendered as `request_timeout` and `callback_request_timeout` under `[server]` in the API configuration. `requestTimeout` bounds a pre-recorded request without a callback end to end (the API returns 504 when it expires) and each attempt of a pre-recorded transcription or text intelligence request from the API to an Engine (not streaming or non-callback TTS requests); `callbackRequestTimeout` bounds processing of a callback request, not delivery (for TTS, until the Engine starts returning audio), and falls back to `requestTimeout`. Pre-recorded transcription and text intelligence requests to an Engine within a callback job are still bounded by `requestTimeout`, so raise `requestTimeout` for long recordings. Both default to empty, which renders nothing and keeps the API default of 3600 seconds, so upgrades are a no-op unless set.
 
 ### Fixed
 
