@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Fixed
+
+- Corrected the documented response when every Engine pod is at `engine.concurrencyLimit.activeRequests`: the API returns `503 Service Unavailable` once its retries are exhausted (or `504` if a pre-recorded request's timeout expires first), not `429 Too Many Requests`. Alerting or retry logic keyed on 429 will not see these rejections. No chart behavior changes.
+
 ## [0.48.0] - 2026-10-20
 
 ### Upgrade Required
