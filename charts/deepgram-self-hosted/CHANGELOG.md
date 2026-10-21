@@ -10,7 +10,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Upgrade Required
 
-- **Existing Flux STT deployments need new Flux model files before upgrading.** Engine in `release-261020` runs Flux STT on a new runtime that loads only the `.dgv2` Flux model files (`flux-general-en.<uuid>.dgv2`, `flux-general-multi.<uuid>.dgv2`). The new runtime does not use previously delivered `.dg` Flux files: with only a `.dg` file present and `engine.flux.enabled: true`, the Engine pod exits at startup with `Can't find Flux model` and crash-loops. Request it from your Deepgram Account Representative. Deployments that do not enable Flux STT are unaffected. No chart values change.
+- **Existing Flux STT deployments need new Flux model files before upgrading.** Engine in `release-261020` runs Flux STT on a new runtime that loads only the `.dgv2` Flux model files (`flux-general-en.<uuid>.dgv2`, `flux-general-multi.<uuid>.dgv2`). The new runtime does not use previously delivered `.dg` Flux files: with only a `.dg` file present and `engine.flux.enabled: true`, the Engine pod exits at startup with `Can't find Flux model` and crash-loops. Request the new `.dgv2` model file from your Deepgram Account Representative. Deployments that do not enable Flux STT are unaffected. No chart values change.
 
 ### Changed
 
