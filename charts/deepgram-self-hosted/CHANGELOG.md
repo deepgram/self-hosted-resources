@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `api.server.requestTimeout` and `api.server.callbackRequestTimeout`, rendered as `request_timeout` and `callback_request_timeout` under `[server]` in the API configuration. `requestTimeout` bounds a pre-recorded request without a callback end to end (the API returns 504 when it expires) and each attempt of a pre-recorded transcription or text intelligence request from the API to an Engine (not streaming or non-callback TTS requests); `callbackRequestTimeout` bounds processing of a callback request, not delivery (for TTS, until the Engine starts returning audio), and falls back to `requestTimeout`. Pre-recorded transcription and text intelligence requests to an Engine within a callback job are still bounded by `requestTimeout`, so raise `requestTimeout` for long recordings. Both default to empty, which renders nothing and keeps the API default of 3600 seconds, so upgrades are a no-op unless set.
+
 ### Fixed
 
 - Corrected the documented response when every Engine pod is at `engine.concurrencyLimit.activeRequests`: the API returns `503 Service Unavailable` once its retries are exhausted (or `504` if a pre-recorded request's timeout expires first), not `429 Too Many Requests`. Alerting or retry logic keyed on 429 will not see these rejections. No chart behavior changes.
