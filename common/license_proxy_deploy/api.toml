@@ -30,6 +30,16 @@ fetch_conn_timeout = "1s"
 ### How long to wait for a response to a fetch URL.
 fetch_timeout = "60s"
 
+### End-to-end limit on a pre-recorded (/v1/listen) request, after which the
+### API returns 504. Also the timeout on each HTTP request the API sends to an
+### Engine (pre-recorded transcription, text intelligence); streaming and TTS
+### connections are not affected. Default "3600s". Raise it for very long
+### pre-recorded audio.
+# request_timeout = "3600s"
+### Limit on processing an asynchronous (callback) request, not including
+### delivery to the callback URL. When unset, it falls back to request_timeout.
+# callback_request_timeout = "3600s"
+
 
 ### By default, the API listens over HTTP. By passing both a certificate
 ### and a key file, the API will instead listen over HTTPS.

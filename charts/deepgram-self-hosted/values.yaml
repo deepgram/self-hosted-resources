@@ -421,6 +421,18 @@ api:
     # downloaded.
     fetchTimeout: "60s"
 
+    # -- (string) requestTimeout is the end-to-end limit on a pre-recorded (`/v1/listen`)
+    # request, after which the API returns 504. It is also the timeout on each HTTP
+    # request the API sends to an Engine (pre-recorded transcription, text
+    # intelligence); streaming and TTS connections are not affected. Leave empty to use
+    # the API default of "3600s". Raise it for very long pre-recorded audio.
+    # The value should be a humantime duration.
+    requestTimeout:
+    # -- (string) callbackRequestTimeout limits processing of an asynchronous (callback)
+    # request, not including delivery to the callback URL. Leave empty to fall back to
+    # `requestTimeout`. The value should be a humantime duration.
+    callbackRequestTimeout:
+
   # -- Specify custom DNS resolution options.
   # @default -- ``
   resolver:

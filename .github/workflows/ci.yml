@@ -57,6 +57,7 @@ jobs:
           render renders "fips enabled"          $SECRET $VOL --set licenseProxy.enabled=true --set global.fips.enabled=true $FIPS_TAGS
           render renders "fips disabled"         $SECRET $VOL --set global.fips.enabled=false
           render renders "fips with billing"     $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING --set billing.image.tag=release-260812-fips
+          render renders "api request timeouts"  $SECRET $VOL --set api.server.requestTimeout=2h --set api.server.callbackRequestTimeout=90m
 
           # Values from a release created by an older chart do not contain keys
           # added since, and `helm upgrade --reuse-values` ignores the new

@@ -41,6 +41,12 @@ data:
       callback_timeout = "{{ .Values.api.server.callbackTimeout }}"
       fetch_conn_timeout = "{{ .Values.api.server.fetchConnTimeout }}"
       fetch_timeout = "{{ .Values.api.server.fetchTimeout }}"
+      {{- with .Values.api.server.requestTimeout }}
+      request_timeout = "{{ . }}"
+      {{- end }}
+      {{- with .Values.api.server.callbackRequestTimeout }}
+      callback_request_timeout = "{{ . }}"
+      {{- end }}
 
     [resolver]
       {{- if .Values.api.resolver.nameservers }}
