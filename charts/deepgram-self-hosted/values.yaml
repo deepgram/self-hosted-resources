@@ -727,8 +727,10 @@ engine:
     # a single Engine container.
     # If additional requests beyond the limit are sent, the API container
     # forming the request will try a different Engine pod. If no Engine pods
-    # are able to accept the request, the API will return a 429 HTTP response
-    # to the client. The `nil` default means no limit will be set.
+    # are able to accept the request, the API will return a 503 HTTP response
+    # to the client once its retries are exhausted (a pre-recorded request whose
+    # request timeout expires first gets a 504). The `nil` default means no limit
+    # will be set.
     activeRequests:
 
   # -- Custom TOML sections can be added to extend engine.toml
