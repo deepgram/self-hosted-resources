@@ -20,6 +20,7 @@ The dashboard provides monitoring of health and performance metrics including:
 
 - Grafana 12.3.0 or higher
 - Prometheus datasource configured
+- Engine metrics scraped every 15 seconds or more often, so `engine_estimated_stream_capacity` stays valid. The Helm chart already does this; for Docker or Podman, set `scrape_interval` on the Engine job, since Prometheus defaults to 1 minute.
 
 ## Usage
 
@@ -153,13 +154,13 @@ Repeat similar steps for:
 100 *
 (
   sum by (namespace) (
-    rate(engine_requests_total{
+    engine_active_requests{
       namespace=~"dg-.*",
       kind="stream"
-    }[1m])
+    }
   )
   /
-  avg by (namespace) (
+  sum by (namespace) (
     engine_estimated_stream_capacity{
       namespace=~"dg-.*"
     }
@@ -168,8 +169,10 @@ Repeat similar steps for:
 ```
 
 **Condition:**
-- WHEN `A` **IS ABOVE** `70`
+- WHEN `A` **IS ABOVE** `100`
 - FOR `10m`
+
+Under load, `engine_estimated_stream_capacity` stays close to the number of active streams and drops below it once the Engine is past its target utilization, so a ratio held above 100% signals saturation.
 
 ### TTS first-byte latency alerts
 
