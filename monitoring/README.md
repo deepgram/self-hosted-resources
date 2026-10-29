@@ -20,7 +20,7 @@ The dashboard provides monitoring of health and performance metrics including:
 
 - Grafana 12.3.0 or higher
 - Prometheus datasource configured
-- Engine metrics scraped every 15 seconds or more often, so `engine_estimated_stream_capacity` stays valid. The Helm chart already does this; for Docker or Podman, set `scrape_interval` on the Engine job, since Prometheus defaults to 1 minute.
+- Engine metrics should be scraped at least every 15 seconds so `engine_estimated_stream_capacity` stays valid. For Docker or Podman, set `scrape_interval` on the Engine job; the Helm chart's bundled Prometheus already does this.
 
 ## Usage
 
