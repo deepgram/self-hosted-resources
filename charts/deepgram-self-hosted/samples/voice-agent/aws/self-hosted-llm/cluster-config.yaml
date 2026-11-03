@@ -11,7 +11,7 @@ kind: ClusterConfig
 metadata:
   name: deepgram-voice-agent-llm-cluster # Change to your desired name
   region: us-west-2 # Change to your desired host region
-  version: "1.35"
+  version: "1.37"
   # The `aws-apn-id` tag identifies this deployment to AWS through the AWS
   # Partner Network for Partner Relationship Management (PRM), so AWS and
   # Deepgram can coordinate a better self-hosted experience. It is a metadata
