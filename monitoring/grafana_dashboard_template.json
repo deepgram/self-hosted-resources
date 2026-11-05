@@ -822,11 +822,11 @@
                 },
                 {
                   "color": "orange",
-                  "value": 70
+                  "value": 90
                 },
                 {
                   "color": "red",
-                  "value": 90
+                  "value": 100
                 }
               ]
             },
@@ -857,7 +857,7 @@
         "pluginVersion": "12.3.0",
         "targets": [
           {
-            "expr": "100 * (\n  sum(rate(engine_requests_total{namespace=~\"$namespace\", kind=\"stream\"}[1m]))\n/\n  avg(engine_estimated_stream_capacity{namespace=~\"$namespace\"})\n)",
+            "expr": "100 * (\n  sum(engine_active_requests{namespace=~\"$namespace\", kind=\"stream\"})\n/\n  sum(engine_estimated_stream_capacity{namespace=~\"$namespace\"})\n)",
             "legendFormat": "Saturation",
             "refId": "A"
           }
@@ -1127,12 +1127,12 @@
         "pluginVersion": "12.3.0",
         "targets": [
           {
-            "expr": "sum(rate(engine_requests_total{namespace=~\"$namespace\", kind=\"stream\"}[1m]))",
-            "legendFormat": "Stream RPS",
+            "expr": "sum(engine_active_requests{namespace=~\"$namespace\", kind=\"stream\"})",
+            "legendFormat": "Active streams",
             "refId": "A"
           },
           {
-            "expr": "avg(engine_estimated_stream_capacity{namespace=~\"$namespace\"})",
+            "expr": "sum(engine_estimated_stream_capacity{namespace=~\"$namespace\"})",
             "legendFormat": "Estimated capacity",
             "refId": "B"
           }
