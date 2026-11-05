@@ -13,10 +13,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Updated sample cluster configuration files to use Kubernetes 1.37 (previously 1.35)
+- Switched the `control-plane-node-group` in all AWS sample cluster configurations to Ubuntu 26.04 (`amiFamily: Ubuntu2604`). GPU, API, and License Proxy node groups remain on Amazon Linux 2023. Creating a cluster from these samples now requires `eksctl` 0.226.0 or later.
 
 ### Fixed
 
-- Switched the `control-plane-node-group` in the `01-basic-setup-aws` and `07-basic-setup-aws-airgapped` sample cluster configurations from `Ubuntu2204` to `AmazonLinux2023`. Canonical does not publish Ubuntu 22.04 EKS node images for Kubernetes 1.33 or later, so that node group had no node image available.
+- The `01-basic-setup-aws` and `07-basic-setup-aws-airgapped` sample cluster configurations can be created again. Their `control-plane-node-group` used `Ubuntu2204`, and Canonical does not publish Ubuntu 22.04 EKS node images for Kubernetes 1.33 or later, so eksctl could not find a node image for it.
 - Corrected the documented response when every Engine pod is at `engine.concurrencyLimit.activeRequests`: the API returns `503 Service Unavailable` once its retries are exhausted (or `504` if a pre-recorded request's timeout expires first), not `429 Too Many Requests`. Alerting or retry logic keyed on 429 will not see these rejections. No chart behavior changes.
 
 ## [0.48.0] - 2026-10-20

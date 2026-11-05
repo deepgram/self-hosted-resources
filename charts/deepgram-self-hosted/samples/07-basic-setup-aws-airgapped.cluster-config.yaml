@@ -38,7 +38,7 @@ managedNodeGroups:
     desiredCapacity: 1
     maxSize: 3
     instanceType: t3.large
-    amiFamily: AmazonLinux2023
+    amiFamily: Ubuntu2604 # requires eksctl 0.226.0 or later
     iam:
       withAddonPolicies:
         autoScaler: true

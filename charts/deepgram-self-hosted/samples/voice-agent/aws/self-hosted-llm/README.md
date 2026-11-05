@@ -29,7 +29,7 @@ API). Two chart values let the in-cluster NIM URL pass server-side validation:
 
 ## Prerequisites
 
-- `eksctl`, `kubectl`, and `helm` installed and configured.
+- `eksctl` (0.226.0 or later), `kubectl`, and `helm` installed and configured.
 - A Deepgram self-hosted API key and image-pull credentials for `quay.io`.
 - An NGC API key (`$NGC_API_KEY`) with access to the NVIDIA NIM catalog.
 
