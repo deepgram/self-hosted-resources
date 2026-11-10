@@ -101,6 +101,9 @@ Invoke with (dict "Values" $.Values "type" $type).
       enabled = true
       uuid = "{{ $fluxTts.uuid }}"
       watermarker_uuid = "{{ $fluxTts.watermarkerUuid }}"
+      {{- if $fluxTts.taggerUuid }}
+      tagger_uuid = "{{ $fluxTts.taggerUuid }}"
+      {{- end }}
       max_batch_size = {{ $fluxTts.maxBatchSize }}
     {{- end }}
 

@@ -58,7 +58,7 @@ global:
 
 api:
   image:
-    tag: release-261020
+    tag: release-261110
 
   features:
     # Expose Flux TTS on the `/v2/speak` endpoint.
@@ -76,7 +76,7 @@ api:
 
 engine:
   image:
-    tag: release-261020
+    tag: release-261110
 
   # Flux TTS uses a single GPU per Engine pod. See the note at the top of this file.
   #
@@ -145,6 +145,11 @@ fluxTts:
   # and Engine will not start with Flux TTS enabled if the watermarker is missing.
   watermarkerUuid: "2c4e7068-5d1d-4425-a207-b2f221fabe79"
 
+  # UUID of the text normalization tagger model, for Flux TTS models that use one.
+  # Leave unset unless your Deepgram Account Representative provides a tagger
+  # model. Requires `release-261110` or later.
+  # taggerUuid: ""
+
   # There is no safe default: the correct value differs substantially between GPUs,
   # and a value tuned for one will perform badly or exhaust memory on another.
   # Engine will not start until you replace this with a non-zero value.
@@ -158,7 +163,7 @@ licenseProxy:
   keepUpstreamServerAsBackup: true
 
   image:
-    tag: release-261020
+    tag: release-261110
 
 # Monitoring configuration
 # Enable Prometheus stack for metrics collection
