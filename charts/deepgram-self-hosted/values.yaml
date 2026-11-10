@@ -278,7 +278,7 @@ api:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram API image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for API containers
-    tag: release-261020
+    tag: release-261110
 
   # -- Additional labels to add to API resources
   additionalLabels: {}
@@ -546,7 +546,7 @@ engine:
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram Engine image
     pullPolicy: IfNotPresent
     # -- tag defines which Deepgram release to use for Engine containers
-    tag: release-261020
+    tag: release-261110
 
   # -- Additional labels to add to Engine resources
   additionalLabels: {}
@@ -961,7 +961,7 @@ licenseProxy:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-license-proxy
     # -- tag defines which Deepgram release to use for License Proxy containers
-    tag: release-261020
+    tag: release-261110
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # License Proxy image
     pullPolicy: IfNotPresent
@@ -1137,7 +1137,7 @@ billing:
     # Deepgram images into a private container registry.
     path: quay.io/deepgram/self-hosted-billing
     # -- tag defines which Deepgram release to use for Billing containers
-    tag: release-261020
+    tag: release-261110
     # -- pullPolicy configures how the Kubelet attempts to pull the Deepgram
     # Billing image
     pullPolicy: IfNotPresent
@@ -1565,3 +1565,8 @@ fluxTts:
   # Flux TTS model. Flux TTS audio is watermarked, and Engine will not start with
   # Flux TTS enabled if the watermarker is missing. Requires `release-261001` or later.
   watermarkerUuid: ""
+
+  # -- UUID of the text normalization tagger model, for Flux TTS models that use one.
+  # Leave empty unless your Deepgram Account Representative provides a tagger model;
+  # when empty, nothing is rendered. Requires `release-261110` or later.
+  taggerUuid: ""
