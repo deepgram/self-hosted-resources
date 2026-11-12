@@ -82,7 +82,7 @@ uuid = "f94b1bd5-5f6d-4e41-bbda-b326273386c0"
 ### UUID of the watermarker model, delivered as its own model file alongside the
 ### Flux TTS model. Required when `enabled = true`; Engine will not start Flux TTS
 ### without it. Requires `release-261001` or later.
-watermarker_uuid = "2c4e7068-5d1d-4425-a207-b2f221fabe79"
+watermarker_uuid = "cade16db-1fd1-4310-aa2a-54b89e56e253"
 ### UUID of the text normalization tagger model, for Flux TTS models that use one.
 ### Leave commented out unless your Deepgram Account Representative provides a
 ### tagger model. Requires `release-261110` or later.
