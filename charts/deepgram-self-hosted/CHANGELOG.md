@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added `fluxTts.taggerMaxBatchSize`, rendered as `tagger_max_batch_size` under `[flux_tts]` in the Engine configuration when both it and `fluxTts.taggerUuid` are set. It sets the widest batch the text normalization tagger assembles; Engine defaults to 8, and matching `fluxTts.maxBatchSize` is a reasonable starting point. Requires `release-261110` or later. Defaults to empty, which renders nothing.
+
 ## [0.49.0] - 2026-11-10
 
 ### Added

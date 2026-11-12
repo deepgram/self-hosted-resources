@@ -150,6 +150,10 @@ fluxTts:
   # model. Requires `release-261110` or later.
   # taggerUuid: ""
 
+  # The widest batch the tagger will assemble. Engine defaults to 8; setting it to
+  # `maxBatchSize` is a reasonable starting point. Only used with `taggerUuid`.
+  # taggerMaxBatchSize: 8
+
   # There is no safe default: the correct value differs substantially between GPUs,
   # and a value tuned for one will perform badly or exhaust memory on another.
   # Engine will not start until you replace this with a non-zero value.
