@@ -58,6 +58,8 @@ jobs:
           render renders "fips disabled"         $SECRET $VOL --set global.fips.enabled=false
           render renders "fips with billing"     $SECRET $VOL --set global.fips.enabled=true $FIPS_TAGS $BILLING --set billing.image.tag=release-260812-fips
           render renders "api request timeouts"  $SECRET $VOL --set api.server.requestTimeout=2h --set api.server.callbackRequestTimeout=90m
+          render renders "azure files volume"    $SECRET --set engine.modelManager.volumes.azure.files.enabled=true --set 'engine.modelManager.volumes.azure.files.storageClass.mountOptions={nconnect=4}'
+          render renders "azure files existing storage class" $SECRET --set engine.modelManager.volumes.azure.files.enabled=true --set engine.modelManager.volumes.azure.files.storageClass.create=false --set engine.modelManager.volumes.azure.files.storageClass.name=azurefile-csi-premium
 
           # Values from a release created by an older chart do not contain keys
           # added since, and `helm upgrade --reuse-values` ignores the new
@@ -76,6 +78,7 @@ jobs:
           render renders "06 aura-2 polyglot"    -f $CHART/samples/06-aura-2-polyglot-setup.values.yaml $VOL
           render renders "07 airgapped billing"  -f $CHART/samples/07-basic-setup-aws-airgapped.values.yaml
           render renders "08 flux tts"           -f $CHART/samples/08-flux-tts-setup.values.yaml $VOL --set fluxTts.maxBatchSize=4
+          render renders "09 azure"              -f $CHART/samples/09-basic-setup-azure.values.yaml
 
           # The chart rejects these at render time so pods do not crash-loop
           # after rollout. Assert each check still fires with its own message,
@@ -89,6 +92,9 @@ jobs:
           render fails "flux tts without batch"  "fluxTts.maxBatchSize must be set"  $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set api.features.speakV2=true
           render fails "flux tts without watermarker" "fluxTts.watermarkerUuid must be set" $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true
           render fails "flux tts with aura-2"    "fluxTts and aura2 cannot both be enabled" $SECRET $VOL --set fluxTts.enabled=true --set fluxTts.uuid=u --set fluxTts.maxBatchSize=4 --set api.features.speakV2=true --set aura2.enabled=true
+
+          render fails "azure files without a storage class" "azure.files.storageClass.name is required" $SECRET --set engine.modelManager.volumes.azure.files.enabled=true --set engine.modelManager.volumes.azure.files.storageClass.create=false
+          render fails "azure files with another volume" "Only one of customVolumeClaim.enabled" $SECRET $VOL --set engine.modelManager.volumes.azure.files.enabled=true
 
           exit $failed
 

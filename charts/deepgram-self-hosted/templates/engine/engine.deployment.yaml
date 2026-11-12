@@ -279,13 +279,14 @@ spec:
           {{- $customClaimName := $.Values.engine.modelManager.volumes.customVolumeClaim.name }}
           {{- $awsEfsEnabled := $.Values.engine.modelManager.volumes.aws.efs.enabled }}
           {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
+          {{- $azureFilesEnabled := $.Values.engine.modelManager.volumes.azure.files.enabled }}
 
-          {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) }}
+          {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) | add (int $azureFilesEnabled) }}
 
           {{- if eq $enabledCount 0 }}
-          {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled must be set to true." }}
+          {{- fail "Error: At least one of customVolumeClaim.enabled, aws.efs.enabled, gcp.gpd.enabled, or azure.files.enabled must be set to true." }}
           {{- else if gt $enabledCount 1 }}
-          {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, or gcp.gpd.enabled can be set to true." }}
+          {{- fail "Error: Only one of customVolumeClaim.enabled, aws.efs.enabled, gcp.gpd.enabled, or azure.files.enabled can be set to true." }}
           {{- end }}
 
           {{- if $customClaimEnabled }}
@@ -298,5 +299,7 @@ spec:
           claimName: {{ $.Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
           {{- else if $gcpGpdEnabled }}
           claimName: {{ $.Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc
+          {{- else if $azureFilesEnabled }}
+          claimName: {{ $.Values.engine.modelManager.volumes.azure.files.namePrefix }}-azure-files-pvc
           {{- end }}
 {{- end }}

@@ -856,13 +856,52 @@ engine:
           volumeHandle: ""
           fsType: "ext4"
 
+      azure:
+        files:
+          # -- Whether to use an [Azure Files](https://learn.microsoft.com/en-us/azure/aks/azure-files-csi)
+          # NFS share to store Deepgram models for use by Engine containers.
+          # This option requires your cluster to be running in
+          # [Azure AKS](https://azure.microsoft.com/products/kubernetes-service) with the
+          # Azure Files CSI driver enabled (the default).
+          # The chart provisions the share dynamically through a PersistentVolumeClaim.
+          # NFS shares require a Premium (SSD) storage account and a cluster that can reach it
+          # over its virtual network. See the
+          # [Azure Files NFS prerequisites](https://learn.microsoft.com/en-us/azure/aks/create-volume-azure-files#prerequisites-for-using-nfs-shares-with-azure-files).
+          enabled: false
+          # -- Name prefix for the resources associated with the model storage in Azure Files.
+          namePrefix: dg-models
+          # -- The requested size of the Azure Files share.
+          # Premium file shares have a minimum size of 100Gi.
+          storageCapacity: "100Gi"
+          # -- Whether to force a fresh download of all model links provided,
+          # even if models are already present in the Azure Files share.
+          forceDownload: false
+          # -- Configuration for the Azure Files StorageClass
+          storageClass:
+            # -- Specifies whether a StorageClass should be created.
+            # When true, the StorageClass provisions NFS shares with the Azure Files CSI driver
+            # and uses the `Retain` reclaim policy, so model files survive deletion of the claim.
+            create: true
+            # -- The name of the StorageClass to use. If not set and create is true, a name is generated using `<namePrefix>-azure-files-sc`. Required when create is false.
+            # A StorageClass you provide yourself must support the `ReadWriteMany` access mode.
+            name:
+            # -- (string) Azure Files storage account type for the created StorageClass.
+            # NFS file shares support SSD (Premium) account types only.
+            skuName: "Premium_LRS"
+            # -- NFS mount options for the created StorageClass.
+            # These are Microsoft's recommended options for Azure Files NFS shares.
+            mountOptions:
+              - nconnect=4
+              - noresvport
+              - actimeo=30
+
     models:
       # -- Deprecated field to automatically download models. Functionality still supported,
       # but migration to use `engine.modelManager.models.add` is strongly recommended.
       links: []
       # -- Links to your Deepgram models to automatically download
       # into storage backing a persistent volume.
-      # **Automatic model management is currently supported for AWS EFS volumes only.**
+      # **Automatic model management is currently supported for AWS EFS and Azure Files volumes only.**
       # Insert each model link provided to you by your Deepgram
       # Account Representative.
       add: []
@@ -870,7 +909,7 @@ engine:
       # Engine on startup), move a link from the `engine.modelManager.models.add` section
       # to this section. You can also use a model name instead of the full link to designate
       # for removal.
-      # **Automatic model management is currently supported for AWS EFS volumes only.**
+      # **Automatic model management is currently supported for AWS EFS and Azure Files volumes only.**
       remove: []
 
   features:

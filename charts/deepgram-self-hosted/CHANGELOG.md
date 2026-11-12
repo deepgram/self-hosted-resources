@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added Azure Files NFS as a model storage option for AKS, with automatic model management. Set `engine.modelManager.volumes.azure.files.enabled` to `true` and the chart creates an Azure Files StorageClass (`file.csi.azure.com`, NFS, `Retain` reclaim policy) and a `ReadWriteMany` PersistentVolumeClaim, then runs a post-install and post-upgrade Job that downloads the links in `engine.modelManager.models.add` and removes those in `engine.modelManager.models.remove`, the same way the AWS EFS option does. Configure the share with `storageCapacity` (default `100Gi`, the Premium minimum), `forceDownload`, `storageClass.skuName` (default `Premium_LRS`), `storageClass.mountOptions`, and `storageClass.create` or `storageClass.name` to use an existing StorageClass. Disabled by default, so existing deployments are unaffected.
+- Added the `09-basic-setup-azure.values.yaml` sample for AKS.
+
+### Changed
+
+- The `engine.modelManager.volumes` validation now accepts `azure.files.enabled` and still requires exactly one volume option to be enabled.
+
 ## [0.49.0] - 2026-11-10
 
 ### Added

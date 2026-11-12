@@ -94,9 +94,12 @@ The Deepgram Helm chart supports different persistent storage options for storin
 
 - AWS Elastic File System (EFS)
 - Google Cloud Persistent Disk (GPD)
+- Azure Files (NFS)
 - Custom PersistentVolumeClaim (PVC)
 
-To configure a specific storage option, see the `engine.modelManager.volumes` [configuration values](#values). Make sure to provide the necessary configuration values for the selected storage option, such as the EFS file system ID or the GPD disk type and size.
+To configure a specific storage option, see the `engine.modelManager.volumes` [configuration values](#values). Make sure to provide the necessary configuration values for the selected storage option, such as the EFS file system ID, the GPD disk type and size, or the Azure Files share size.
+
+Automatic model management (downloading the links in `engine.modelManager.models.add` and removing those in `engine.modelManager.models.remove`) is available for the AWS EFS and Azure Files options. For the other options, populate the volume yourself.
 
 For detailed instructions on setting up and configuring each storage option, refer to the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes) and the respective cloud provider's documentation.
 
@@ -420,9 +423,9 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.metricsServer | object | `` | metricsServer exposes an endpoint on each Engine container for reporting inference-specific system metrics. See https://developers.deepgram.com/docs/metrics-guide#deepgram-engine for more details. |
 | engine.metricsServer.host | string | `"0.0.0.0"` | host is the IP address to listen on for metrics requests. You will want to listen on all interfaces to interact with other pods in the cluster. |
 | engine.metricsServer.port | int | `9991` | port to listen on for metrics requests |
-| engine.modelManager.models.add | list | `[]` | Links to your Deepgram models to automatically download into storage backing a persistent volume. **Automatic model management is currently supported for AWS EFS volumes only.** Insert each model link provided to you by your Deepgram Account Representative. |
+| engine.modelManager.models.add | list | `[]` | Links to your Deepgram models to automatically download into storage backing a persistent volume. **Automatic model management is currently supported for AWS EFS and Azure Files volumes only.** Insert each model link provided to you by your Deepgram Account Representative. |
 | engine.modelManager.models.links | list | `[]` | Deprecated field to automatically download models. Functionality still supported, but migration to use `engine.modelManager.models.add` is strongly recommended. |
-| engine.modelManager.models.remove | list | `[]` | If desiring to remove a model from storage (to reduce number of models loaded by Engine on startup), move a link from the `engine.modelManager.models.add` section to this section. You can also use a model name instead of the full link to designate for removal. **Automatic model management is currently supported for AWS EFS volumes only.** |
+| engine.modelManager.models.remove | list | `[]` | If desiring to remove a model from storage (to reduce number of models loaded by Engine on startup), move a link from the `engine.modelManager.models.add` section to this section. You can also use a model name instead of the full link to designate for removal. **Automatic model management is currently supported for AWS EFS and Azure Files volumes only.** |
 | engine.modelManager.volumes.aws.efs.enabled | bool | `false` | Whether to use an [AWS Elastic File Sytem](https://aws.amazon.com/efs/) to store Deepgram models for use by Engine containers. This option requires your cluster to be running in [AWS EKS](https://aws.amazon.com/eks/). |
 | engine.modelManager.volumes.aws.efs.fileSystemId | string | `nil` | FileSystemId of existing AWS Elastic File System where Deepgram model files will be persisted. You can find it using the AWS CLI: ``` $ aws efs describe-file-systems --query "FileSystems[*].FileSystemId" ``` |
 | engine.modelManager.volumes.aws.efs.forceDownload | bool | `false` | Whether to force a fresh download of all model links provided, even if models are already present in EFS. |
@@ -430,6 +433,15 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.modelManager.volumes.aws.efs.storageClass | object | `{"create":true,"name":null}` | Configuration for the EFS StorageClass |
 | engine.modelManager.volumes.aws.efs.storageClass.create | bool | `true` | Specifies whether a StorageClass should be created |
 | engine.modelManager.volumes.aws.efs.storageClass.name | string | `nil` | The name of the StorageClass to use. If not set and create is true, a name is generated using `<namePrefix>-aws-efs-sc`. Required when create is false. |
+| engine.modelManager.volumes.azure.files.enabled | bool | `false` | Whether to use an [Azure Files](https://learn.microsoft.com/en-us/azure/aks/azure-files-csi) NFS share to store Deepgram models for use by Engine containers. This option requires your cluster to be running in [Azure AKS](https://azure.microsoft.com/products/kubernetes-service) with the Azure Files CSI driver enabled (the default). The chart provisions the share dynamically through a PersistentVolumeClaim. NFS shares require a Premium (SSD) storage account and a cluster that can reach it over its virtual network. See the [Azure Files NFS prerequisites](https://learn.microsoft.com/en-us/azure/aks/create-volume-azure-files#prerequisites-for-using-nfs-shares-with-azure-files). |
+| engine.modelManager.volumes.azure.files.forceDownload | bool | `false` | Whether to force a fresh download of all model links provided, even if models are already present in the Azure Files share. |
+| engine.modelManager.volumes.azure.files.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in Azure Files. |
+| engine.modelManager.volumes.azure.files.storageCapacity | string | `"100Gi"` | The requested size of the Azure Files share. Premium file shares have a minimum size of 100Gi. |
+| engine.modelManager.volumes.azure.files.storageClass | object | `{"create":true,"mountOptions":["nconnect=4","noresvport","actimeo=30"],"name":null,"skuName":"Premium_LRS"}` | Configuration for the Azure Files StorageClass |
+| engine.modelManager.volumes.azure.files.storageClass.create | bool | `true` | Specifies whether a StorageClass should be created. When true, the StorageClass provisions NFS shares with the Azure Files CSI driver and uses the `Retain` reclaim policy, so model files survive deletion of the claim. |
+| engine.modelManager.volumes.azure.files.storageClass.mountOptions | list | `["nconnect=4","noresvport","actimeo=30"]` | NFS mount options for the created StorageClass. These are Microsoft's recommended options for Azure Files NFS shares. |
+| engine.modelManager.volumes.azure.files.storageClass.name | string | `nil` | The name of the StorageClass to use. If not set and create is true, a name is generated using `<namePrefix>-azure-files-sc`. Required when create is false. A StorageClass you provide yourself must support the `ReadWriteMany` access mode. |
+| engine.modelManager.volumes.azure.files.storageClass.skuName | string | `"Premium_LRS"` | Azure Files storage account type for the created StorageClass. NFS file shares support SSD (Premium) account types only. |
 | engine.modelManager.volumes.customVolumeClaim.enabled | bool | `false` | You may manually create your own PersistentVolume and PersistentVolumeClaim to store and expose model files to the Deepgram Engine. Configure your storage beforehand, and enable here. Note: Make sure the PV and PVC accessMode are set to `readWriteMany` or `readOnlyMany` |
 | engine.modelManager.volumes.customVolumeClaim.modelsDirectory | string | `"/"` | Name of the directory within your pre-configured PersistentVolume where the models are stored |
 | engine.modelManager.volumes.customVolumeClaim.name | string | `nil` | Name of your pre-configured PersistentVolumeClaim |

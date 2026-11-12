@@ -31,7 +31,7 @@ rules:
     verbs: ["get"]
   - apiGroups: [""]
     resources: ["persistentvolumeclaims"]
-    resourceNames: ["{{ .Values.engine.modelManager.volumes.customVolumeClaim.name }}", "{{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc", "{{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc" ]
+    resourceNames: ["{{ .Values.engine.modelManager.volumes.customVolumeClaim.name }}", "{{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc", "{{ .Values.engine.modelManager.volumes.gcp.gpd.namePrefix }}-gcp-gpd-pvc", "{{ .Values.engine.modelManager.volumes.azure.files.namePrefix }}-azure-files-pvc" ]
     verbs: ["get", "list", "watch"]
   - apiGroups: ["nvidia.com"]
     resources: ["*"]
