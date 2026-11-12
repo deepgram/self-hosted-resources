@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+## [0.49.1] - 2026-11-12
+
 ### Added
 
 - Added `fluxTts.taggerMaxBatchSize`, rendered as `tagger_max_batch_size` under `[flux_tts]` in the Engine configuration when both it and `fluxTts.taggerUuid` are set. It sets the widest batch the text normalization tagger assembles; Engine defaults to 8, and matching `fluxTts.maxBatchSize` is a reasonable starting point. Requires `release-261110` or later. Defaults to empty, which renders nothing.
@@ -617,7 +619,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - Initial implementation of the Helm chart.
 
-[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.49.0...HEAD
+[unreleased]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.49.1...HEAD
+[0.49.1]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.49.0...deepgram-self-hosted-0.49.1
 [0.49.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.48.0...deepgram-self-hosted-0.49.0
 [0.48.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.47.0...deepgram-self-hosted-0.48.0
 [0.47.0]: https://github.com/deepgram/self-hosted-resources/compare/deepgram-self-hosted-0.46.0...deepgram-self-hosted-0.47.0
