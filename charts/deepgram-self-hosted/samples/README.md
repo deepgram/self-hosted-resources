@@ -11,6 +11,7 @@ This directory contains examples of how to use the Deepgram Helm chart in variou
 - **05-voice-agent-aws.values.yaml** - AWS EKS Voice Agent deployment configuration
 - **06-aura-2-polyglot-setup.values.yaml** - Aura-2 model deployment with English and Polyglot language support (Dutch, German, French, Italian, Japanese)
 - **07-basic-setup-aws-airgapped.values.yaml** - AWS EKS airgapped deployment ([see airgapped.md](./airgapped.md) for full guide)
+- **09-basic-setup-azure.values.yaml** - Basic Azure AKS deployment configuration
 - **[voice-agent/aws/self-hosted-llm/](./voice-agent/aws/self-hosted-llm/)** - AWS EKS Voice Agent routed to a self-hosted LLM (NVIDIA NIM serving Nemotron) running in-cluster ([see its README](./voice-agent/aws/self-hosted-llm/README.md) for the full guide)
 
 ## AWS EKS Samples
@@ -31,6 +32,11 @@ All of the above are AWS-only and have no effect on GCP, on-premises, Docker, or
 
 ## GCP GKE Samples
 See the [Deepgram GCP GKE guide](https://developers.deepgram.com/docs/gcp-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in GCP.
+
+## Azure AKS Samples
+See the [Deepgram Azure AKS guide](https://developers.deepgram.com/docs/azure-k8s) for detailed instructions on how to deploy Deepgram services in a managed Kubernetes cluster in Azure.
+
+The Azure sample stores models on an Azure Files NFS share that the chart provisions. The chart also runs a post-install and post-upgrade Job that downloads the links in `engine.modelManager.models.add` to the share, as it does for AWS EFS. Create the Engine GPU node pool with `--gpu-driver none` so the NVIDIA GPU Operator, which the chart installs by default, can install the driver Deepgram requires.
 
 ## Aura-2 Deployment
 For deploying Aura-2 models, use the `04-aura-2-setup.values.yaml` sample configuration for English and Spanish, or `06-aura-2-polyglot-setup.values.yaml` for English and Polyglot languages (Dutch, German, French, Italian, Japanese). These configurations include:

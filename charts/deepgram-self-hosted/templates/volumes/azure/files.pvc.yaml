@@ -1,0 +1,15 @@
+{{- if .Values.engine.modelManager.volumes.azure.files.enabled }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ .Values.engine.modelManager.volumes.azure.files.namePrefix }}-azure-files-pvc
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+spec:
+  accessModes:
+    - ReadWriteMany
+  storageClassName: {{ default (printf "%s-azure-files-sc" .Values.engine.modelManager.volumes.azure.files.namePrefix) .Values.engine.modelManager.volumes.azure.files.storageClass.name }}
+  resources:
+    requests:
+      storage: {{ .Values.engine.modelManager.volumes.azure.files.storageCapacity }}
+{{- end }}

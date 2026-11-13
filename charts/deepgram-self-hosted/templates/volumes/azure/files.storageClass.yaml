@@ -1,0 +1,24 @@
+{{- if .Values.engine.modelManager.volumes.azure.files.enabled }}
+{{- if and (not .Values.engine.modelManager.volumes.azure.files.storageClass.create) (not .Values.engine.modelManager.volumes.azure.files.storageClass.name) }}
+{{- fail "engine.modelManager.volumes.azure.files.storageClass.name is required when storageClass.create is false" }}
+{{- end }}
+{{- end }}
+{{- if and .Values.engine.modelManager.volumes.azure.files.enabled .Values.engine.modelManager.volumes.azure.files.storageClass.create }}
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ default (printf "%s-azure-files-sc" .Values.engine.modelManager.volumes.azure.files.namePrefix) .Values.engine.modelManager.volumes.azure.files.storageClass.name }}
+  labels:
+{{ include "deepgram-self-hosted.labels" . | indent 4}}
+provisioner: file.csi.azure.com
+# Keep the underlying Azure file share, and the model files on it, if the claim is deleted.
+reclaimPolicy: Retain
+allowVolumeExpansion: true
+parameters:
+  protocol: nfs
+  skuName: {{ .Values.engine.modelManager.volumes.azure.files.storageClass.skuName | quote }}
+{{- with .Values.engine.modelManager.volumes.azure.files.storageClass.mountOptions }}
+mountOptions:
+  {{- toYaml . | nindent 2 }}
+{{- end }}
+{{- end }}
