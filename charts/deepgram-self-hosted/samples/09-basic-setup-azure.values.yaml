@@ -138,3 +138,8 @@ gpu-operator:
   # The GPU Operator then installs the NVIDIA driver (open kernel modules, >=580)
   # and container toolkit that Deepgram requires.
   enabled: true
+  toolkit:
+    # Current AKS node images run containerd 2.x. The chart's default toolkit (v1.15.0) does not
+    # register the `nvidia` runtime with it, so GPU Operator pods fail with
+    # `no runtime for "nvidia" is configured`. Use a newer toolkit.
+    version: v1.17.8-ubi8

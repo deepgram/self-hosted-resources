@@ -16,6 +16,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The `engine.modelManager.volumes` validation now accepts `azure.files.enabled` and still requires exactly one volume option to be enabled.
 
+### Fixed
+
+- Corrected the `engine.halfPrecision.state` documentation: the valid values are `"enabled"`, `"disabled"`, and `"auto"` (it said `"enable"`).
+- The AKS sample (`09-basic-setup-azure.values.yaml`) sets `gpu-operator.toolkit.version` to `v1.17.8-ubi8`. The default `v1.15.0-ubi8` does not register the `nvidia` runtime with the containerd 2.x used by current AKS node images, leaving GPU Operator pods stuck with `no runtime for "nvidia" is configured`. The chart default is unchanged for other platforms.
+
 ## [0.49.0] - 2026-11-10
 
 ### Added

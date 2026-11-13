@@ -954,7 +954,7 @@ engine:
   halfPrecision:
     # -- Engine will automatically enable half precision operations if your GPU supports
     # them. You can explicitly enable or disable this behavior with the state parameter
-    # which supports `"enable"`, `"disabled"`, and `"auto"`.
+    # which supports `"enabled"`, `"disabled"`, and `"auto"`.
     state: "auto"
   
   # -- This determines the number of seconds that the Pod will be retained, for the Deepgram
@@ -1386,6 +1386,9 @@ gpu-operator:
     # present on nodes running older Linux distribution releases, such as Ubuntu 22.04.
     # Therefore, we specify the `ubi8` image, which statically links the GLIBC library
     # and avoids this issue.
+    # Clusters whose nodes run containerd 2.x, such as current AKS node images, need a newer
+    # toolkit (`v1.15.0` does not register the `nvidia` runtime with them); `v1.17.8-ubi8` is
+    # validated on AKS (see the Azure sample).
     version: v1.15.0-ubi8
 
 cluster-autoscaler:
