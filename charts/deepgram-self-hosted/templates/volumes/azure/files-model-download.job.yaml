@@ -10,6 +10,8 @@ metadata:
     "helm.sh/hook": post-install,post-upgrade
     "helm.sh/hook-delete-policy": before-hook-creation
 spec:
+  # Retry failed downloads (for example, a dropped connection partway through a large model file).
+  backoffLimit: 3
   ttlSecondsAfterFinished: {{ .Values.engine.ttlSecondsAfterFinished }}
   template:
     spec:
@@ -34,6 +36,8 @@ spec:
           - /bin/sh
           - -c
           - |
+            # Exit non-zero if any download fails, so the Job is retried (backoffLimit) and then reported as failed.
+            set -eu
             TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
             
             ADD_LINKS=$(cat <<EOF
@@ -51,7 +55,10 @@ spec:
               FILE_NAME=$(basename "$link")
               if [ "{{ .Values.engine.modelManager.volumes.azure.files.forceDownload }}" == "true" ] || [ ! -f "/mnt/models/$FILE_NAME" ]; then
                 printf "[%s] [INFO] Downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
-                wget -O "/mnt/models/$FILE_NAME" "$link"
+                # Download to a .part file and rename on success. "wget -c" resumes an interrupted attempt on retry,
+                # and an incomplete file is never mistaken for a finished model.
+                wget -c -O "/mnt/models/$FILE_NAME.part" "$link"
+                mv "/mnt/models/$FILE_NAME.part" "/mnt/models/$FILE_NAME"
                 printf "[%s] [INFO] Downloaded model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
               else
                 printf "[%s] [INFO] Model file already exists in Azure Files storage: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
