@@ -5,6 +5,10 @@ metadata:
   name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pv
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
+  {{- with .Values.engine.modelManager.volumes.aws.efs.resourceAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   capacity:
     # EFS will grow and shrink as files are added.

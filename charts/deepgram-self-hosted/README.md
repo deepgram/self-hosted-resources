@@ -426,7 +426,9 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | engine.modelManager.volumes.aws.efs.enabled | bool | `false` | Whether to use an [AWS Elastic File Sytem](https://aws.amazon.com/efs/) to store Deepgram models for use by Engine containers. This option requires your cluster to be running in [AWS EKS](https://aws.amazon.com/eks/). |
 | engine.modelManager.volumes.aws.efs.fileSystemId | string | `nil` | FileSystemId of existing AWS Elastic File System where Deepgram model files will be persisted. You can find it using the AWS CLI: ``` $ aws efs describe-file-systems --query "FileSystems[*].FileSystemId" ``` |
 | engine.modelManager.volumes.aws.efs.forceDownload | bool | `false` | Whether to force a fresh download of all model links provided, even if models are already present in EFS. |
+| engine.modelManager.volumes.aws.efs.modelManagement.annotations | object | `nil` | Replacement annotations for the model-management Job. Null preserves the default Helm post-install/post-upgrade hooks; an empty map removes all annotations. |
 | engine.modelManager.volumes.aws.efs.namePrefix | string | `"dg-models"` | Name prefix for the resources associated with the model storage in AWS EFS. |
+| engine.modelManager.volumes.aws.efs.resourceAnnotations | object | `{}` | Annotations for the EFS StorageClass, PersistentVolume and PersistentVolumeClaim. |
 | engine.modelManager.volumes.aws.efs.storageClass | object | `{"create":true,"name":null}` | Configuration for the EFS StorageClass |
 | engine.modelManager.volumes.aws.efs.storageClass.create | bool | `true` | Specifies whether a StorageClass should be created |
 | engine.modelManager.volumes.aws.efs.storageClass.name | string | `nil` | The name of the StorageClass to use. If not set and create is true, a name is generated using `<namePrefix>-aws-efs-sc`. Required when create is false. |
