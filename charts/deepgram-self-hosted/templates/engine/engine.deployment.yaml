@@ -279,7 +279,7 @@ spec:
           {{- $customClaimName := $.Values.engine.modelManager.volumes.customVolumeClaim.name }}
           {{- $awsEfsEnabled := $.Values.engine.modelManager.volumes.aws.efs.enabled }}
           {{- $gcpGpdEnabled := $.Values.engine.modelManager.volumes.gcp.gpd.enabled }}
-          {{- $azureFilesEnabled := $.Values.engine.modelManager.volumes.azure.files.enabled }}
+          {{- $azureFilesEnabled := (($.Values.engine.modelManager.volumes.azure | default dict).files | default dict).enabled }}
 
           {{- $enabledCount := (int $customClaimEnabled) | add (int $awsEfsEnabled) | add (int $gcpGpdEnabled) | add (int $azureFilesEnabled) }}
 

@@ -68,6 +68,7 @@ jobs:
           render renders "newer keys absent"     $SECRET $VOL \
             --set global.fips=null --set fluxTts=null \
             --set api.features.speakV2=null --set api.features.speakV2Streaming=null
+          render renders "azure files key absent" $SECRET $VOL --set engine.modelManager.volumes.azure=null
 
           echo "Sample values files:"
           render renders "01 aws"                -f $CHART/samples/01-basic-setup-aws.values.yaml

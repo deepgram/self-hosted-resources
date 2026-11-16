@@ -1,4 +1,4 @@
-{{- if .Values.engine.modelManager.volumes.azure.files.enabled }}
+{{- if ((.Values.engine.modelManager.volumes.azure | default dict).files | default dict).enabled }}
 {{- if or .Values.engine.modelManager.models.links .Values.engine.modelManager.models.add .Values.engine.modelManager.models.remove }}
 apiVersion: batch/v1
 kind: Job

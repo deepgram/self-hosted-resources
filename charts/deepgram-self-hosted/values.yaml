@@ -880,7 +880,9 @@ engine:
           storageClass:
             # -- Specifies whether a StorageClass should be created.
             # When true, the StorageClass provisions NFS shares with the Azure Files CSI driver
-            # and uses the `Retain` reclaim policy, so model files survive deletion of the claim.
+            # and uses the `Retain` reclaim policy, so the Azure file share is not deleted when its claim is.
+            # `helm uninstall` deletes the claim, and a later install provisions a new, empty share; the old
+            # share keeps existing (and billing) until you delete its PersistentVolume and file share.
             create: true
             # -- The name of the StorageClass to use. If not set and create is true, a name is generated using `<namePrefix>-azure-files-sc`. Required when create is false.
             # A StorageClass you provide yourself must support the `ReadWriteMany` access mode.

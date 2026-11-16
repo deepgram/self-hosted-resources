@@ -1,9 +1,10 @@
-{{- if .Values.engine.modelManager.volumes.azure.files.enabled }}
-{{- if and (not .Values.engine.modelManager.volumes.azure.files.storageClass.create) (not .Values.engine.modelManager.volumes.azure.files.storageClass.name) }}
+{{- $azureFiles := (.Values.engine.modelManager.volumes.azure | default dict).files | default dict }}
+{{- if $azureFiles.enabled }}
+{{- if and (not $azureFiles.storageClass.create) (not $azureFiles.storageClass.name) }}
 {{- fail "engine.modelManager.volumes.azure.files.storageClass.name is required when storageClass.create is false" }}
 {{- end }}
 {{- end }}
-{{- if and .Values.engine.modelManager.volumes.azure.files.enabled .Values.engine.modelManager.volumes.azure.files.storageClass.create }}
+{{- if and $azureFiles.enabled $azureFiles.storageClass.create }}
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
