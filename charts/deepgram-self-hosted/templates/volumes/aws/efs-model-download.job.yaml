@@ -34,6 +34,8 @@ spec:
           - /bin/sh
           - -c
           - |
+            set -e
+
             TIMESTAMP_FORMAT="%Y-%m-%dT%H:%M:%SZ"
             
             ADD_LINKS=$(cat <<EOF
@@ -51,7 +53,12 @@ spec:
               FILE_NAME=$(basename "$link")
               if [ "{{ .Values.engine.modelManager.volumes.aws.efs.forceDownload }}" == "true" ] || [ ! -f "/mnt/efs/$FILE_NAME" ]; then
                 printf "[%s] [INFO] Downloading model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
-                wget -O "/mnt/efs/$FILE_NAME" "$link"
+                TEMP_FILE=$(mktemp "/mnt/efs/.${FILE_NAME}.XXXXXX")
+                trap 'rm -f "$TEMP_FILE"' EXIT
+                wget -O "$TEMP_FILE" "$link"
+                chmod 0644 "$TEMP_FILE"
+                mv -f "$TEMP_FILE" "/mnt/efs/$FILE_NAME"
+                trap - EXIT
                 printf "[%s] [INFO] Downloaded model file: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
               else
                 printf "[%s] [INFO] Model file already exists in EFS storage: %s\n" "$(date -u +$TIMESTAMP_FORMAT)" "$FILE_NAME"
