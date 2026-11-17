@@ -1570,3 +1570,8 @@ fluxTts:
   # Leave empty unless your Deepgram Account Representative provides a tagger model;
   # when empty, nothing is rendered. Requires `release-261110` or later.
   taggerUuid: ""
+
+  # -- The widest batch the text normalization tagger will assemble. Only rendered when
+  # `taggerUuid` is also set; when empty, Engine uses its default of 8. Setting it to
+  # `maxBatchSize` is a reasonable starting point. Requires `release-261110` or later.
+  taggerMaxBatchSize: ""

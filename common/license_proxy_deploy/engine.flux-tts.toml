@@ -84,6 +84,9 @@ watermarker_uuid = "2c4e7068-5d1d-4425-a207-b2f221fabe79"
 ### Leave commented out unless your Deepgram Account Representative provides a
 ### tagger model. Requires `release-261110` or later.
 # tagger_uuid = ""
+### The widest batch the tagger will assemble. Only used with `tagger_uuid`.
+### Defaults to 8; setting it to `max_batch_size` is a reasonable starting point.
+# tagger_max_batch_size = 8
 ### The widest batch the Flux TTS workers will assemble.
 ### Placeholder; required for production. Set explicitly based on GPU type.
 ###

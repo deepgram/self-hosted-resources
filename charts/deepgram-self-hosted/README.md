@@ -1,6 +1,6 @@
 # deepgram-self-hosted
 
-![Version: 0.49.0](https://img.shields.io/badge/Version-0.49.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-261110](https://img.shields.io/badge/AppVersion-release--261110-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
+![Version: 0.49.1](https://img.shields.io/badge/Version-0.49.1-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: release-261110](https://img.shields.io/badge/AppVersion-release--261110-informational?style=flat-square) [![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/deepgram-self-hosted)](https://artifacthub.io/packages/search?repo=deepgram-self-hosted)
 
 A Helm chart for running Deepgram services in a self-hosted environment
 
@@ -477,6 +477,7 @@ If you encounter issues while deploying or using Deepgram, consider the followin
 | fluxTts.cudaVisibleDevices | string | `""` | GPUs the Flux TTS Engine may use, as CUDA device indices (e.g. `"0"`). Flux TTS binds to a single GPU, so on multi-GPU nodes pin each Engine to its own device. Leave empty to expose all GPUs to the Engine. Not needed when `engine.resources.useNvidiaDevicePlugin` handles GPU allocation. |
 | fluxTts.enabled | bool | `false` | Enable Flux TTS features and configuration |
 | fluxTts.maxBatchSize | int | `0` | Maximum number of Flux TTS requests batched together in the Engine process. There is no safe default: the correct value differs substantially between GPUs, and a value tuned for one will perform badly or exhaust memory on another. Engine will not start until you replace this with a non-zero value. Contact your Deepgram Account Representative for a recommended value. |
+| fluxTts.taggerMaxBatchSize | string | `""` | The widest batch the text normalization tagger will assemble. Only rendered when `taggerUuid` is also set; when empty, Engine uses its default of 8. Setting it to `maxBatchSize` is a reasonable starting point. Requires `release-261110` or later. |
 | fluxTts.taggerUuid | string | `""` | UUID of the text normalization tagger model, for Flux TTS models that use one. Leave empty unless your Deepgram Account Representative provides a tagger model; when empty, nothing is rendered. Requires `release-261110` or later. |
 | fluxTts.uuid | string | `""` | UUID of the Flux TTS model to load. Confirm the correct UUID for your release with your Deepgram Account Representative before deploying. |
 | fluxTts.watermarkerUuid | string | `""` | UUID of the watermarker model, delivered as its own model file alongside the Flux TTS model. Flux TTS audio is watermarked, and Engine will not start with Flux TTS enabled if the watermarker is missing. Requires `release-261001` or later. |
