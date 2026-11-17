@@ -10,5 +10,9 @@ metadata:
   name: {{ default (printf "%s-aws-efs-sc" .Values.engine.modelManager.volumes.aws.efs.namePrefix) .Values.engine.modelManager.volumes.aws.efs.storageClass.name }}
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
+  {{- with .Values.engine.modelManager.volumes.aws.efs.storageAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 provisioner: efs.csi.aws.com
 {{- end }}

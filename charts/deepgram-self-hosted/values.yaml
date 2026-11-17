@@ -829,6 +829,10 @@ engine:
           # -- Whether to force a fresh download of all model links provided,
           # even if models are already present in EFS.
           forceDownload: false
+          # -- Annotations for the EFS StorageClass, PersistentVolume and PersistentVolumeClaim.
+          storageAnnotations: {}
+          # -- Annotations for the model download Job, added to its Helm post-install/post-upgrade hook annotations.
+          jobAnnotations: {}
           # -- Configuration for the EFS StorageClass
           storageClass:
             # -- Specifies whether a StorageClass should be created

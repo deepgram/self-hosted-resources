@@ -7,8 +7,8 @@ metadata:
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
   annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation
+    {{- $hookAnnotations := dict "helm.sh/hook" "post-install,post-upgrade" "helm.sh/hook-delete-policy" "before-hook-creation" }}
+    {{- merge (deepCopy (.Values.engine.modelManager.volumes.aws.efs.jobAnnotations | default dict)) $hookAnnotations | toYaml | nindent 4 }}
 spec:
   backoffLimit: 3
   ttlSecondsAfterFinished: {{ .Values.engine.ttlSecondsAfterFinished }}

@@ -1,0 +1,15 @@
+# Apply after your AWS values file in an Argo CD Application.
+# EFS, its CSI driver, the namespace and suitable download nodes must already exist.
+# Storage binds in wave -2, the download Job completes in wave -1,
+# and workloads deploy in the default wave 0.
+# Argo CD ignores the Job's Helm hook annotations when it has an argocd.argoproj.io/hook annotation.
+engine:
+  modelManager:
+    volumes:
+      aws:
+        efs:
+          storageAnnotations:
+            argocd.argoproj.io/sync-wave: "-2"
+          jobAnnotations:
+            argocd.argoproj.io/hook: Sync
+            argocd.argoproj.io/sync-wave: "-1"

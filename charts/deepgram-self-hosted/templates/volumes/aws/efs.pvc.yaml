@@ -5,6 +5,10 @@ metadata:
   name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-pvc
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
+  {{- with .Values.engine.modelManager.volumes.aws.efs.storageAnnotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   accessModes:
     - ReadWriteMany

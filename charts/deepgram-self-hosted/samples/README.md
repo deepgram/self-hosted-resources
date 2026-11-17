@@ -13,6 +13,7 @@ This directory contains examples of how to use the Deepgram Helm chart in variou
 - **07-basic-setup-aws-airgapped.values.yaml** - AWS EKS airgapped deployment ([see airgapped.md](./airgapped.md) for full guide)
 - **08-flux-tts-setup.values.yaml** - Flux TTS deployment configuration
 - **09-basic-setup-azure.values.yaml** - Basic Azure AKS deployment configuration
+- **10-aws-argocd.values.yaml** - Argo CD overlay for AWS EKS with EFS model storage: apply after your AWS values to create storage, download models, then deploy workloads in order.
 - **[voice-agent/aws/self-hosted-llm/](./voice-agent/aws/self-hosted-llm/)** - AWS EKS Voice Agent routed to a self-hosted LLM (NVIDIA NIM serving Nemotron) running in-cluster ([see its README](./voice-agent/aws/self-hosted-llm/README.md) for the full guide)
 
 ## AWS EKS Samples
