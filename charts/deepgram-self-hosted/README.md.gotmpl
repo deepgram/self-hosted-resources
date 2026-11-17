@@ -84,9 +84,12 @@ The Deepgram Helm chart supports different persistent storage options for storin
 
 - AWS Elastic File System (EFS)
 - Google Cloud Persistent Disk (GPD)
+- Azure Files (NFS)
 - Custom PersistentVolumeClaim (PVC)
 
-To configure a specific storage option, see the `engine.modelManager.volumes` [configuration values](#values). Make sure to provide the necessary configuration values for the selected storage option, such as the EFS file system ID or the GPD disk type and size.
+To configure a specific storage option, see the `engine.modelManager.volumes` [configuration values](#values). Make sure to provide the necessary configuration values for the selected storage option, such as the EFS file system ID, the GPD disk type and size, or the Azure Files share size.
+
+Automatic model management (downloading the links in `engine.modelManager.models.add` and removing those in `engine.modelManager.models.remove`) is available for the AWS EFS and Azure Files options. For the other options, populate the volume yourself.
 
 For detailed instructions on setting up and configuring each storage option, refer to the [Deepgram self-hosted guides](https://developers.deepgram.com/docs/kubernetes) and the respective cloud provider's documentation.
 
