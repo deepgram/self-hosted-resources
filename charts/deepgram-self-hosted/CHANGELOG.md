@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## Unreleased
 
+### Added
+
+- Added Azure Files NFS as a model storage option for AKS, with automatic model management. Set `engine.modelManager.volumes.azure.files.enabled` to `true` and the chart creates an Azure Files StorageClass (`file.csi.azure.com`, NFS, `Retain` reclaim policy) and a `ReadWriteMany` PersistentVolumeClaim, then runs a post-install and post-upgrade Job that downloads the links in `engine.modelManager.models.add` and removes those in `engine.modelManager.models.remove`, the same way the AWS EFS option does. Configure the share with `storageCapacity` (default `100Gi`, the Premium minimum), `forceDownload`, `storageClass.skuName` (default `Premium_LRS`), `storageClass.mountOptions`, and `storageClass.create` or `storageClass.name` to use an existing StorageClass. The `Retain` reclaim policy keeps the file share if its claim is deleted, but `helm uninstall` deletes the claim, so a later install provisions a new, empty share and the old one keeps billing until you delete its PersistentVolume and file share. Disabled by default, so existing deployments are unaffected.
+- Added the `09-basic-setup-azure.values.yaml` sample for AKS.
+- The Azure Files model download Job retries failed downloads (`backoffLimit: 3`), resumes interrupted transfers with `wget -c`, and fails the Job when a download fails. Files are written as `<name>.part` and renamed once complete.
+
+### Changed
+
+- The `engine.modelManager.volumes` validation now accepts `azure.files.enabled` and still requires exactly one volume option to be enabled.
+
+### Fixed
+
+- The AWS EFS model download Job now fails when a download fails. Previously it continued past a failed `wget`, reported success, and left a partial file at the model's final path, which later runs skipped unless `forceDownload` was set. The Job now matches the Azure Files Job: files are written as `<name>.part` and renamed once complete, interrupted transfers resume with `wget -c`, and failed downloads are retried (`backoffLimit: 3`).
+- Corrected the `engine.halfPrecision.state` documentation: the valid values are `"enabled"`, `"disabled"`, and `"auto"` (it said `"enable"`).
+- The AKS sample (`09-basic-setup-azure.values.yaml`) sets `gpu-operator.toolkit.version` to `v1.17.8-ubi8`. The default `v1.15.0-ubi8` does not register the `nvidia` runtime with the containerd 2.x used by current AKS node images, leaving GPU Operator pods stuck with `no runtime for "nvidia" is configured`. The chart default is unchanged for other platforms.
+
 ## [0.49.0] - 2026-11-10
 
 ### Added
