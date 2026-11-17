@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ### Fixed
 
+- The AWS EFS model download Job now fails when a download fails. Previously it continued past a failed `wget`, reported success, and left a partial file at the model's final path, which later runs skipped unless `forceDownload` was set. The Job now matches the Azure Files Job: files are written as `<name>.part` and renamed once complete, interrupted transfers resume with `wget -c`, and failed downloads are retried (`backoffLimit: 3`).
 - Corrected the `engine.halfPrecision.state` documentation: the valid values are `"enabled"`, `"disabled"`, and `"auto"` (it said `"enable"`).
 - The AKS sample (`09-basic-setup-azure.values.yaml`) sets `gpu-operator.toolkit.version` to `v1.17.8-ubi8`. The default `v1.15.0-ubi8` does not register the `nvidia` runtime with the containerd 2.x used by current AKS node images, leaving GPU Operator pods stuck with `no runtime for "nvidia" is configured`. The chart default is unchanged for other platforms.
 
