@@ -69,6 +69,7 @@ jobs:
             --set global.fips=null --set fluxTts=null \
             --set api.features.speakV2=null --set api.features.speakV2Streaming=null
           render renders "azure files key absent" $SECRET $VOL --set engine.modelManager.volumes.azure=null
+          render renders "efs annotation keys absent" -f $CHART/samples/01-basic-setup-aws.values.yaml --set engine.modelManager.volumes.aws.efs.storageAnnotations=null --set engine.modelManager.volumes.aws.efs.jobAnnotations=null
 
           echo "Sample values files:"
           render renders "01 aws"                -f $CHART/samples/01-basic-setup-aws.values.yaml
@@ -80,6 +81,7 @@ jobs:
           render renders "07 airgapped billing"  -f $CHART/samples/07-basic-setup-aws-airgapped.values.yaml
           render renders "08 flux tts"           -f $CHART/samples/08-flux-tts-setup.values.yaml $VOL --set fluxTts.maxBatchSize=4
           render renders "09 azure"              -f $CHART/samples/09-basic-setup-azure.values.yaml
+          render renders "10 aws argocd"         -f $CHART/samples/01-basic-setup-aws.values.yaml -f $CHART/samples/10-aws-argocd.values.yaml
 
           # The chart rejects these at render time so pods do not crash-loop
           # after rollout. Assert each check still fires with its own message,

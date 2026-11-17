@@ -1,22 +1,14 @@
 {{- if .Values.engine.modelManager.volumes.aws.efs.enabled }}
 {{- if or .Values.engine.modelManager.models.links .Values.engine.modelManager.models.add .Values.engine.modelManager.models.remove }}
-{{- $modelManagement := .Values.engine.modelManager.volumes.aws.efs.modelManagement | default dict }}
 apiVersion: batch/v1
 kind: Job
 metadata:
   name: {{ .Values.engine.modelManager.volumes.aws.efs.namePrefix }}-aws-efs-models-management
   labels:
 {{ include "deepgram-self-hosted.labels" . | indent 4}}
-  {{- if kindIs "map" $modelManagement.annotations }}
-  {{- with $modelManagement.annotations }}
   annotations:
-    {{- toYaml . | nindent 4 }}
-  {{- end }}
-  {{- else }}
-  annotations:
-    "helm.sh/hook": post-install,post-upgrade
-    "helm.sh/hook-delete-policy": before-hook-creation
-  {{- end }}
+    {{- $hookAnnotations := dict "helm.sh/hook" "post-install,post-upgrade" "helm.sh/hook-delete-policy" "before-hook-creation" }}
+    {{- merge (deepCopy (.Values.engine.modelManager.volumes.aws.efs.jobAnnotations | default dict)) $hookAnnotations | toYaml | nindent 4 }}
 spec:
   backoffLimit: 3
   ttlSecondsAfterFinished: {{ .Values.engine.ttlSecondsAfterFinished }}

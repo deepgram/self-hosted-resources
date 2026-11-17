@@ -830,11 +830,9 @@ engine:
           # even if models are already present in EFS.
           forceDownload: false
           # -- Annotations for the EFS StorageClass, PersistentVolume and PersistentVolumeClaim.
-          resourceAnnotations: {}
-          modelManagement:
-            # -- (object) Replacement annotations for the model-management Job. Null preserves
-            # the default Helm post-install/post-upgrade hooks; an empty map removes all annotations.
-            annotations: null
+          storageAnnotations: {}
+          # -- Annotations for the model download Job, added to its Helm post-install/post-upgrade hook annotations.
+          jobAnnotations: {}
           # -- Configuration for the EFS StorageClass
           storageClass:
             # -- Specifies whether a StorageClass should be created
