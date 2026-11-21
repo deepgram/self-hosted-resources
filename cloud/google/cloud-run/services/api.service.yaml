@@ -1,0 +1,102 @@
+# Deepgram API — Cloud Run service definition (STT / Nova-2 / Nova-3)
+#
+# This API service routes requests to the STT Engine (nova-2/nova-3) only.
+# Each workload type requires its own dedicated API+Engine pair:
+#   services/api-flux.service.yaml — Flux turn-based streaming STT
+#   services/api-tts.service.yaml  — Aura TTS
+#
+# This file is a template. Variables in ${VAR} notation are substituted
+# by deploy.sh using envsubst before being applied with:
+#   gcloud run services replace - --region=${REGION} --project=${PROJECT_ID}
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: deepgram-api
+  annotations:
+    # Allow public internet traffic. Clients send transcription requests here.
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+
+        # The API is CPU-bound; scale from zero when idle to save cost.
+        # Raise minScale if you require zero-latency API responses at all times.
+        autoscaling.knative.dev/minScale: "1"
+
+        # Maximum number of API replicas. Each replica load-balances across all
+        # Engine instances in the driver pool.
+        autoscaling.knative.dev/maxScale: "10"
+
+        # Attach the API to the Deepgram VPC via Direct VPC Egress so that
+        # calls to the Engine stay on the private network.
+        run.googleapis.com/network-interfaces: '[{"network":"${VPC_NETWORK}","subnetwork":"${VPC_SUBNETWORK}"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+    spec:
+      # Service account used to read config from Secret Manager.
+      serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
+
+      # Match the Engine timeout to allow long-running requests to complete.
+      timeoutSeconds: 3600
+
+      containers:
+        - image: "${IMAGE_REGISTRY}/self-hosted-api:${IMAGE_TAG}"
+          # Override the container CMD. The api config is mounted from Secret Manager.
+          args: ["-vvv", "serve", "/config/api.toml"]
+
+          ports:
+            - containerPort: 8080
+
+          env:
+            # Deepgram self-hosted API key, read from Secret Manager at runtime.
+            - name: DEEPGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-api-key
+                  key: latest
+
+            - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+              value: cloud-run
+
+          resources:
+            limits:
+              # The API is lightweight. Adjust based on observed memory usage.
+              cpu: "2"
+              memory: 4Gi
+
+          volumeMounts:
+            # api.toml is mounted from Secret Manager into /config/api.toml.
+            # The config already contains the Engine service URL, substituted
+            # by deploy.sh when the secret was created.
+            - name: api-config
+              mountPath: /config
+              readOnly: true
+
+          startupProbe:
+            httpGet:
+              path: /v1/status
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 12
+            timeoutSeconds: 3
+
+          livenessProbe:
+            httpGet:
+              path: /v1/status
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 3
+            timeoutSeconds: 5
+
+      volumes:
+        # Mount api.toml from Secret Manager.
+        # The secret value is written to /config/api.toml inside the container.
+        - name: api-config
+          secret:
+            secretName: deepgram-api-config
+            items:
+              - key: latest
+                path: api.toml

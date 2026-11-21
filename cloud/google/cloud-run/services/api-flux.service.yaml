@@ -1,0 +1,100 @@
+# Deepgram API — Cloud Run service definition (Flux / dedicated)
+#
+# This API service routes requests exclusively to the Flux Engine.
+# It must NOT be shared with STT (nova) or TTS workloads — each workload
+# type requires its own dedicated API+Engine pair:
+#   services/api.service.yaml     — STT nova-2/nova-3
+#   services/api-tts.service.yaml — Aura TTS
+#
+# This file is a template. Variables in ${VAR} notation are substituted
+# by deploy.sh using envsubst before being applied with:
+#   gcloud run services replace - --region=${REGION} --project=${PROJECT_ID}
+
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: deepgram-api-flux
+  annotations:
+    # Allow public internet traffic. Clients send Flux streaming requests here.
+    run.googleapis.com/ingress: all
+spec:
+  template:
+    metadata:
+      annotations:
+        run.googleapis.com/execution-environment: gen2
+
+        # The API is CPU-bound. Keep at least one warm instance to avoid
+        # connection delays for latency-sensitive Flux voice agent traffic.
+        autoscaling.knative.dev/minScale: "1"
+
+        # Maximum number of API replicas. Scale based on concurrent Flux connection volume.
+        autoscaling.knative.dev/maxScale: "10"
+
+        run.googleapis.com/network-interfaces: '[{"network":"${VPC_NETWORK}","subnetwork":"${VPC_SUBNETWORK}"}]'
+        run.googleapis.com/vpc-access-egress: private-ranges-only
+    spec:
+      # Service account used to read config from Secret Manager.
+      serviceAccountName: ${SERVICE_ACCOUNT_EMAIL}
+
+      # Match the Engine timeout to allow long-running Flux sessions to complete.
+      timeoutSeconds: 3600
+
+      containers:
+        - image: "${IMAGE_REGISTRY}/self-hosted-api:${IMAGE_TAG}"
+          args: ["-v", "serve", "/config/api.toml"]
+
+          ports:
+            - name: h2c
+              containerPort: 8080
+
+          env:
+            # Deepgram self-hosted API key, read from Secret Manager at runtime.
+            - name: DEEPGRAM_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: deepgram-api-key
+                  key: latest
+
+            - name: DEEPGRAM_DEPLOYMENT_ORCHESTRATOR
+              value: cloud-run
+
+          resources:
+            limits:
+              # The API is lightweight. Adjust based on observed memory usage.
+              cpu: "2"
+              memory: 4Gi
+
+          volumeMounts:
+            # api-flux.toml is mounted from Secret Manager into /config/api.toml.
+            # The config already contains the Flux Engine service URL, substituted
+            # by deploy.sh when the secret was created.
+            - name: api-config
+              mountPath: /config
+              readOnly: true
+
+          startupProbe:
+            httpGet:
+              path: /v1/status
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 12
+            timeoutSeconds: 3
+
+          livenessProbe:
+            httpGet:
+              path: /v1/status
+              port: 8080
+            periodSeconds: 30
+            failureThreshold: 3
+            timeoutSeconds: 5
+
+      volumes:
+        # Mount api-flux.toml from Secret Manager.
+        # Create this secret with: gcloud secrets create deepgram-api-flux-config
+        - name: api-config
+          secret:
+            secretName: deepgram-api-flux-config
+            items:
+              - key: latest
+                path: api.toml
